@@ -1,0 +1,4 @@
+/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles/rebuild_cache.dir
+/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles/edit_cache.dir
+/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles/StaticTest.dir
+/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles/MyStaticLib.dir
