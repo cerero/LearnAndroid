@@ -57,41 +57,41 @@ include CMakeFiles/MyStaticLib.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/MyStaticLib.dir/flags.make
 
-CMakeFiles/MyStaticLib.dir/include/method.cpp.o: CMakeFiles/MyStaticLib.dir/flags.make
-CMakeFiles/MyStaticLib.dir/include/method.cpp.o: ../include/method.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/MyStaticLib.dir/include/method.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/MyStaticLib.dir/include/method.cpp.o -c /Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/include/method.cpp
+CMakeFiles/MyStaticLib.dir/include/method.o: CMakeFiles/MyStaticLib.dir/flags.make
+CMakeFiles/MyStaticLib.dir/include/method.o: ../include/method.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/MyStaticLib.dir/include/method.o"
+	/Users/wangyongjie/book/workspace/c++/LearnAndroid/open_lib/android-toolchain/arm/bin/arm-linux-androideabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/MyStaticLib.dir/include/method.o   -c /Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/include/method.c
 
-CMakeFiles/MyStaticLib.dir/include/method.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/MyStaticLib.dir/include/method.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/include/method.cpp > CMakeFiles/MyStaticLib.dir/include/method.cpp.i
+CMakeFiles/MyStaticLib.dir/include/method.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/MyStaticLib.dir/include/method.i"
+	/Users/wangyongjie/book/workspace/c++/LearnAndroid/open_lib/android-toolchain/arm/bin/arm-linux-androideabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/include/method.c > CMakeFiles/MyStaticLib.dir/include/method.i
 
-CMakeFiles/MyStaticLib.dir/include/method.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/MyStaticLib.dir/include/method.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/include/method.cpp -o CMakeFiles/MyStaticLib.dir/include/method.cpp.s
+CMakeFiles/MyStaticLib.dir/include/method.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/MyStaticLib.dir/include/method.s"
+	/Users/wangyongjie/book/workspace/c++/LearnAndroid/open_lib/android-toolchain/arm/bin/arm-linux-androideabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/include/method.c -o CMakeFiles/MyStaticLib.dir/include/method.s
 
-CMakeFiles/MyStaticLib.dir/include/method.cpp.o.requires:
+CMakeFiles/MyStaticLib.dir/include/method.o.requires:
 
-.PHONY : CMakeFiles/MyStaticLib.dir/include/method.cpp.o.requires
+.PHONY : CMakeFiles/MyStaticLib.dir/include/method.o.requires
 
-CMakeFiles/MyStaticLib.dir/include/method.cpp.o.provides: CMakeFiles/MyStaticLib.dir/include/method.cpp.o.requires
-	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/include/method.cpp.o.provides.build
-.PHONY : CMakeFiles/MyStaticLib.dir/include/method.cpp.o.provides
+CMakeFiles/MyStaticLib.dir/include/method.o.provides: CMakeFiles/MyStaticLib.dir/include/method.o.requires
+	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/include/method.o.provides.build
+.PHONY : CMakeFiles/MyStaticLib.dir/include/method.o.provides
 
-CMakeFiles/MyStaticLib.dir/include/method.cpp.o.provides.build: CMakeFiles/MyStaticLib.dir/include/method.cpp.o
+CMakeFiles/MyStaticLib.dir/include/method.o.provides.build: CMakeFiles/MyStaticLib.dir/include/method.o
 
 
 # Object files for target MyStaticLib
 MyStaticLib_OBJECTS = \
-"CMakeFiles/MyStaticLib.dir/include/method.cpp.o"
+"CMakeFiles/MyStaticLib.dir/include/method.o"
 
 # External object files for target MyStaticLib
 MyStaticLib_EXTERNAL_OBJECTS =
 
-libMyStaticLib.a: CMakeFiles/MyStaticLib.dir/include/method.cpp.o
+libMyStaticLib.a: CMakeFiles/MyStaticLib.dir/include/method.o
 libMyStaticLib.a: CMakeFiles/MyStaticLib.dir/build.make
 libMyStaticLib.a: CMakeFiles/MyStaticLib.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library libMyStaticLib.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C static library libMyStaticLib.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/MyStaticLib.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/MyStaticLib.dir/link.txt --verbose=$(VERBOSE)
 
@@ -100,7 +100,7 @@ CMakeFiles/MyStaticLib.dir/build: libMyStaticLib.a
 
 .PHONY : CMakeFiles/MyStaticLib.dir/build
 
-CMakeFiles/MyStaticLib.dir/requires: CMakeFiles/MyStaticLib.dir/include/method.cpp.o.requires
+CMakeFiles/MyStaticLib.dir/requires: CMakeFiles/MyStaticLib.dir/include/method.o.requires
 
 .PHONY : CMakeFiles/MyStaticLib.dir/requires
 

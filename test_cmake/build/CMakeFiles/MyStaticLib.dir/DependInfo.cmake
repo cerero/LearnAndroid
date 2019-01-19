@@ -1,15 +1,16 @@
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
+  "C"
   )
 # The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/include/method.cpp" "/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles/MyStaticLib.dir/include/method.cpp.o"
+set(CMAKE_DEPENDS_CHECK_C
+  "/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/include/method.c" "/Users/wangyongjie/book/workspace/c++/LearnAndroid/test_cmake/build/CMakeFiles/MyStaticLib.dir/include/method.o"
   )
-set(CMAKE_CXX_COMPILER_ID "Clang")
+set(CMAKE_C_COMPILER_ID "Clang")
 
 # The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
+set(CMAKE_C_TARGET_INCLUDE_PATH
+  "../include"
   )
 
 # Targets to which this target links.

@@ -524,7 +524,7 @@
 @set config-gpl yes
 @c @set config-nonfree no
 @c @set config-version3 no
-@set config-avdevice yes
+@c @set config-avdevice no
 @set config-avfilter yes
 @set config-swscale yes
 @set config-postproc yes
@@ -563,8 +563,8 @@
 @set config-encoders yes
 @c @set config-hwaccels no
 @set config-parsers yes
-@set config-indevs yes
-@set config-outdevs yes
+@c @set config-indevs no
+@c @set config-outdevs no
 @set config-filters yes
 @set config-demuxers yes
 @set config-muxers yes
@@ -1512,17 +1512,17 @@
 @c @set config-decklink-indev no
 @c @set config-libndi-newtek-indev no
 @c @set config-dshow-indev no
-@set config-fbdev-indev yes
+@c @set config-fbdev-indev no
 @c @set config-gdigrab-indev no
 @c @set config-iec61883-indev no
 @c @set config-jack-indev no
 @c @set config-kmsgrab-indev no
-@set config-lavfi-indev yes
+@c @set config-lavfi-indev no
 @c @set config-openal-indev no
 @c @set config-oss-indev no
 @c @set config-pulse-indev no
 @c @set config-sndio-indev no
-@set config-v4l2-indev yes
+@c @set config-v4l2-indev no
 @c @set config-vfwcap-indev no
 @c @set config-xcbgrab-indev no
 @c @set config-libcdio-indev no
@@ -1531,13 +1531,13 @@
 @c @set config-caca-outdev no
 @c @set config-decklink-outdev no
 @c @set config-libndi-newtek-outdev no
-@set config-fbdev-outdev yes
+@c @set config-fbdev-outdev no
 @c @set config-opengl-outdev no
 @c @set config-oss-outdev no
 @c @set config-pulse-outdev no
 @c @set config-sdl2-outdev no
 @c @set config-sndio-outdev no
-@set config-v4l2-outdev yes
+@c @set config-v4l2-outdev no
 @c @set config-xv-outdev no
 @set config-abench-filter yes
 @set config-acompressor-filter yes

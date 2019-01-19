@@ -1,7 +1,7 @@
 #!/bin/bash
-export STAND_ALONE=../android-toolchain/arm
+export STAND_ALONE=$(pwd)/../android-toolchain/arm
 export SYSROOT=$STAND_ALONE/sysroot
-export CPU=arm
+export CPU=armeabi-v7a
 export PREFIX=$(pwd)/libffmpeg/$CPU
 export ADDI_CFLAGS="-marm"
 
@@ -12,8 +12,7 @@ cd ./ffmpeg-4.1
 ./configure \
 --target-os=linux \
 --prefix=$PREFIX \
---arch=arm \
---disable-doc \
+--arch=$CPU \
 --enable-shared \
 --disable-static \
 --disable-yasm \
@@ -22,6 +21,7 @@ cd ./ffmpeg-4.1
 --disable-ffmpeg \
 --disable-ffplay \
 --disable-ffprobe \
+--disable-avdevice \
 --disable-doc \
 --disable-symver \
 --cross-prefix=$STAND_ALONE/bin/arm-linux-androideabi- \
@@ -30,6 +30,7 @@ cd ./ffmpeg-4.1
 --sysroot=$SYSROOT \
 --extra-cflags="-Os -fpic $ADDI_CFLAGS" \
 --extra-ldflags="$ADDI_LDFLAGS"
+$ADDITIONAL_CONFIGURE_FLAG
 
 make clean
 make

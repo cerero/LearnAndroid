@@ -136,59 +136,20 @@ MyStaticLib/fast:
 	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/build
 .PHONY : MyStaticLib/fast
 
-include/method.o: include/method.cpp.o
-
+# target to build an object file
+include/method.o:
+	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/include/method.o
 .PHONY : include/method.o
 
-# target to build an object file
-include/method.cpp.o:
-	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/include/method.cpp.o
-.PHONY : include/method.cpp.o
-
-include/method.i: include/method.cpp.i
-
+# target to preprocess a source file
+include/method.i:
+	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/include/method.i
 .PHONY : include/method.i
 
-# target to preprocess a source file
-include/method.cpp.i:
-	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/include/method.cpp.i
-.PHONY : include/method.cpp.i
-
-include/method.s: include/method.cpp.s
-
+# target to generate assembly for a file
+include/method.s:
+	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/include/method.s
 .PHONY : include/method.s
-
-# target to generate assembly for a file
-include/method.cpp.s:
-	$(MAKE) -f CMakeFiles/MyStaticLib.dir/build.make CMakeFiles/MyStaticLib.dir/include/method.cpp.s
-.PHONY : include/method.cpp.s
-
-simple.o: simple.cpp.o
-
-.PHONY : simple.o
-
-# target to build an object file
-simple.cpp.o:
-	$(MAKE) -f CMakeFiles/StaticTest.dir/build.make CMakeFiles/StaticTest.dir/simple.cpp.o
-.PHONY : simple.cpp.o
-
-simple.i: simple.cpp.i
-
-.PHONY : simple.i
-
-# target to preprocess a source file
-simple.cpp.i:
-	$(MAKE) -f CMakeFiles/StaticTest.dir/build.make CMakeFiles/StaticTest.dir/simple.cpp.i
-.PHONY : simple.cpp.i
-
-simple.s: simple.cpp.s
-
-.PHONY : simple.s
-
-# target to generate assembly for a file
-simple.cpp.s:
-	$(MAKE) -f CMakeFiles/StaticTest.dir/build.make CMakeFiles/StaticTest.dir/simple.cpp.s
-.PHONY : simple.cpp.s
 
 # Help Target
 help:
@@ -203,9 +164,6 @@ help:
 	@echo "... include/method.o"
 	@echo "... include/method.i"
 	@echo "... include/method.s"
-	@echo "... simple.o"
-	@echo "... simple.i"
-	@echo "... simple.s"
 .PHONY : help
 
 

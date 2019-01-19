@@ -1,42 +1,35 @@
 #CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-#project(HelloWorld)
-
-#ADD_LIBRARY(MyStaticLib STATIC ./include/method.cpp)
-
-#SET(APP_EXE StaticTest)
-
-#ADD_EXECUTABLE(${APP_EXE} simple.cpp)
-
-#TARGET_LINK_LIBRARIES(${APP_EXE} MyStaticLib)
-
-#creat android static library
-
 project(HelloWorld)
 
+#creat android static library
+SET(CMAKE_SYSTEM_NAME Linux)
+# Android 5.0 以上需要在此处设置 PIE
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIE")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fPIE -pie")
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 #please change "YourUserName" to your own user name~
 set(NDK_STANDALONE_TOOLCHAIN /Users/wangyongjie/book/workspace/c++/LearnAndroid/open_lib/android-toolchain/arm)
-set(CMAKE_SYSTEM_NAME Android)
+#set(CMAKE_SYSTEM_NAME Android)
+
 #choose Android version. This is not the version of Cmake.
-set(CMAKE_SYSTEM_VERSION 21)
+#set(CMAKE_SYSTEM_VERSION 21)
 set(CMAKE_C_COMPILER ${NDK_STANDALONE_TOOLCHAIN}/bin/arm-linux-androideabi-gcc)
 set(CMAKE_CXX_COMPILER ${NDK_STANDALONE_TOOLCHAIN}/bin/arm-linux-androideabi-g++)
+
 #choose Android ABI. Mine is armeabi-v7a
 set(CMAKE_ANDROID_ARCH_ABI armeabi)
+
 set(CMAKE_FIND_ROOT_PATH ${NDK_STANDALONE_TOOLCHAIN})
 add_definitions("--sysroot=${NDK_STANDALONE_TOOLCHAIN}/sysroot")
 
 # CMake instructions to make the static lib
-
-ADD_LIBRARY( MyStaticLib STATIC
-             Structure.cpp )
+ADD_LIBRARY(MyStaticLib STATIC ./include/method.c)
 
 # CMake instructions to test using the static lib
-
-SET( APP_EXE StaticTest )
-
-ADD_EXECUTABLE( ${APP_EXE}
-                main.cpp )
-
-TARGET_LINK_LIBRARIES( ${APP_EXE}
-                       MyStaticLib )
+SET(APP_EXE StaticTest)
+file(GLOB_RECURSE demo_source_files "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
+ADD_EXECUTABLE(${APP_EXE} demo_source_files)
+TARGET_LINK_LIBRARIES(${APP_EXE} MyStaticLib)
