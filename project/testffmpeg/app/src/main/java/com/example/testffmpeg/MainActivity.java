@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("avfilter-7");
 
         System.loadLibrary("native-lib");
+        init();
     }
 
     @Override
@@ -30,13 +31,13 @@ public class MainActivity extends AppCompatActivity {
         tv.setText(testPath);
 
         testListDir(testPath);
+        decode("testInput", "testOutput");
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
+    public static native void init();
     public native String stringFromJNI();
 
     public native void testListDir(String path);
+
+    public native void decode(String input, String output);
 }
