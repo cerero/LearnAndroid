@@ -1,12 +1,18 @@
 #!/bin/bash
-export STAND_ALONE=$(pwd)/../android-toolchain/arm
+#export STAND_ALONE=$(pwd)/../android-toolchain/arm
+#export CPU=armeabi-v7a
+#export PREFIX=$(pwd)/libffmpeg/android-21/$CPU
+
+export ANDROID_PLATFORM=android-19
+export STAND_ALONE=$(pwd)/../android-toolchain/${ANDROID_PLATFORM}/arm
 export SYSROOT=$STAND_ALONE/sysroot
-export CPU=armeabi-v7a
-export PREFIX=$(pwd)/libffmpeg/$CPU
+export CPU=armeabi
+export PREFIX=$(pwd)/libffmpeg/${ANDROID_PLATFORM}/$CPU
 export ADDI_CFLAGS="-marm"
 
-rm -rf libffmpeg
-mkdir libffmpeg
+rm -rf libffmpeg/${ANDROID_PLATFORM}
+mkdir libffmpeg/${ANDROID_PLATFORM}
+
 cd ./ffmpeg-4.1
 
 ./configure \
