@@ -4,7 +4,9 @@
 extern "C" {
 #include "ffmpeg_player.h"
 #include "my_log.h"
-int avio_dir_cmd_main(int argc, char *argv[]);
+#include "avio_dir_cmd.h"
+#include "avio_reading.h"
+#include "decode_video.h"
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -41,4 +43,10 @@ Java_com_example_testffmpeg_MainActivity_decode(JNIEnv* env, jobject jobj, jstri
 
     env->ReleaseStringUTFChars(jstr_input, c_input);
     env->ReleaseStringUTFChars(jstr_output, c_output);
+}
+
+int test_demo() {
+//    int avio_dir_cmd_main(int argc, char *argv[]);
+//    int avio_reading_main(int argc, char *argv[]);
+//    int decode_video_main(int argc, char **argv);
 }

@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-include_directories(include)
+include_directories(include demo)
 
 add_library(avutil-56 SHARED IMPORTED)
 set_target_properties(avutil-56
@@ -48,9 +48,12 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              native-lib.cpp
+
              my_log.c
              ffmpeg_player.c
-             avio_dir_cmd.c)
+        demo/avio_dir_cmd.c
+        demo/avio_reading.c
+        demo/decode_video.c)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
