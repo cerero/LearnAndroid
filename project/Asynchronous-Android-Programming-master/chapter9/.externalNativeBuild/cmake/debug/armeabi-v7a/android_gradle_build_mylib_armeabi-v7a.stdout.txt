@@ -1,0 +1,9 @@
+[1/2] Building CXX object CMakeFiles/mylib.dir/thread.cpp.o
+/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/thread.cpp:48:17: warning: field 'env' is uninitialized when used here [-Wuninitialized]
+            ref(env->NewLocalRef(ref_)) { }
+                ^
+/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/thread.cpp:47:17: warning: field 'env' is uninitialized when used here [-Wuninitialized]
+            env(env),
+                ^
+2 warnings generated.
+[2/2] Linking CXX shared library /Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/build/intermediates/cmake/debug/obj/armeabi-v7a/libmylib.so

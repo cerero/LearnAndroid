@@ -1,0 +1,72 @@
+
+{
+	"buildFiles" : 
+	[
+		"/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/CMakeLists.txt"
+	],
+	"cFileExtensions" : [ "c" ],
+	"cleanCommands" : 
+	[
+		"/Users/lisujia/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a --target clean"
+	],
+	"cppFileExtensions" : [ "cpp" ],
+	"libraries" : 
+	{
+		"mylib-Debug-armeabi-v7a" : 
+		{
+			"abi" : "armeabi-v7a",
+			"artifactName" : "mylib",
+			"buildCommand" : "/Users/lisujia/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a --target mylib",
+			"buildType" : "debug",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi16 --gcc-toolchain=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dmylib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/c_functions.c",
+					"workingDirectory" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi16 --gcc-toolchain=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dmylib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++11 -frtti -fexceptions -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/exception.cpp",
+					"workingDirectory" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi16 --gcc-toolchain=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dmylib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++11 -frtti -fexceptions -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/image.cpp",
+					"workingDirectory" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi16 --gcc-toolchain=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dmylib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++11 -frtti -fexceptions -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/mylib.cpp",
+					"workingDirectory" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi16 --gcc-toolchain=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dmylib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++11 -frtti -fexceptions -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/stats.cpp",
+					"workingDirectory" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				},
+				
+				{
+					"flags" : "  --target=armv7-none-linux-androideabi16 --gcc-toolchain=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dmylib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -mfpu=vfpv3-d16 -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++11 -frtti -fexceptions -O0 -fno-limit-debug-info  -fPIC    -c ",
+					"src" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/src/main/jni/thread.cpp",
+					"workingDirectory" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a"
+				}
+			],
+			"output" : "/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/build/intermediates/cmake/debug/obj/armeabi-v7a/libmylib.so",
+			"toolchain" : "15139928442194199587"
+		}
+	},
+	"toolchains" : 
+	{
+		"15139928442194199587" : 
+		{
+			"cCompilerExecutable" : "/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
+			"cppCompilerExecutable" : "/Users/lisujia/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
+		}
+	}
+}
