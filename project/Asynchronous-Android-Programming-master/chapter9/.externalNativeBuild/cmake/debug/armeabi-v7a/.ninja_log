@@ -1,0 +1,10 @@
+# ninja log v5
+1	58	0	CMakeFiles/mylib.dir/c_functions.c.o	188186b82c0eb562
+1	78	0	CMakeFiles/mylib.dir/exception.cpp.o	97800548fe0c5cf5
+1	81	0	CMakeFiles/mylib.dir/image.cpp.o	bbf2461469888004
+1	635	0	CMakeFiles/mylib.dir/mylib.cpp.o	6ae0ba34e2b19d0e
+2	731	0	CMakeFiles/mylib.dir/thread.cpp.o	80e224314c3146dc
+1	894	0	CMakeFiles/mylib.dir/stats.cpp.o	c309411ecfa648a0
+894	941	0	/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/build/intermediates/cmake/debug/obj/armeabi-v7a/libmylib.so	813cff7f3df69d4e
+1	650	0	CMakeFiles/mylib.dir/thread.cpp.o	80e224314c3146dc
+650	687	0	/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/build/intermediates/cmake/debug/obj/armeabi-v7a/libmylib.so	813cff7f3df69d4e

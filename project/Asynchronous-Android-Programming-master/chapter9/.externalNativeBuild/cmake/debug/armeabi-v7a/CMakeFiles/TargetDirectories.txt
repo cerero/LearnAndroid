@@ -1,0 +1,3 @@
+/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+/Users/lisujia/workspace/LearnAndroid/project/Asynchronous-Android-Programming-master/chapter9/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/mylib.dir
