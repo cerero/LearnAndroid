@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="b2838686-dc45-47fc-8e3f-6057676688de" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/.idea/caches/build_file_checksums.ser" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/.idea/caches/gradle_models.ser" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/.idea/runConfigurations.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/bitten.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/bobargb8888.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/bobrgb888.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/buttons.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/click.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/eat.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/gameover.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/headdown.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/headleft.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/headright.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/headup.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/help1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/help2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/help3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/mainmenu.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/music.ogg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/numbers.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/pausemenu.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/ready.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/stain1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/stain2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/stain3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/assets/mrnom/tail.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/FontTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/Audio.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/FileIO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/Game.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/Graphics.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/Input.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/Music.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/Pixmap.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/Screen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/Sound.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AccelerometerHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidAudio.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidFastRenderView.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidFileIO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidGame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidGraphics.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidInput.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidMusic.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidPixmap.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/AndroidSound.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/CompassHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/KeyboardHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/MultiTouchHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/Pool.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/SingleTouchHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/framework/impl/TouchHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/Assets.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/GameScreen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/HelpScreen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/HelpScreen2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/HelpScreen3.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/HighscoreScreen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/LoadingScreen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/MainMenuScreen.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/MrNomGame.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/Settings.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/Snake.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/SnakePart.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/Stain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/mrnom/World.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/ch06-mr-nom.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch04-android-basics/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../ch04-android-basics/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/AndroidBasicsStarter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/AndroidBasicsStarter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/BitmapTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/BitmapTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/SurfaceViewTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../ch04-android-basics/app/src/main/java/com/badlogic/androidgames/ch04androidbasics/SurfaceViewTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch04-android-basics/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../ch04-android-basics/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch04-android-basics/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../ch04-android-basics/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch09-jumper/.idea/caches/gradle_models.ser" beforeDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="581151387">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="1" />
+          <entry key="project.open.time.0" value="1" />
+          <entry key="project.opened" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="java" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="JAVA" value="2" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/mrnom/World.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="309">
+              <caret line="52" column="5" lean-forward="true" selection-start-line="52" selection-start-column="5" selection-end-line="52" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidAudio.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="37" lean-forward="true" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="80" />
+    <option name="y" value="23" />
+    <option name="width" value="1745" />
+    <option name="height" value="1022" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="ch06-mr-nom" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ch06-mr-nom" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ch06-mr-nom" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ch06-mr-nom" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ch06-mr-nom" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ch06-mr-nom" type="462c0819:PsiDirectoryNode" />
+              <item name="app" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="android.sdk.path" value="$USER_HOME$/Library/Android/sdk" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b2838686-dc45-47fc-8e3f-6057676688de" name="Default Changelist" comment="" />
+      <created>1550569828267</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1550569828267</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="80" y="23" width="1745" height="1022" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" visible="true" weight="0.32946634" />
+      <window_info id="Structure" side_tool="true" />
+      <window_info id="Image Layers" />
+      <window_info id="Designer" />
+      <window_info id="Capture Tool" />
+      <window_info id="Favorites" side_tool="true" />
+      <window_info id="Captures" order="0" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
+      <window_info anchor="bottom" id="TODO" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="right" id="Capture Analysis" />
+      <window_info anchor="right" id="Theme Preview" />
+      <window_info anchor="right" id="Palette&#9;" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/mrnom/World.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="309">
+          <caret line="52" column="5" lean-forward="true" selection-start-line="52" selection-start-column="5" selection-end-line="52" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidAudio.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="37" lean-forward="true" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

@@ -4,6 +4,8 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -12,7 +14,7 @@ public class AndroidBasicsStarter extends ListActivity {
             "KeyTest", "AccelerometerTest", "AssetsTest",
             "ExternalStorageTest", "SoundPoolTest", "MediaPlayerTest",
             "FullScreenTest", "RenderViewTest", "ShapeTest", "BitmapTest",
-            "FontTest", "SurfaceViewTest" };
+            "FontTest", "SurfaceViewTest", "mrnom.MrNomGame" };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

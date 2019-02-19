@@ -53,7 +53,7 @@ public class BitmapTest extends AppCompatActivity {
             canvas.drawRGB(0, 0, 0);
             dst.set(50, 50, 350, 350);
             canvas.drawBitmap(bob565, null, dst, null);
-            canvas.drawBitmap(bob4444, 100, 100, null);
+            canvas.drawBitmap(bob4444, 500, 500, null);
             invalidate();
         }
     }
