@@ -33,9 +33,9 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = findViewById(R.id.sample_text);
         StringBuilder strLog = new StringBuilder();
 
-        String mp4_input    =   Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "720.mp4";
-        String video_output =   Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "720.h264";
-        String audio_output =   Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "720.aac";
+        String mp4_input    =   Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "gift_960.mp4";
+        String video_output =   Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "gift_960.yuv";
+        String audio_output =   Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "gift_960.pcm";
 
         strLog.append(mp4_input).append("\n").append(video_output).append("\n").append(audio_output);
         tv.setText(strLog.toString());
