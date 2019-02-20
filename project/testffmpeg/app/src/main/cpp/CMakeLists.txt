@@ -53,7 +53,8 @@ add_library( # Sets the name of the library.
              ffmpeg_player.c
         demo/avio_dir_cmd.c
         demo/avio_reading.c
-        demo/decode_video.c)
+        demo/decode_video.c
+        demo/demuxing_decoding.c)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

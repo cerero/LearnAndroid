@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "my_log.h"
 #include <libavcodec/avcodec.h>
 #include "decode_video.h"
 #define INBUF_SIZE 4096
@@ -110,6 +110,7 @@ int decode_video_main(int argc, char **argv)
 
     /* find the MPEG-1 video decoder */
     codec = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
+
     if (!codec) {
         fprintf(stderr, "Codec not found\n");
         exit(1);

@@ -7,7 +7,11 @@ extern "C" {
 #include "avio_dir_cmd.h"
 #include "avio_reading.h"
 #include "decode_video.h"
+
+int demuxing_and_decode_main (int argc, char **argv);
 }
+
+
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_example_testffmpeg_MainActivity_init(JNIEnv* env, jclass jcls) {
@@ -34,19 +38,18 @@ Java_com_example_testffmpeg_MainActivity_testListDir(JNIEnv* env, jobject jobj, 
 
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_example_testffmpeg_MainActivity_decode(JNIEnv* env, jobject jobj, jstring jstr_input, jstring jstr_output) {
+Java_com_example_testffmpeg_MainActivity_decode(JNIEnv* env, jobject jobj, jstring jstr_input, jstring jstr_video_output, jstring jstr_audio_output) {
     const char *c_input = env->GetStringUTFChars(jstr_input, NULL);
-    const char *c_output = env->GetStringUTFChars(jstr_output, NULL);
+    const char *c_video_output = env->GetStringUTFChars(jstr_video_output, NULL);
+    const char *c_audio_output = env->GetStringUTFChars(jstr_audio_output, NULL);
 
-    LOGD("FFMPEG_PLAYER", "native-lib:decode(%s, %s)", c_input, c_output);
-    int ret = player_decode(c_input, c_output);
+    LOGD("FFMPEG_PLAYER", "native-lib:demuxing_and_decode_main(input: %s\nvideo_output: %s\naudio_output:%s)", c_input, c_video_output, c_audio_output);
+
+    char* argv[] = {"demuxing_and_decode_main", "-refcount", const_cast<char *>(c_input), const_cast<char *>(c_video_output), const_cast<char *>(c_audio_output)};
+    demuxing_and_decode_main(5, argv);
 
     env->ReleaseStringUTFChars(jstr_input, c_input);
-    env->ReleaseStringUTFChars(jstr_output, c_output);
+    env->ReleaseStringUTFChars(jstr_video_output, c_video_output);
+    env->ReleaseStringUTFChars(jstr_audio_output, c_audio_output);
 }
 
-int test_demo() {
-//    int avio_dir_cmd_main(int argc, char *argv[]);
-//    int avio_reading_main(int argc, char *argv[]);
-//    int decode_video_main(int argc, char **argv);
-}
