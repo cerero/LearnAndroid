@@ -37,7 +37,7 @@ static int decode_packet(const AVPacket *pkt)
 {
     int ret = avcodec_send_packet(video_dec_ctx, pkt);
     if (ret < 0) {
-        fprintf(stderr, "Error while sending a packet to the decoder: %s\n", av_err2str(ret));
+        fprintf(stderr, "Error while sending a packet to the com.example.testffmpeg.decoder: %s\n", av_err2str(ret));
         return ret;
     }
 
@@ -46,7 +46,7 @@ static int decode_packet(const AVPacket *pkt)
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
             break;
         } else if (ret < 0) {
-            fprintf(stderr, "Error while receiving a frame from the decoder: %s\n", av_err2str(ret));
+            fprintf(stderr, "Error while receiving a frame from the com.example.testffmpeg.decoder: %s\n", av_err2str(ret));
             return ret;
         }
 
@@ -102,7 +102,7 @@ static int open_codec_context(AVFormatContext *fmt_ctx, enum AVMediaType type)
             return ret;
         }
 
-        /* Init the video decoder */
+        /* Init the video com.example.testffmpeg.decoder */
         av_dict_set(&opts, "flags2", "+export_mvs", 0);
         if ((ret = avcodec_open2(dec_ctx, dec, &opts)) < 0) {
             fprintf(stderr, "Failed to open %s codec\n",

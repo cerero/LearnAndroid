@@ -163,7 +163,7 @@ static int open_codec_context(int *stream_idx,
         stream_index = ret;
         st = fmt_ctx->streams[stream_index];
 
-        /* find decoder for the stream */
+        /* find com.example.testffmpeg.decoder for the stream */
         dec = avcodec_find_decoder(st->codecpar->codec_id);
         if (!dec) {
             fprintf(stderr, "Failed to find %s codec\n",
@@ -171,7 +171,7 @@ static int open_codec_context(int *stream_idx,
             return AVERROR(EINVAL);
         }
 
-        /* Allocate a codec context for the decoder */
+        /* Allocate a codec context for the com.example.testffmpeg.decoder */
         *dec_ctx = avcodec_alloc_context3(dec);
         if (!*dec_ctx) {
             fprintf(stderr, "Failed to allocate the %s codec context\n",
@@ -181,7 +181,7 @@ static int open_codec_context(int *stream_idx,
 
         /* Copy codec parameters from input stream to output codec context */
         if ((ret = avcodec_parameters_to_context(*dec_ctx, st->codecpar)) < 0) {
-            fprintf(stderr, "Failed to copy %s codec parameters to decoder context\n",
+            fprintf(stderr, "Failed to copy %s codec parameters to com.example.testffmpeg.decoder context\n",
                     av_get_media_type_string(type));
             return ret;
         }
@@ -359,7 +359,7 @@ int demuxing_and_decode_main (int argc, char **argv)
 
         if (av_sample_fmt_is_planar(sfmt)) {
             const char *packed = av_get_sample_fmt_name(sfmt);
-            printf("Warning: the sample format the decoder produced is planar "
+            printf("Warning: the sample format the com.example.testffmpeg.decoder produced is planar "
                    "(%s). This example will output the first channel only.\n",
                    packed ? packed : "?");
             sfmt = av_get_packed_sample_fmt(sfmt);

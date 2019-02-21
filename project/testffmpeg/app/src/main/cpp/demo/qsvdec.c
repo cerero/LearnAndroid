@@ -57,7 +57,7 @@ static int get_format(AVCodecContext *avctx, const enum AVPixelFormat *pix_fmts)
             AVQSVFramesContext *frames_hwctx;
             int ret;
 
-            /* create a pool of surfaces to be used by the decoder */
+            /* create a pool of surfaces to be used by the com.example.testffmpeg.decoder */
             avctx->hw_frames_ctx = av_hwframe_ctx_alloc(decode->hw_device_ref);
             if (!avctx->hw_frames_ctx)
                 return AV_PIX_FMT_NONE;
@@ -184,10 +184,10 @@ int main(int argc, char **argv)
         goto finish;
     }
 
-    /* initialize the decoder */
+    /* initialize the com.example.testffmpeg.decoder */
     decoder = avcodec_find_decoder_by_name("h264_qsv");
     if (!decoder) {
-        fprintf(stderr, "The QSV decoder is not present in libavcodec\n");
+        fprintf(stderr, "The QSV com.example.testffmpeg.decoder is not present in libavcodec\n");
         goto finish;
     }
 
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
 
     ret = avcodec_open2(decoder_ctx, NULL, NULL);
     if (ret < 0) {
-        fprintf(stderr, "Error opening the decoder: ");
+        fprintf(stderr, "Error opening the com.example.testffmpeg.decoder: ");
         goto finish;
     }
 
@@ -244,7 +244,7 @@ int main(int argc, char **argv)
         av_packet_unref(&pkt);
     }
 
-    /* flush the decoder */
+    /* flush the com.example.testffmpeg.decoder */
     pkt.data = NULL;
     pkt.size = 0;
     ret = decode_packet(&decode, decoder_ctx, frame, sw_frame, &pkt, output_ctx);

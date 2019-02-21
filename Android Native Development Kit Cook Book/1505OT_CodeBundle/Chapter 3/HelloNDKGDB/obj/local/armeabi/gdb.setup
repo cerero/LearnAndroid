@@ -1,0 +1,4 @@
+set solib-search-path ./obj/local/armeabi
+directory /home/roman10/Desktop/android/android-ndk-r8b/platforms/android-14/arch-arm/usr/include /home/roman10/Desktop/android/android-ndk-r8b/sources/cxx-stl/system/include jni
+file ./obj/local/armeabi/app_process
+target remote :5039

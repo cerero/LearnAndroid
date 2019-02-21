@@ -80,9 +80,9 @@ static int open_input_file(const char *filename)
         return AVERROR(ENOMEM);
     avcodec_parameters_to_context(dec_ctx, fmt_ctx->streams[video_stream_index]->codecpar);
 
-    /* init the video decoder */
+    /* init the video com.example.testffmpeg.decoder */
     if ((ret = avcodec_open2(dec_ctx, dec, NULL)) < 0) {
-        av_log(NULL, AV_LOG_ERROR, "Cannot open video decoder\n");
+        av_log(NULL, AV_LOG_ERROR, "Cannot open video com.example.testffmpeg.decoder\n");
         return ret;
     }
 
@@ -106,7 +106,7 @@ static int init_filters(const char *filters_descr)
         goto end;
     }
 
-    /* buffer video source: the decoded frames from the decoder will be inserted here. */
+    /* buffer video source: the decoded frames from the com.example.testffmpeg.decoder will be inserted here. */
     snprintf(args, sizeof(args),
             "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
             dec_ctx->width, dec_ctx->height, dec_ctx->pix_fmt,
@@ -239,7 +239,7 @@ int main(int argc, char **argv)
         if (packet.stream_index == video_stream_index) {
             ret = avcodec_send_packet(dec_ctx, &packet);
             if (ret < 0) {
-                av_log(NULL, AV_LOG_ERROR, "Error while sending a packet to the decoder\n");
+                av_log(NULL, AV_LOG_ERROR, "Error while sending a packet to the com.example.testffmpeg.decoder\n");
                 break;
             }
 
@@ -248,7 +248,7 @@ int main(int argc, char **argv)
                 if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                     break;
                 } else if (ret < 0) {
-                    av_log(NULL, AV_LOG_ERROR, "Error while receiving a frame from the decoder\n");
+                    av_log(NULL, AV_LOG_ERROR, "Error while receiving a frame from the com.example.testffmpeg.decoder\n");
                     goto end;
                 }
 

@@ -1,0 +1,6 @@
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+LOCAL_MODULE := libbmp
+LOCAL_SRC_FILES := bmpfile.c
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+include $(BUILD_STATIC_LIBRARY)

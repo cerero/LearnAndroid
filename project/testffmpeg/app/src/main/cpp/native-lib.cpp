@@ -37,8 +37,7 @@ Java_com_example_testffmpeg_MainActivity_testListDir(JNIEnv* env, jobject jobj, 
 }
 
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_testffmpeg_MainActivity_decode(JNIEnv* env, jobject jobj, jstring jstr_input, jstring jstr_video_output, jstring jstr_audio_output) {
+void decode(JNIEnv* env, jobject jobj, jstring jstr_input, jstring jstr_video_output, jstring jstr_audio_output) {
     const char *c_input = env->GetStringUTFChars(jstr_input, NULL);
     const char *c_video_output = env->GetStringUTFChars(jstr_video_output, NULL);
     const char *c_audio_output = env->GetStringUTFChars(jstr_audio_output, NULL);
@@ -53,3 +52,25 @@ Java_com_example_testffmpeg_MainActivity_decode(JNIEnv* env, jobject jobj, jstri
     env->ReleaseStringUTFChars(jstr_audio_output, c_audio_output);
 }
 
+//jint add(JNIEnv* env, jobject jobj, jint pa, jint pb) {
+//    return pa + pb;
+//}
+//
+//JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* pVm, void *reserved) {
+//    JNIEnv* env;
+//
+//    if (pVm->GetEnv((void **)&env, JNI_VERSION_1_6)) {
+//        return -1;
+//    }
+//
+//    JNINativeMethod nm[1];
+//    nm[0].name = "add";
+//    nm[0].signature = "(II)I";
+//    nm[0].fnPtr = (void *)add;
+//
+//    jclass cls = env->FindClass("com/example/testffmpeg/GiftTestActivity");
+//    env->RegisterNatives(cls, nm, 1);
+//
+//    init_my_log();
+//    return JNI_VERSION_1_6;
+//}

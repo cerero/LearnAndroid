@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
         av_packet_unref(&packet);
     }
 
-    /* flush the decoder */
+    /* flush the com.example.testffmpeg.decoder */
     packet.data = NULL;
     packet.size = 0;
     ret = decode_write(decoder_ctx, &packet);

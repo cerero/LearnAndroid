@@ -1,0 +1,42 @@
+armv5te:
+read packet time: 0.579321892005ms
+decode time: 169.786249149ms
+scale and color conversion time: 138.458134786ms
+draw on canvas time: 2.6929884275ms
+seek time: -1.0ms
+
+armv6:
+read packet time: 0.188363331938ms
+decode time: 173.749489449ms
+scale and color conversion time: 138.728386658ms
+draw on canvas time: 4.77671885636ms
+seek time: -1.0ms
+
+armv6vfp:
+read packet time: 0.108832147342ms
+decode time: 169.312457454ms
+scale and color conversion time: 137.908781484ms
+draw on canvas time: 2.81484002723ms
+seek time: -1.0ms
+
+armv7:
+read packet time: 0.0962745918794ms
+decode time: 157.311095984ms
+scale and color conversion time: 123.821647379ms
+draw on canvas time: 2.96392103472ms
+seek time: -1.0ms
+
+armv7neon:
+read packet time: 0.142318961909ms
+decode time: 155.831177672ms
+scale and color conversion time: 122.364193329ms
+draw on canvas time: 2.94417971409ms
+seek time: -1.0ms
+
+armv7neon2:
+read packet time: 0.109250732524ms
+decode time: 156.300884956ms
+scale and color conversion time: 121.611980939ms
+draw on canvas time: 2.7161334241ms
+seek time: -1.0ms
+

@@ -170,7 +170,7 @@ static int dec_enc(AVPacket *pkt, AVCodec *enc_codec)
         }
 
         if (!initialized) {
-            /* we need to ref hw_frames_ctx of decoder to initialize encoder's codec.
+            /* we need to ref hw_frames_ctx of com.example.testffmpeg.decoder to initialize encoder's codec.
                Only after we get a decoded frame, can we obtain its hw_frames_ctx */
             encoder_ctx->hw_frames_ctx = av_buffer_ref(decoder_ctx->hw_frames_ctx);
             if (!encoder_ctx->hw_frames_ctx) {
@@ -178,7 +178,7 @@ static int dec_enc(AVPacket *pkt, AVCodec *enc_codec)
                 goto fail;
             }
             /* set AVCodecContext Parameters for encoder, here we keep them stay
-             * the same as decoder.
+             * the same as com.example.testffmpeg.decoder.
              * xxx: now the sample can't handle resolution change case.
              */
             encoder_ctx->time_base = av_inv_q(decoder_ctx->framerate);
@@ -284,7 +284,7 @@ int main(int argc, char **argv)
         av_packet_unref(&dec_pkt);
     }
 
-    /* flush decoder */
+    /* flush com.example.testffmpeg.decoder */
     dec_pkt.data = NULL;
     dec_pkt.size = 0;
     ret = dec_enc(&dec_pkt, enc_codec);

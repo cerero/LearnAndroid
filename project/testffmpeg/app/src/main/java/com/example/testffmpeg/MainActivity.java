@@ -38,9 +38,13 @@ public class MainActivity extends AppCompatActivity {
         String audio_output =   Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "gift_960.pcm";
 
         strLog.append(mp4_input).append("\n").append(video_output).append("\n").append(audio_output);
-        tv.setText(strLog.toString());
+//        tv.setText(strLog.toString());
 
         decode(mp4_input, video_output, audio_output);
+//        int ret = add(10, 20);
+//        strLog.append("\n");
+//        strLog.append(ret);
+//        tv.setText(strLog.toString());
     }
 
     public static native void init();
@@ -49,4 +53,6 @@ public class MainActivity extends AppCompatActivity {
     public native void testListDir(String path);
 
     public native void decode(String input, String decode_video_output, String decode_audio_output);
+
+//    public native int add(int a, int b);
 }

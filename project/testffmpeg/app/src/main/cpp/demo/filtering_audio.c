@@ -75,9 +75,9 @@ static int open_input_file(const char *filename)
         return AVERROR(ENOMEM);
     avcodec_parameters_to_context(dec_ctx, fmt_ctx->streams[audio_stream_index]->codecpar);
 
-    /* init the audio decoder */
+    /* init the audio com.example.testffmpeg.decoder */
     if ((ret = avcodec_open2(dec_ctx, dec, NULL)) < 0) {
-        av_log(NULL, AV_LOG_ERROR, "Cannot open audio decoder\n");
+        av_log(NULL, AV_LOG_ERROR, "Cannot open audio com.example.testffmpeg.decoder\n");
         return ret;
     }
 
@@ -104,7 +104,7 @@ static int init_filters(const char *filters_descr)
         goto end;
     }
 
-    /* buffer audio source: the decoded frames from the decoder will be inserted here. */
+    /* buffer audio source: the decoded frames from the com.example.testffmpeg.decoder will be inserted here. */
     if (!dec_ctx->channel_layout)
         dec_ctx->channel_layout = av_get_default_channel_layout(dec_ctx->channels);
     snprintf(args, sizeof(args),
@@ -240,7 +240,7 @@ int main(int argc, char **argv)
         if (packet.stream_index == audio_stream_index) {
             ret = avcodec_send_packet(dec_ctx, &packet);
             if (ret < 0) {
-                av_log(NULL, AV_LOG_ERROR, "Error while sending a packet to the decoder\n");
+                av_log(NULL, AV_LOG_ERROR, "Error while sending a packet to the com.example.testffmpeg.decoder\n");
                 break;
             }
 
@@ -249,7 +249,7 @@ int main(int argc, char **argv)
                 if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                     break;
                 } else if (ret < 0) {
-                    av_log(NULL, AV_LOG_ERROR, "Error while receiving a frame from the decoder\n");
+                    av_log(NULL, AV_LOG_ERROR, "Error while receiving a frame from the com.example.testffmpeg.decoder\n");
                     goto end;
                 }
 

@@ -72,7 +72,7 @@ static void decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt,
         printf("saving frame %3d\n", dec_ctx->frame_number);
         fflush(stdout);
 
-        /* the picture is allocated by the decoder. no need to
+        /* the picture is allocated by the com.example.testffmpeg.decoder. no need to
            free it */
         snprintf(buf, sizeof(buf), "%s-%d", filename, dec_ctx->frame_number);
         pgm_save(frame->data[0], frame->linesize[0],
@@ -108,7 +108,7 @@ int decode_video_main(int argc, char **argv)
     /* set end of buffer to 0 (this ensures that no overreading happens for damaged MPEG streams) */
     memset(inbuf + INBUF_SIZE, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
-    /* find the MPEG-1 video decoder */
+    /* find the MPEG-1 video com.example.testffmpeg.decoder */
     codec = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
 
     if (!codec) {
@@ -173,7 +173,7 @@ int decode_video_main(int argc, char **argv)
         }
     }
 
-    /* flush the decoder */
+    /* flush the com.example.testffmpeg.decoder */
     decode(c, frame, NULL, outfilename);
 
     fclose(f);

@@ -75,17 +75,17 @@ static int open_input_file(const char *filename)
         AVCodec *dec = avcodec_find_decoder(stream->codecpar->codec_id);
         AVCodecContext *codec_ctx;
         if (!dec) {
-            av_log(NULL, AV_LOG_ERROR, "Failed to find decoder for stream #%u\n", i);
+            av_log(NULL, AV_LOG_ERROR, "Failed to find com.example.testffmpeg.decoder for stream #%u\n", i);
             return AVERROR_DECODER_NOT_FOUND;
         }
         codec_ctx = avcodec_alloc_context3(dec);
         if (!codec_ctx) {
-            av_log(NULL, AV_LOG_ERROR, "Failed to allocate the decoder context for stream #%u\n", i);
+            av_log(NULL, AV_LOG_ERROR, "Failed to allocate the com.example.testffmpeg.decoder context for stream #%u\n", i);
             return AVERROR(ENOMEM);
         }
         ret = avcodec_parameters_to_context(codec_ctx, stream->codecpar);
         if (ret < 0) {
-            av_log(NULL, AV_LOG_ERROR, "Failed to copy decoder parameters to input decoder context "
+            av_log(NULL, AV_LOG_ERROR, "Failed to copy com.example.testffmpeg.decoder parameters to input com.example.testffmpeg.decoder context "
                    "for stream #%u\n", i);
             return ret;
         }
@@ -94,10 +94,10 @@ static int open_input_file(const char *filename)
                 || codec_ctx->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (codec_ctx->codec_type == AVMEDIA_TYPE_VIDEO)
                 codec_ctx->framerate = av_guess_frame_rate(ifmt_ctx, stream, NULL);
-            /* Open decoder */
+            /* Open com.example.testffmpeg.decoder */
             ret = avcodec_open2(codec_ctx, dec, NULL);
             if (ret < 0) {
-                av_log(NULL, AV_LOG_ERROR, "Failed to open decoder for stream #%u\n", i);
+                av_log(NULL, AV_LOG_ERROR, "Failed to open com.example.testffmpeg.decoder for stream #%u\n", i);
                 return ret;
             }
         }

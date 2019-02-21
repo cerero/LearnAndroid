@@ -88,7 +88,7 @@ static int open_input_file(const char *filename,
         return AVERROR_EXIT;
     }
 
-    /* Find a decoder for the audio stream. */
+    /* Find a com.example.testffmpeg.decoder for the audio stream. */
     if (!(input_codec = avcodec_find_decoder((*input_format_context)->streams[0]->codecpar->codec_id))) {
         fprintf(stderr, "Could not find input codec\n");
         avformat_close_input(input_format_context);
@@ -111,7 +111,7 @@ static int open_input_file(const char *filename,
         return error;
     }
 
-    /* Open the decoder for the audio stream to use it later. */
+    /* Open the com.example.testffmpeg.decoder for the audio stream to use it later. */
     if ((error = avcodec_open2(avctx, input_codec, NULL)) < 0) {
         fprintf(stderr, "Could not open input codec (error '%s')\n",
                 av_err2str(error));
@@ -120,7 +120,7 @@ static int open_input_file(const char *filename,
         return error;
     }
 
-    /* Save the decoder context for easier access later. */
+    /* Save the com.example.testffmpeg.decoder context for easier access later. */
     *input_codec_context = avctx;
 
     return 0;
@@ -289,7 +289,7 @@ static int init_resampler(AVCodecContext *input_codec_context,
          * Set the conversion parameters.
          * Default channel layouts based on the number of channels
          * are assumed for simplicity (they are sometimes not detected
-         * properly by the demuxer and/or decoder).
+         * properly by the demuxer and/or com.example.testffmpeg.decoder).
          */
         *resample_context = swr_alloc_set_opts(NULL,
                                               av_get_default_channel_layout(output_codec_context->channels),
@@ -377,7 +377,7 @@ static int decode_audio_frame(AVFrame *frame,
 
     /* Read one audio frame from the input file into a temporary packet. */
     if ((error = av_read_frame(input_format_context, &input_packet)) < 0) {
-        /* If we are at the end of the file, flush the decoder below. */
+        /* If we are at the end of the file, flush the com.example.testffmpeg.decoder below. */
         if (error == AVERROR_EOF)
             *finished = 1;
         else {
@@ -387,17 +387,17 @@ static int decode_audio_frame(AVFrame *frame,
         }
     }
 
-    /* Send the audio frame stored in the temporary packet to the decoder.
-     * The input audio stream decoder is used to do this. */
+    /* Send the audio frame stored in the temporary packet to the com.example.testffmpeg.decoder.
+     * The input audio stream com.example.testffmpeg.decoder is used to do this. */
     if ((error = avcodec_send_packet(input_codec_context, &input_packet)) < 0) {
         fprintf(stderr, "Could not send packet for decoding (error '%s')\n",
                 av_err2str(error));
         return error;
     }
 
-    /* Receive one frame from the decoder. */
+    /* Receive one frame from the com.example.testffmpeg.decoder. */
     error = avcodec_receive_frame(input_codec_context, frame);
-    /* If the decoder asks for more data to be able to decode a frame,
+    /* If the com.example.testffmpeg.decoder asks for more data to be able to decode a frame,
      * return indicating that no data is present. */
     if (error == AVERROR(EAGAIN)) {
         error = 0;
@@ -564,7 +564,7 @@ static int read_decode_convert_and_store(AVAudioFifo *fifo,
                            input_codec_context, &data_present, finished))
         goto cleanup;
     /* If we are at the end of the file and there are no more samples
-     * in the decoder which are delayed, we are actually finished.
+     * in the com.example.testffmpeg.decoder which are delayed, we are actually finished.
      * This must not be treated as an error. */
     if (*finished) {
         ret = 0;
@@ -817,7 +817,7 @@ int main(int argc, char **argv)
 
         /* Make sure that there is one frame worth of samples in the FIFO
          * buffer so that the encoder can do its work.
-         * Since the decoder's and the encoder's frame size may differ, we
+         * Since the com.example.testffmpeg.decoder's and the encoder's frame size may differ, we
          * need to FIFO buffer to store as many frames worth of input samples
          * that they make up at least one frame worth of output samples. */
         while (av_audio_fifo_size(fifo) < output_frame_size) {

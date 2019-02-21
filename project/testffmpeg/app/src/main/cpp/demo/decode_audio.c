@@ -45,10 +45,10 @@ static void decode(AVCodecContext *dec_ctx, AVPacket *pkt, AVFrame *frame,
     int i, ch;
     int ret, data_size;
 
-    /* send the packet with the compressed data to the decoder */
+    /* send the packet with the compressed data to the com.example.testffmpeg.decoder */
     ret = avcodec_send_packet(dec_ctx, pkt);
     if (ret < 0) {
-        fprintf(stderr, "Error submitting the packet to the decoder\n");
+        fprintf(stderr, "Error submitting the packet to the com.example.testffmpeg.decoder\n");
         exit(1);
     }
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 
     pkt = av_packet_alloc();
 
-    /* find the MPEG audio decoder */
+    /* find the MPEG audio com.example.testffmpeg.decoder */
     codec = avcodec_find_decoder(AV_CODEC_ID_MP2);
     if (!codec) {
         fprintf(stderr, "Codec not found\n");
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
         }
     }
 
-    /* flush the decoder */
+    /* flush the com.example.testffmpeg.decoder */
     pkt->data = NULL;
     pkt->size = 0;
     decode(c, pkt, decoded_frame, outfile);
