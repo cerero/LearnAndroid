@@ -3302,13 +3302,13 @@ typedef struct AVCodecContext {
 
     /*
      * Video decoding only.  Sets the number of extra hardware frames which
-     * the decoder will allocate for use by the caller.  This must be set
+     * the com.example.testffmpeg.decoder will allocate for use by the caller.  This must be set
      * before avcodec_open2() is called.
      *
      * Some hardware decoders require all frames that they will use for
      * output to be defined in advance before decoding starts.  For such
      * decoders, the hardware frame pool must therefore be of a fixed size.
-     * The extra frames set here are on top of any number that the decoder
+     * The extra frames set here are on top of any number that the com.example.testffmpeg.decoder
      * needs internally in order to operate normally (for example, frames
      * used as reference pictures).
      */

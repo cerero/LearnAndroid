@@ -1,0 +1,115 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity" >
+	<FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+	        android:layout_alignParentTop="true">
+	    <cookbook.chapter11.wolf3dport.GameView
+	        android:id="@+id/gameView"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	         />
+	    <LinearLayout android:id="@+id/gameController"
+                android:orientation="horizontal"
+                android:layout_gravity="bottom"
+                android:background="@drawable/transparent_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+	        <TableLayout
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:paddingLeft="20dip"
+	            android:layout_gravity="left" >
+
+	            <TableRow
+	                android:id="@+id/tableRow1"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content" >
+					<View
+					    android:layout_width="50dip"
+					    android:layout_height="50dip">
+					</View>
+	                <Button
+	                    android:id="@+id/buttonForward"
+	                    android:layout_width="50dip"
+	                    android:layout_height="50dip"
+	                    android:text="F" />
+					<View
+					    android:layout_width="50dip"
+					    android:layout_height="50dip">
+					</View>
+	            </TableRow>
+
+	            <TableRow
+	                android:id="@+id/tableRow2"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content" >
+
+	                <Button
+	                    android:id="@+id/buttonLeft"
+	                    android:layout_width="50dip"
+	                    android:layout_height="50dip"
+	                    android:text="L" />
+					<View
+					    android:layout_width="50dip"
+					    android:layout_height="50dip">
+					</View>
+	                <Button
+	                    android:id="@+id/buttonRight"
+	                    android:layout_width="50dip"
+	                    android:layout_height="50dip"
+	                    android:text="R" />
+
+	            </TableRow>
+
+	            <TableRow
+	                android:id="@+id/tableRow3"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content" >
+					<View
+					    android:layout_width="50dip"
+					    android:layout_height="50dip">
+					</View>
+	                <Button
+	                    android:id="@+id/buttonBack"
+	                    android:layout_width="50dip"
+	                    android:layout_height="50dip"
+	                    android:text="B" />
+					<View
+					    android:layout_width="50dip"
+					    android:layout_height="50dip">
+					</View>
+	            </TableRow>
+	        </TableLayout>
+                
+	        <LinearLayout
+	            android:layout_width="fill_parent"
+	            android:layout_height="fill_parent"
+	            android:layout_gravity="right"
+	            android:paddingRight="20dip"
+	            android:gravity="center_vertical"
+	            android:orientation="vertical" >
+
+	            <Button
+	                android:id="@+id/buttonFire"
+	                android:layout_width="100dip"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="right"
+	                android:text="Fire" />
+
+	            <Button
+	                android:id="@+id/buttonOpen"
+	                android:layout_width="100dip"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="right"
+	                android:text="Open" />
+
+	        </LinearLayout>
+        </LinearLayout>
+	</FrameLayout>
+</RelativeLayout>

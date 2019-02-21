@@ -1,0 +1,88 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity" >
+	 <LinearLayout
+	    android:id="@+id/layouttop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        >
+        <Button
+	        android:id="@+id/button1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Choose a png image" />
+        <Spinner
+	        android:id="@+id/spinner1"
+	        android:layout_width="80dip"
+	        android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="100dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="50"
+            android:ems="10" >
+
+            <requestFocus />
+        </EditText>
+        
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/layout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layouttop"
+        android:orientation="horizontal"
+        >
+        <Button
+	        android:id="@+id/button2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Width" />
+        <Button
+	        android:id="@+id/button3"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Height" />
+    </LinearLayout>
+	<TextView
+	    android:id="@+id/text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout2"
+        android:text="@string/hello_world" />
+    <LinearLayout
+        android:id="@+id/layoutbottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" >
+        <ImageView
+	        android:id="@+id/imageView1"
+	        android:layout_width="0px"
+	        android:layout_height="wrap_content"
+	        android:paddingLeft="3px"
+	        android:paddingRight="3px"
+	        android:layout_weight="1"
+	         />
+
+	    <ImageView
+	        android:id="@+id/imageView2"
+	        android:layout_width="0px"
+	        android:layout_height="wrap_content"
+	        android:paddingLeft="3px"
+	        android:paddingRight="3px"
+	        android:layout_weight="1"
+	        />
+    </LinearLayout>
+	<TextView
+	    android:id="@+id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/layoutbottom"
+        android:text="@string/hello_world" />
+</RelativeLayout>

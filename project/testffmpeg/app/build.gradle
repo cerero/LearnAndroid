@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.testffmpeg"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -31,6 +31,10 @@ android {
         }
     }
 }
+
+//compileJava {
+//    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

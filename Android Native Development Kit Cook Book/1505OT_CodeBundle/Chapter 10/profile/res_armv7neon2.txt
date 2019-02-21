@@ -1,0 +1,5 @@
+read packet time: 0.109250732524ms
+decode time: 156.300884956ms
+scale and color conversion time: 121.611980939ms
+draw on canvas time: 2.7161334241ms
+seek time: -1.0ms
