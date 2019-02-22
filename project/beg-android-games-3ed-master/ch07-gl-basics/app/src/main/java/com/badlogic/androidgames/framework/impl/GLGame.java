@@ -1,5 +1,6 @@
 package com.badlogic.androidgames.framework.impl;
 
+import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
@@ -21,7 +22,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 
-public abstract class GLGame extends AppCompatActivity implements Game, GLSurfaceView.Renderer {
+public abstract class GLGame extends Activity implements Game, GLSurfaceView.Renderer {
 
      enum GLGameState {
         Initialized,
@@ -93,8 +94,8 @@ public abstract class GLGame extends AppCompatActivity implements Game, GLSurfac
             float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
             startTime = System.nanoTime();
 
-        screen.update(deltaTime);
-        screen.present(mMVPMatrix);
+            screen.update(deltaTime);
+            screen.present(mMVPMatrix);
 
         }
 
@@ -154,11 +155,11 @@ public abstract class GLGame extends AppCompatActivity implements Game, GLSurfac
         audio = new AndroidAudio(this);
         input = new AndroidInput(this, glView, 1, 1);
     }
-@Override
-public void onResume() {
+    @Override
+    public void onResume() {
         super.onResume();
         glView.onResume();
-        }
+    }
 
     @Override
     public void onPause() {
