@@ -9,7 +9,7 @@ android {
 	}
 
 	defaultConfig {
-		applicationId "com.serenegiant.audiovideoplayersample"
+		applicationId "com.kugou.audiovideoplayersample"
 		minSdkVersion 18
 		targetSdkVersion versionTarget
 		versionCode versionCodeNum
@@ -21,7 +21,6 @@ android {
 			debuggable true
 		}
 		release {
-			debuggable true
 			minifyEnabled false
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
 		}
