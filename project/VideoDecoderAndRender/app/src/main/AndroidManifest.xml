@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.videodecoderandrender">
-
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,8 +21,15 @@
 
         <activity
             android:name=".demo.chap04.dm01.Dm01TwoDG1Activity"
-            android:label="Dm01Activity" />
+            android:label="Dm01Activity" android:screenOrientation="landscape"/>
 
+        <activity
+            android:name=".demo.chap04.dm02.Dm02Cube2Activity"
+            android:label="Dm02Cube2Activity" android:screenOrientation="landscape"/>
+
+        <activity
+            android:name=".demo.chap04.dm03.EGLDemoActivity"
+            android:label="Dm02Cube2Activity" android:screenOrientation="landscape"/>
     </application>
 
 </manifest>
