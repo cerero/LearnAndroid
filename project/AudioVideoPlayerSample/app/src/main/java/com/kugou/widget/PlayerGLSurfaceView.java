@@ -20,23 +20,24 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
 
     public PlayerGLSurfaceView(Context context) {
         super(context);
-        setEGLContextClientVersion(2);
-        setZOrderOnTop(true);
-        setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        getHolder().setFormat(PixelFormat.RGBA_8888);
-        mRender = new Render();
-        setRenderer(mRender);
-        this.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        configSurface();
     }
 
     public PlayerGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        configSurface();
+    }
+
+    private void configSurface() {
         setEGLContextClientVersion(2);
+
         setZOrderOnTop(true);
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         getHolder().setFormat(PixelFormat.RGBA_8888);
+
         mRender = new Render();
         setRenderer(mRender);
+
         this.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 

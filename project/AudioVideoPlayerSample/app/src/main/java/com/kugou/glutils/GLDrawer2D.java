@@ -33,7 +33,7 @@ public class GLDrawer2D {
 		+ "uniform samplerExternalOES sTexture;\n"
 		+ "varying highp vec2 vTextureCoord;\n"
 		+ "void main() {\n"
-            + "vec2 refTextureCoord = vec2(vTextureCoord.s, vTextureCoord.t + 0.5);\n"
+            + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t);\n"
             + "vec4 refColor = texture2D(sTexture, refTextureCoord);\n"
             + "vec4 texel = texture2D(sTexture, vTextureCoord);\n"
             + "gl_FragColor = vec4(texel.rgb, refColor.b);\n"
@@ -45,10 +45,10 @@ public class GLDrawer2D {
             1.0f, -1.0f,
             -1.0f, -1.0f };
     private static final float[] TEXCOORD = {
-            1.0f, 0.0f,
+            0.5f, 0.0f,
             0.0f, 0.0f,
-            1.0f, 0.5f,
-            0.0f, 0.5f };
+            0.5f, 1.0f,
+            0.0f, 1.0f };
 
 	private final FloatBuffer pVertex;
 	private final FloatBuffer pTexCoord;
@@ -67,17 +67,17 @@ public class GLDrawer2D {
 	 * this should be called in GL context
 	 */
 	public GLDrawer2D() {
-		pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
-				.order(ByteOrder.nativeOrder()).asFloatBuffer();
+		pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ).order(ByteOrder.nativeOrder()).asFloatBuffer();
 		pVertex.put(VERTICES);
 		pVertex.flip();
-		pTexCoord = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
-				.order(ByteOrder.nativeOrder()).asFloatBuffer();
+
+		pTexCoord = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ).order(ByteOrder.nativeOrder()).asFloatBuffer();
 		pTexCoord.put(TEXCOORD);
 		pTexCoord.flip();
 
 		hProgram = loadShader(vss, fss);
 		GLES20.glUseProgram(hProgram);
+
         maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
         maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");
         muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
@@ -118,7 +118,7 @@ public class GLDrawer2D {
 	}
 	
 	/**
-	 * create external texture
+	 * 创建一个外部纹理，硬解后的输出纹理，也是openGL的读取用纹理
 	 * @return texture ID
 	 */
 	public static int initTex() {
@@ -147,7 +147,7 @@ public class GLDrawer2D {
 	}
 
 	/**
-	 * load, compile and link shader
+	 * 加载、编译、连接shader
 	 * @param vss source of vertex shader
 	 * @param fss source of fragment shader
 	 * @return

@@ -34,18 +34,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.kugou.audiovideoplayersample.PlayerFragment" >
 
-    <!-- com.serenegiant.widget.PlayerGLView -->
-    <!--<com.serenegiant.widget.PlayerTextureView-->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_launcher"/>
+
+    <!--<com.kugou.widget.PlayerTextureView-->
         <!--android:id="@+id/player_view"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="match_parent"-->
         <!--android:layout_centerInParent="true"-->
         <!--android:layout_marginLeft="4dp"-->
         <!--android:layout_marginTop="4dp" />-->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/ic_launcher"/>
+
 
     <com.kugou.widget.PlayerGLSurfaceView
         android:id="@+id/player_view"

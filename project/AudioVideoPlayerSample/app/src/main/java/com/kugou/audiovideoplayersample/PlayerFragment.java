@@ -1,26 +1,4 @@
 package com.kugou.audiovideoplayersample;
-/*
- * AudioVideoPlayerSample
- * Sample project to play audio and video from MPEG4 file using MediaCodec.
- *
- * Copyright (c) 2014 saki t_saki@serenegiant.com
- *
- * File name: PlayerFragment.java
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- * All files in the folder are under this Apache License, Version 2.0.
-*/
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -29,7 +7,9 @@ import java.io.IOException;
 
 import com.kugou.media.MediaMoviePlayer;
 import com.kugou.media.IFrameCallback;
+import com.kugou.util.HardwareSupportCheck;
 import com.kugou.widget.PlayerGLSurfaceView;
+import com.kugou.widget.PlayerTextureView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -41,8 +21,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
-@SuppressWarnings("unused")
 public class PlayerFragment extends Fragment {
 	private static final boolean DEBUG = true;	// TODO set false on release
 	private static final String TAG = "PlayerFragment";
@@ -97,14 +77,24 @@ public class PlayerFragment extends Fragment {
 	private final OnClickListener mOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			switch (view.getId()) {
-			case R.id.play_button:
-				if (mPlayer == null)
-					startPlay();
-				else
-					stopPlay();
-				break;
-			}
+		    //960 × 854   - 480低端礼物
+            //1500 × 1334 - 750中端礼物
+            //2160 × 1922 - 1080高端礼物
+            boolean isSupport480 = HardwareSupportCheck.isSupportH264(960, 854);
+            if (isSupport480) {
+                switch (view.getId()) {
+                    case R.id.play_button:
+                        if (mPlayer == null)
+                            startPlay();
+                        else
+                            stopPlay();
+                        break;
+                }
+            } else {
+                Toast.makeText(getActivity(), "Not support w h!",
+                        Toast.LENGTH_LONG).show();
+            }
+
 		}
 	};
 
@@ -117,8 +107,7 @@ public class PlayerFragment extends Fragment {
 		try {
 			final File dir = activity.getFilesDir();
 			dir.mkdirs();
-//			final File path = new File(dir, "easter_egg_nexus9_small.mp4");
-			final File path = new File(dir, "gift_960.mp4");
+			final File path = new File(dir, "gift_480.mp4");
 
 			prepareSampleMovie(path);
 			mPlayerButton.setColorFilter(0x7fff0000);	// turn red
@@ -188,9 +177,7 @@ public class PlayerFragment extends Fragment {
 		final Activity activity = getActivity();
 		if (!path.exists()) {
 			if (DEBUG) Log.i(TAG, "copy sample movie file from res/raw to " + path.getName());
-//			final BufferedInputStream in = new BufferedInputStream(activity.getResources().openRawResource(R.raw.easter_egg_nexus9_small));
-            final BufferedInputStream in = new BufferedInputStream(activity.getResources().openRawResource(R.raw.gift_960));
-
+            final BufferedInputStream in = new BufferedInputStream(activity.getResources().openRawResource(R.raw.gift_480));
             final BufferedOutputStream out = new BufferedOutputStream(activity.openFileOutput(path.getName(), Context.MODE_PRIVATE));
 			byte[] buf = new byte[8192];
 			int size = in.read(buf);
