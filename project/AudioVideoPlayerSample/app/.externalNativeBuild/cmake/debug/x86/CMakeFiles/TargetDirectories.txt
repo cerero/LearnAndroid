@@ -1,0 +1,3 @@
+/Users/wangyongjie/book/workspace/c++/LearnAndroid/project/AudioVideoPlayerSample/app/.externalNativeBuild/cmake/debug/x86/CMakeFiles/edit_cache.dir
+/Users/wangyongjie/book/workspace/c++/LearnAndroid/project/AudioVideoPlayerSample/app/.externalNativeBuild/cmake/debug/x86/CMakeFiles/rebuild_cache.dir
+/Users/wangyongjie/book/workspace/c++/LearnAndroid/project/AudioVideoPlayerSample/app/.externalNativeBuild/cmake/debug/x86/CMakeFiles/AVNative-lib.dir

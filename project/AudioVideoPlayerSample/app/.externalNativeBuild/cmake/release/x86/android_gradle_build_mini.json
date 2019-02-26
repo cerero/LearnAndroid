@@ -1,0 +1,21 @@
+{
+  "buildFiles": [
+    "/Users/wangyongjie/book/workspace/c++/LearnAndroid/project/AudioVideoPlayerSample/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "/Users/wangyongjie/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/wangyongjie/book/workspace/c++/LearnAndroid/project/AudioVideoPlayerSample/app/.externalNativeBuild/cmake/release/x86 --target clean"
+  ],
+  "libraries": {
+    "ffmpeg-Release-x86": {
+      "artifactName": "ffmpeg",
+      "abi": "x86",
+      "output": "/Users/wangyongjie/book/workspace/c++/LearnAndroid/project/AudioVideoPlayerSample/app/src/main/cpp/../jniLibs/x86/libffmpeg.so"
+    },
+    "AVNative-lib-Release-x86": {
+      "artifactName": "AVNative-lib",
+      "buildCommand": "/Users/wangyongjie/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/wangyongjie/book/workspace/c++/LearnAndroid/project/AudioVideoPlayerSample/app/.externalNativeBuild/cmake/release/x86 --target AVNative-lib",
+      "abi": "x86",
+      "output": "/Users/wangyongjie/book/workspace/c++/LearnAndroid/project/AudioVideoPlayerSample/app/build/intermediates/cmake/release/obj/x86/libAVNative-lib.so"
+    }
+  }
+}
