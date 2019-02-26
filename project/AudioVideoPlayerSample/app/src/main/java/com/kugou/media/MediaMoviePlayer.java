@@ -1,6 +1,10 @@
 package com.kugou.media;
 /*
  * play audio and video from MPEG4 file using MediaCodec.
+ * 原理:
+ *  开启一个总控线程，负责接收外部的prepare/play/stop/resume/release/seek指令，通过锁，对音频与视频解码线程进行控制
+ * 	在独立的线程里，video通过MediaCodec进行硬解，解码到surface，然后按照帧pts进行休眠，达到音画同步效果
+ * 	在独立的线程里，audio通过MediaCodec进行硬解，硬解后的pcm添加到AudioTrack进行播放,然后按照帧pts进行休眠，达到音画同步效果
 */
 
 import java.io.File;
@@ -797,6 +801,8 @@ public class MediaMoviePlayer {
             if (inputBufIndex >= 0) {
                 final int size = extractor.readSampleData(inputBuffers[inputBufIndex], 0);
                 if (size > 0) {
+//                    ByteBuffer tmp = inputBuffers[inputBufIndex].duplicate();
+//                    Log.i(TAG, "sample size:" + tmp.capacity() + "," + tmp.get(0) + " " + tmp.get(1) + " " + tmp.get(2) + " " + tmp.get(3) + " " + tmp.get(4) + " " + tmp.get(5) + " " + tmp.get(6) + " " + tmp.get(7) + " " + tmp.get(8));
                 	codec.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
                 }
             	result = extractor.advance();	// return false if no data is available
