@@ -18,7 +18,8 @@ public class MainActivity extends ListActivity {
     String tests[] = {
             "demo.chap04.dm01.Dm01TwoDG1Activity",
             "demo.chap04.dm02.Dm02Cube2Activity",
-            "demo.chap04.dm03.EGLDemoActivity"};
+            "demo.chap04.dm03.EGLDemoActivity",
+            "demo.chap04.dm04.DrawTextureG1"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

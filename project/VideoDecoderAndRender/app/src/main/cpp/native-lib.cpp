@@ -3,7 +3,7 @@
 #include "dm01/TwoDG1.h"
 #include "dm02/CubeG2.h"
 #include "dm03/EGLDemo.h"
-
+#include "dm04/DiceG1.h"
 //extern "C" JNIEXPORT jstring JNICALL
 //Java_com_example_videodecoderandrender_MainActivity_stringFromJNI(JNIEnv *env,jobject /* this */) {
 //    std::string hello = "Hello from C++";
@@ -31,5 +31,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* pVm, void* reserved){
     TwoDG1::OnLoad(env, reserved);
     CubeG2::OnLoad(env, reserved);
     EGLDemo::OnLoad(env, reserved);
+    DiceG1::OnLoad(env, reserved);
+
     return JNI_VERSION_1_6;
 }

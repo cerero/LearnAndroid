@@ -29,7 +29,13 @@
 
         <activity
             android:name=".demo.chap04.dm03.EGLDemoActivity"
-            android:label="Dm02Cube2Activity" android:screenOrientation="landscape"/>
+            android:label="EGLDemoActivity" android:screenOrientation="landscape"/>
+
+        <activity
+            android:name=".demo.chap04.dm04.DrawTextureG1"
+            android:label="DrawTextureG1" android:screenOrientation="portrait"/>
+
+
     </application>
 
 </manifest>

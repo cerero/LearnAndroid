@@ -9,11 +9,67 @@ extern "C" {
 #endif
 /*
  * Class:     Test
- * Method:    stringFromJNI
- * Signature: ()Ljava/lang/String;
+ * Method:    nativeInit
+ * Signature: (I)V
  */
-JNIEXPORT jstring JNICALL Java_Test_stringFromJNI
+JNIEXPORT void JNICALL Java_Test_nativeInit
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     Test
+ * Method:    nativeDestroy
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_Test_nativeDestroy
   (JNIEnv *, jobject);
+
+/*
+ * Class:     Test
+ * Method:    consumeNalUnitsFromDirectBuffer
+ * Signature: (Ljava/lang/String;IJ)V
+ */
+JNIEXPORT void JNICALL Java_Test_consumeNalUnitsFromDirectBuffer
+  (JNIEnv *, jobject, jstring, jint, jlong);
+
+/*
+ * Class:     Test
+ * Method:    isFrameReady
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_Test_isFrameReady
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Test
+ * Method:    getWidth
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Test_getWidth
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Test
+ * Method:    getHeight
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Test_getHeight
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Test
+ * Method:    getOutputByteSize
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_Test_getOutputByteSize
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     Test
+ * Method:    decodeFrameToDirectBuffer
+ * Signature: (Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_Test_decodeFrameToDirectBuffer
+  (JNIEnv *, jobject, jstring);
 
 #ifdef __cplusplus
 }

@@ -66,23 +66,23 @@ GLfloat trangleVertices[9] = {
 };
 Triangle mTriangle(trangleVertices);
 
-GLfloat vertices[12] = {
+GLfloat vertices_dm01[12] = {
 	-1.0f, -1.0f,  0.0f,  // 0. left-bottom
 	1.0f, -1.0f,  0.0f,  // 1. right-bottom
 	-1.0f,  1.0f,  0.0f,  // 2. left-top
 	1.0f,  1.0f,  0.0f   // 3. right-top
 };
-GLfloat colors[16] = {
+GLfloat colors_dm01[16] = {
 	1.0f, 0.0f, 0.0f, 1.0f, // Red
 	0.0f, 1.0f, 0.0f, 1.0f, // Green
 	0.0f, 0.0f, 1.0f, 1.0f, // Blue
 	1.0f, 1.0f, 1.0f, 1.0f	// white
 };
-GLbyte indices[6] = {
+GLbyte indices_dm01[6] = {
 	0, 1, 2,
 	1, 2, 3
 };
-Square mSquare(vertices, colors, indices);
+Square mSquare(vertices_dm01, colors_dm01, indices_dm01);
 
 GLfloat matrix[16];
 

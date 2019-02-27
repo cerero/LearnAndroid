@@ -92,35 +92,35 @@ void h264softdecoder::OnLoad(JNIEnv* env, void* reserved) {
 
     JNINativeMethod nm[7];
     nm[0].name = "nativeInit";
-    nm[0].signature = "(Landroid/view/Surface;)V";
+    nm[0].signature = "(I)V";
     nm[0].fnPtr = (void *)nativeInit;
 
     nm[1].name = "nativeDestroy";
-    nm[1].signature = "(Landroid/view/Surface;)V";
+    nm[1].signature = "()V";
     nm[1].fnPtr = (void *)nativeDestroy;
 
     nm[2].name = "consumeNalUnitsFromDirectBuffer";
-    nm[2].signature = "(Landroid/view/Surface;)V";
+    nm[2].signature = "(Ljava/nio/ByteBuffer;IJ)V";
     nm[2].fnPtr = (void *)consumeNalUnitsFromDirectBuffer;
 
     nm[3].name = "isFrameReady";
-    nm[3].signature = "(Landroid/view/Surface;)V";
+    nm[3].signature = "()Z";
     nm[3].fnPtr = (void *)isFrameReady;
 
     nm[4].name = "getWidth";
-    nm[4].signature = "(Landroid/view/Surface;)V";
+    nm[4].signature = "()I";
     nm[4].fnPtr = (void *)getWidth;
 
     nm[5].name = "getHeight";
-    nm[5].signature = "(Landroid/view/Surface;)V";
+    nm[5].signature = "()I";
     nm[5].fnPtr = (void *)getHeight;
 
     nm[6].name = "getOutputByteSize";
-    nm[6].signature = "(Landroid/view/Surface;)V";
+    nm[6].signature = "()I";
     nm[6].fnPtr = (void *)getOutputByteSize;
 
     nm[7].name = "decodeFrameToDirectBuffer";
-    nm[7].signature = "(Landroid/view/Surface;)V";
+    nm[7].signature = "(Ljava/nio/ByteBuffer;)J";
     nm[7].fnPtr = (void *)decodeFrameToDirectBuffer;
     jclass cls = env->FindClass("com/kugou/media/H264SoftDecoder");
 

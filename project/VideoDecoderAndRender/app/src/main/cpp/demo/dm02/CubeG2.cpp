@@ -49,7 +49,7 @@ GLfloat vertices_dm02[108] = {
 GLbyte indices_dm02[6] = {
 	0, 1, 2, 3, 4, 5
 };
-Cube mCube(vertices_dm02, indices_dm02);
+Cube mCube_dm02(vertices_dm02, indices_dm02);
 
 GLuint loadShader(GLenum shaderType, const char* pSource) {
     GLuint shader = glCreateShader(shaderType);
@@ -182,7 +182,7 @@ void naDrawGraphics_dm02(JNIEnv* env, jclass clazz, float pAngleX, float pAngleY
 
 	glUniformMatrix4fv(gmvP, 1, GL_FALSE, aMVP);
 
-	mCube.draw(gvPositionHandle);
+	mCube_dm02.draw(gvPositionHandle);
 }
 
 

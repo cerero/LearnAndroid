@@ -17,6 +17,7 @@ public class H264SoftDecoder {
     }
 
     private int cdata;
+
     private native void nativeInit(int colorFormat);
     private native void nativeDestroy();
 

@@ -31,7 +31,9 @@ add_library( # Sets the name of the library.
         demo/dm03/Cube.cpp
         demo/dm03/EGLDemo.cpp
         demo/dm03/Renderer.cpp
-        demo/dm03/OldRenderMethods.cpp)
+        demo/dm03/OldRenderMethods.cpp
+        demo/dm04/Cube.cpp
+        demo/dm04/DiceG1.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -50,6 +52,7 @@ find_library(GLESv1_CM-lib GLESv1_CM)
 find_library(GLESv2-lib GLESv2)
 find_library(EGL-lib EGL)
 find_library(android-lib android)
+find_library(jnigraphics-lib jnigraphics)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
@@ -64,4 +67,5 @@ target_link_libraries( # Specifies the target library.
         ${GLESv1_CM-lib}
         ${GLESv2-lib}
         ${EGL-lib}
-        ${android-lib})
+        ${android-lib}
+        ${jnigraphics-lib})
