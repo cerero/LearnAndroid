@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.opensource.svgaplayer.SVGADrawable;
+import com.opensource.svgaplayer.SVGAGLView;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
 import com.opensource.svgaplayer.SVGAVideoEntity;
@@ -19,20 +20,26 @@ import java.util.ArrayList;
 public class AnimationFromAssetsActivity extends Activity {
 
     SVGAImageView animationView = null;
+    SVGAGLView animationGLView = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        animationView = new SVGAImageView(this);
-        animationView.setBackgroundColor(Color.BLACK);
-        animationView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loadAnimation();
-            }
-        });
+
+        animationGLView = new SVGAGLView(this);
+        setContentView(animationGLView);
         loadAnimation();
-        setContentView(animationView);
+
+//        animationView = new SVGAImageView(this);
+//        animationView.setBackgroundColor(Color.BLACK);
+//        animationView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                loadAnimation();
+//            }
+//        });
+//        loadAnimation();
+//        setContentView(animationView);
     }
 
     private void loadAnimation() {
@@ -40,8 +47,11 @@ public class AnimationFromAssetsActivity extends Activity {
         parser.decodeFromAssets(this.randomSample(), new SVGAParser.ParseCompletion() {
             @Override
             public void onComplete(@NotNull SVGAVideoEntity videoItem) {
-                animationView.setVideoItem(videoItem);
-                animationView.startAnimation();
+//                animationView.setVideoItem(videoItem);
+//                animationView.startAnimation();
+
+                animationGLView.setVideoItem(videoItem);
+                animationGLView.startAnimation();
             }
             @Override
             public void onError() {
@@ -54,10 +64,10 @@ public class AnimationFromAssetsActivity extends Activity {
 
     private String randomSample() {
         if (samples.size() == 0) {
-            samples.add("data_3.svga");
-            samples.add("data_1.svga");
-            samples.add("data_2.svga");
-//            samples.add("angel.svga");
+//            samples.add("data_3.svga");
+//            samples.add("data_1.svga");
+//            samples.add("data_2.svga");
+            samples.add("angel.svga");
 //            samples.add("alarm.svga");
 //            samples.add("EmptyState.svga");
 //            samples.add("heartbeat.svga");

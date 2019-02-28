@@ -2,9 +2,10 @@ package com.opensource.svgaplayer
 
 import android.widget.ImageView
 import com.kugou.graphic.ICanvasGL
+import com.kugou.graphic.glview.GLView
 import com.opensource.svgaplayer.drawer.SVGACanvasDrawer
 
-class SVGAGLDrawable (val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynamicEntity) {
+class SVGAGLDrawable (val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynamicEntity, val glView : GLView) {
     var cleared = true
         internal set (value) {
             if (field == value) {
@@ -34,13 +35,13 @@ class SVGAGLDrawable (val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynam
         }
 
         canvasWrapper.glCanvas = canvas
-        canvasWrapper?.let {
+        canvasWrapper.let {
             drawer.drawFrame(it, currentFrame, scaleType)
         }
     }
 
     private fun invalidateSelf() {
-        /////TODO 记得执行requestRender ，否则图像不会更新
+        glView.requestRender()
     }
 //    override fun setAlpha(alpha: Int) { }
 //
