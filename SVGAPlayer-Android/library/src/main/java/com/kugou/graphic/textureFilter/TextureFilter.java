@@ -18,31 +18,21 @@
  *
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+package com.kugou.graphic.textureFilter;
 
-buildscript {
-    repositories {
-        google()
-        maven{url"https://maven.google.com"}
-        jcenter()
+import com.kugou.graphic.ICanvasGL;
+import com.kugou.graphic.glcanvas.BasicTexture;
 
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
+/**
+ * Created by Matthew on 2016/10/14.
+ */
 
-allprojects {
-    repositories {
-        google()
-        maven{url"https://maven.google.com"}
-        jcenter()
-    }
-}
+public interface TextureFilter {
+    String getVertexShader();
+    String getFragmentShader();
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+    String getOesFragmentProgram();
+
+    void onPreDraw(int program, BasicTexture texture, ICanvasGL canvas);
+    void destroy();
 }

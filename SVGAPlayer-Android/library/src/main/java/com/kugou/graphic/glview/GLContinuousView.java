@@ -18,31 +18,33 @@
  *
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+package com.kugou.graphic.glview;
 
-buildscript {
-    repositories {
-        google()
-        maven{url"https://maven.google.com"}
-        jcenter()
+import android.content.Context;
+import android.opengl.GLSurfaceView;
+import android.util.AttributeSet;
 
+import com.kugou.graphic.ICanvasGL;
+
+/**
+ * Created by Chilling on 2016/10/24.
+ */
+
+public abstract class GLContinuousView extends GLView {
+    public GLContinuousView(Context context) {
+        super(context);
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
 
-allprojects {
-    repositories {
-        google()
-        maven{url"https://maven.google.com"}
-        jcenter()
+    public GLContinuousView(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
-}
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+    @Override
+    protected void init() {
+        super.init();
+        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+    }
+
+
+    protected abstract void onGLDraw(ICanvasGL canvas);
 }

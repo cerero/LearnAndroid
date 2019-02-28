@@ -18,31 +18,17 @@
  *
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+package com.kugou.graphic.glcanvas;
 
-buildscript {
-    repositories {
-        google()
-        maven{url"https://maven.google.com"}
-        jcenter()
+// This mimics corresponding GL functions.
+public interface GLId {
+    public int generateTexture();
 
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
+    public void glGenBuffers(int n, int[] buffers, int offset);
 
-allprojects {
-    repositories {
-        google()
-        maven{url"https://maven.google.com"}
-        jcenter()
-    }
-}
+    public void glDeleteTextures(int n, int[] textures, int offset);
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+    public void glDeleteBuffers(int n, int[] buffers, int offset);
+
+    public void glDeleteFramebuffers(int n, int[] buffers, int offset);
 }

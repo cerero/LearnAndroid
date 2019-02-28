@@ -54,6 +54,7 @@ public class AnimationFromAssetsActivity extends Activity {
 
     private String randomSample() {
         if (samples.size() == 0) {
+            samples.add("data_3.svga");
             samples.add("data_1.svga");
             samples.add("data_2.svga");
 //            samples.add("angel.svga");

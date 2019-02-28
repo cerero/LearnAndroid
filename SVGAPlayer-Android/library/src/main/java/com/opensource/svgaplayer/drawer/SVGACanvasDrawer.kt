@@ -3,6 +3,7 @@ package com.opensource.svgaplayer.drawer
 import android.graphics.*
 import android.text.StaticLayout
 import android.widget.ImageView
+import com.opensource.svgaplayer.ICanvas
 import com.opensource.svgaplayer.SVGADynamicEntity
 import com.opensource.svgaplayer.SVGAVideoEntity
 import com.opensource.svgaplayer.entities.SVGAVideoShapeEntity
@@ -17,8 +18,8 @@ internal class SVGACanvasDrawer(videoItem: SVGAVideoEntity, val dynamicItem: SVG
     private val drawTextCache: HashMap<String, Bitmap> = hashMapOf()
     private val pathCache = PathCache()
 
-    override fun drawFrame(canvas: Canvas, frameIndex: Int, scaleType: ImageView.ScaleType) {
-        super.drawFrame(canvas,frameIndex, scaleType)
+    override fun drawFrame(canvas: ICanvas, frameIndex: Int, scaleType: ImageView.ScaleType) {
+        super.drawFrame(canvas, frameIndex, scaleType)
         this.pathCache.onSizeChanged(canvas)
         val sprites = requestFrameSprites(frameIndex)
         sprites.forEach {
@@ -53,13 +54,13 @@ internal class SVGACanvasDrawer(videoItem: SVGAVideoEntity, val dynamicItem: SVG
         return matrix
     }
 
-    private fun drawSprite(sprite: SVGADrawerSprite, canvas :Canvas, frameIndex: Int) {
+    private fun drawSprite(sprite: SVGADrawerSprite, canvas :ICanvas, frameIndex: Int) {
         drawImage(sprite, canvas)
         drawShape(sprite, canvas)
         drawDynamic(sprite, canvas, frameIndex)
     }
 
-    private fun drawImage(sprite: SVGADrawerSprite, canvas :Canvas) {
+    private fun drawImage(sprite: SVGADrawerSprite, canvas :ICanvas) {
         val imageKey = sprite.imageKey ?: return
         val isHidden = dynamicItem.dynamicHidden[imageKey] == true
         if (isHidden) { return }
@@ -88,7 +89,7 @@ internal class SVGACanvasDrawer(videoItem: SVGAVideoEntity, val dynamicItem: SVG
         drawTextOnBitmap(canvas, drawingBitmap, sprite, frameMatrix)
     }
 
-    private fun drawTextOnBitmap(canvas: Canvas, drawingBitmap: Bitmap, sprite: SVGADrawerSprite, frameMatrix: Matrix) {
+    private fun drawTextOnBitmap(canvas: ICanvas, drawingBitmap: Bitmap, sprite: SVGADrawerSprite, frameMatrix: Matrix) {
         if (dynamicItem.isTextDirty) {
             this.drawTextCache.clear()
             dynamicItem.isTextDirty = false
@@ -149,7 +150,7 @@ internal class SVGACanvasDrawer(videoItem: SVGAVideoEntity, val dynamicItem: SVG
         }
     }
 
-    private fun drawShape(sprite: SVGADrawerSprite, canvas: Canvas) {
+    private fun drawShape(sprite: SVGADrawerSprite, canvas: ICanvas) {
         val frameMatrix = shareFrameMatrix(sprite.frameEntity.transform)
         sprite.frameEntity.shapes.forEach { shape ->
             shape.buildPath()
@@ -264,7 +265,7 @@ internal class SVGACanvasDrawer(videoItem: SVGAVideoEntity, val dynamicItem: SVG
         return if (scaleInfo.ratioX) Math.abs(scaleX.toFloat()) else Math.abs(scaleY.toFloat())
     }
 
-    private fun drawDynamic(sprite: SVGADrawerSprite, canvas: Canvas, frameIndex: Int) {
+    private fun drawDynamic(sprite: SVGADrawerSprite, canvas: ICanvas, frameIndex: Int) {
         val imageKey = sprite.imageKey ?: return
         dynamicItem.dynamicDrawer[imageKey]?.let {
             val frameMatrix = shareFrameMatrix(sprite.frameEntity.transform)
@@ -316,7 +317,7 @@ internal class SVGACanvasDrawer(videoItem: SVGAVideoEntity, val dynamicItem: SVG
         private var canvasHeight: Int = 0
         private val cache = HashMap<SVGAVideoShapeEntity,Path>()
 
-        fun onSizeChanged(canvas: Canvas) {
+        fun onSizeChanged(canvas: ICanvas) {
             if(this.canvasWidth != canvas.width || this.canvasHeight != canvas.height){
                 this.cache.clear()
             }

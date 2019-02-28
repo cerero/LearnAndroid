@@ -1,16 +1,10 @@
 package com.opensource.svgaplayer
 
-import android.graphics.Canvas
-import android.graphics.ColorFilter
-import android.graphics.PixelFormat
-import android.graphics.drawable.Drawable
 import android.widget.ImageView
+import com.kugou.graphic.ICanvasGL
 import com.opensource.svgaplayer.drawer.SVGACanvasDrawer
 
-class SVGADrawable(val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynamicEntity): Drawable() {
-
-    constructor(videoItem: SVGAVideoEntity): this(videoItem, SVGADynamicEntity())
-
+class SVGAGLDrawable (val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynamicEntity) {
     var cleared = true
         internal set (value) {
             if (field == value) {
@@ -34,24 +28,27 @@ class SVGADrawable(val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynamicE
     private val drawer = SVGACanvasDrawer(videoItem, dynamicItem)
     private var canvasWrapper : CanvasWrapper = CanvasWrapper(null ,null)
 
-    override fun draw(canvas: Canvas?) {
+    fun draw(canvas: ICanvasGL?) {
         if (cleared) {
             return
         }
-        canvasWrapper.normCavas = canvas
+
+        canvasWrapper.glCanvas = canvas
         canvasWrapper?.let {
             drawer.drawFrame(it, currentFrame, scaleType)
         }
     }
 
-    override fun setAlpha(alpha: Int) { }
-
-    override fun getOpacity(): Int {
-        return PixelFormat.TRANSPARENT
+    private fun invalidateSelf() {
+        /////TODO 记得执行requestRender ，否则图像不会更新
     }
-
-    override fun setColorFilter(colorFilter: ColorFilter?) {
-
-    }
-
+//    override fun setAlpha(alpha: Int) { }
+//
+//    override fun getOpacity(): Int {
+//        return PixelFormat.TRANSPARENT
+//    }
+//
+//    override fun setColorFilter(colorFilter: ColorFilter?) {
+//
+//    }
 }
