@@ -233,32 +233,38 @@ public abstract class UploadedTexture extends BasicTexture {
                     canvas.initializeTexture(this, bitmap);
                 } else {
                     int format = GLUtils.getInternalFormat(bitmap);
-                    int type = GLUtils.getType(bitmap);
+//                    int type = GLUtils.getType(bitmap);
                     Config config = bitmap.getConfig();
 
-                    canvas.initializeTextureSize(this, format, type);
-                    canvas.texSubImage2D(this, mBorder, mBorder, bitmap, format, type);
+                    canvas.initializeTexture(this, bitmap);
+                    canvas.texSubImage2D(this, mBorder, mBorder, bitmap);
+//                    canvas.initializeTextureSize(this, format, type);
+//                    canvas.texSubImage2D(this, mBorder, mBorder, bitmap, format, type);
 
                     if (mBorder > 0) {
                         // Left border
                         Bitmap line = getBorderLine(true, config, texHeight);
-                        canvas.texSubImage2D(this, 0, 0, line, format, type);
+                        canvas.texSubImage2D(this, 0, 0, line);
+//                        canvas.texSubImage2D(this, 0, 0, line, format, type);
 
                         // Top border
                         line = getBorderLine(false, config, texWidth);
-                        canvas.texSubImage2D(this, 0, 0, line, format, type);
+                        canvas.texSubImage2D(this, 0, 0, line);
+//                        canvas.texSubImage2D(this, 0, 0, line, format, type);
                     }
 
                     // Right border
                     if (mBorder + bWidth < texWidth) {
                         Bitmap line = getBorderLine(true, config, texHeight);
-                        canvas.texSubImage2D(this, mBorder + bWidth, 0, line, format, type);
+                        canvas.texSubImage2D(this, mBorder + bWidth, 0, line);
+//                        canvas.texSubImage2D(this, mBorder + bWidth, 0, line, format, type);
                     }
 
                     // Bottom border
                     if (mBorder + bHeight < texHeight) {
                         Bitmap line = getBorderLine(false, config, texWidth);
-                        canvas.texSubImage2D(this, 0, mBorder + bHeight, line, format, type);
+                        canvas.texSubImage2D(this, 0, mBorder + bHeight, line);
+//                        canvas.texSubImage2D(this, 0, mBorder + bHeight, line, format, type);
                     }
                 }
             } finally {

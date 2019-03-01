@@ -188,6 +188,8 @@ public interface GLCanvas {
                                        Bitmap bitmap,
                                        int format, int type);
 
+    public abstract void texSubImage2D(BasicTexture texture, int xOffset, int yOffset, Bitmap bitmap);
+
     /**
      * Generates buffers and uploads the buffer data.
      *

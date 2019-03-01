@@ -1,12 +1,9 @@
 package com.example.ponycui_home.svgaplayer;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
 
-import com.opensource.svgaplayer.SVGADrawable;
 import com.opensource.svgaplayer.SVGAGLView;
 import com.opensource.svgaplayer.SVGAImageView;
 import com.opensource.svgaplayer.SVGAParser;
@@ -14,23 +11,22 @@ import com.opensource.svgaplayer.SVGAVideoEntity;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.net.URL;
 import java.util.ArrayList;
 
-public class AnimationFromAssetsActivity extends Activity {
+public class AnimationWithImageViewActivity extends Activity {
 
     SVGAImageView animationView = null;
-    SVGAGLView animationGLView = null;
+//    SVGAGLView animationGLView = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        animationGLView = new SVGAGLView(this);
-        setContentView(animationGLView);
-        loadAnimation();
+//        animationGLView = new SVGAGLView(this);
+//        setContentView(animationGLView);
+//        loadAnimation();
 
-//        animationView = new SVGAImageView(this);
+        animationView = new SVGAImageView(this);
 //        animationView.setBackgroundColor(Color.BLACK);
 //        animationView.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -38,8 +34,18 @@ public class AnimationFromAssetsActivity extends Activity {
 //                loadAnimation();
 //            }
 //        });
-//        loadAnimation();
-//        setContentView(animationView);
+        loadAnimation();
+        setContentView(animationView);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        animationView.stopAnimation();
     }
 
     private void loadAnimation() {
@@ -47,11 +53,11 @@ public class AnimationFromAssetsActivity extends Activity {
         parser.decodeFromAssets(this.randomSample(), new SVGAParser.ParseCompletion() {
             @Override
             public void onComplete(@NotNull SVGAVideoEntity videoItem) {
-//                animationView.setVideoItem(videoItem);
-//                animationView.startAnimation();
+                animationView.setVideoItem(videoItem);
+                animationView.startAnimation();
 
-                animationGLView.setVideoItem(videoItem);
-                animationGLView.startAnimation();
+//                animationGLView.setVideoItem(videoItem);
+//                animationGLView.startAnimation();
             }
             @Override
             public void onError() {

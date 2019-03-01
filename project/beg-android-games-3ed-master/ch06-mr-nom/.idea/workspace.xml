@@ -2,8 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b2838686-dc45-47fc-8e3f-6057676688de" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/java/com/kugou/glutils/FPSCounter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ch09-jumper/.idea/caches/gradle_models.ser" beforeDir="false" afterPath="$PROJECT_DIR$/../ch09-jumper/.idea/caches/gradle_models.ser" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/AnimationWithImageViewActivity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/AnimationWithSurfaceViewActivity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/opensource/svgaplayer/SVGASurfaceView.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/opensource/svgaplayer/SVGASurfaceViewDrawable.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/AnimationFromAssetsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/AnimationFromAssetsActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/GLCanvas.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/GLCanvas.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/GLES20Canvas.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/GLES20Canvas.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/UploadedTexture.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/UploadedTexture.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/opensource/svgaplayer/SVGAVideoEntity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/opensource/svgaplayer/SVGAVideoEntity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../VideoDecoderAndRender/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../VideoDecoderAndRender/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch07-gl-basics/.idea/caches/gradle_models.ser" beforeDir="false" afterPath="$PROJECT_DIR$/../ch07-gl-basics/.idea/caches/gradle_models.ser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ch07-gl-basics/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ch07-gl-basics/.idea/misc.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,19 +28,20 @@
     <session id="581151387">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.opened" value="1" />
+          <entry key="project.open.time.1" value="1" />
+          <entry key="project.opened" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="java" value="2" />
+          <entry key="java" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JAVA" value="2" />
+          <entry key="JAVA" value="3" />
         </counts>
       </usages-collector>
     </session>
@@ -56,7 +70,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/mrnom/World.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="884">
+            <state relative-caret-position="780">
               <caret line="52" column="5" selection-start-line="52" selection-start-column="5" selection-end-line="52" selection-end-column="5" />
             </state>
           </provider>
@@ -65,26 +79,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidAudio.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
+            <state relative-caret-position="105">
               <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidGame.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="260">
-              <caret line="34" column="47" lean-forward="true" selection-start-line="34" selection-start-column="47" selection-end-line="34" selection-end-column="47" />
+            <state relative-caret-position="183">
+              <caret line="62" column="4" selection-start-line="62" selection-start-column="4" selection-end-line="76" selection-end-column="5" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidGraphics.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="21" column="18" lean-forward="true" selection-start-line="21" selection-start-column="18" selection-end-line="21" selection-end-column="18" />
+            <state relative-caret-position="240">
+              <caret line="30" column="5" lean-forward="true" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -92,8 +106,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidFastRenderView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="32" selection-start-line="17" selection-start-column="32" selection-end-line="17" selection-end-column="32" />
+            <state relative-caret-position="532">
+              <caret line="40" column="41" selection-start-line="40" selection-start-column="30" selection-end-line="40" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -103,15 +117,18 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>FPSCounter</find>
+      <find>AndroidFastRenderView</find>
+      <find>renderView</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="23" />
-    <option name="width" value="1440" />
-    <option name="height" value="877" />
+    <option name="x" value="161" />
+    <option name="y" value="40" />
+    <option name="width" value="1627" />
+    <option name="height" value="977" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -246,21 +263,21 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="877" extended-state="0" />
+    <frame x="161" y="40" width="1627" height="977" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Captures" order="0" weight="0.25" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.32840028" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.2901619" />
       <window_info id="Structure" order="2" side_tool="true" />
       <window_info id="Image Layers" order="3" />
       <window_info id="Designer" order="4" />
       <window_info id="Capture Tool" order="5" />
       <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info anchor="bottom" id="Find" />
       <window_info anchor="bottom" id="Version Control" order="0" show_stripe_button="false" />
       <window_info anchor="bottom" id="TODO" order="1" />
       <window_info anchor="bottom" id="Terminal" order="2" />
       <window_info anchor="bottom" id="Event Log" order="3" side_tool="true" />
+      <window_info anchor="bottom" id="Find" order="4" />
       <window_info anchor="right" id="Capture Analysis" order="0" />
       <window_info anchor="right" id="Theme Preview" order="1" />
       <window_info anchor="right" id="Palette&#9;" order="2" />
@@ -270,41 +287,48 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/Graphics.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/Game.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="1" lean-forward="true" selection-start-line="16" selection-start-column="1" selection-end-line="16" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidFastRenderView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="532">
+          <caret line="40" column="41" selection-start-line="40" selection-start-column="30" selection-end-line="40" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/mrnom/World.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="884">
+        <state relative-caret-position="780">
           <caret line="52" column="5" selection-start-line="52" selection-start-column="5" selection-end-line="52" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidAudio.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
+        <state relative-caret-position="105">
           <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/Graphics.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidFastRenderView.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="17" column="32" selection-start-line="17" selection-start-column="32" selection-end-line="17" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidGame.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="34" column="47" lean-forward="true" selection-start-line="34" selection-start-column="47" selection-end-line="34" selection-end-column="47" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidGraphics.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="21" column="18" lean-forward="true" selection-start-line="21" selection-start-column="18" selection-end-line="21" selection-end-column="18" />
+        <state relative-caret-position="240">
+          <caret line="30" column="5" lean-forward="true" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidGame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="62" column="4" selection-start-line="62" selection-start-column="4" selection-end-line="76" selection-end-column="5" />
         </state>
       </provider>
     </entry>

@@ -89,8 +89,8 @@ class SVGAVideoEntity {
     private fun resetImages(obj: JSONObject) {
         obj.optJSONObject("images")?.let { imgObjects ->
             imgObjects.keys().forEach { imageKey ->
-//                options.inPreferredConfig = Bitmap.Config.RGB_565
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888
+                options.inPreferredConfig = Bitmap.Config.RGB_565
+//                options.inPreferredConfig = Bitmap.Config.ARGB_4444
                 var filePath = cacheDir.absolutePath + "/" + imgObjects[imageKey]
                 var bitmap = if (File(filePath).exists()) BitmapFactory.decodeFile(filePath, options) else null
                 if (bitmap != null) {
@@ -109,8 +109,8 @@ class SVGAVideoEntity {
     private fun resetImages(obj: MovieEntity) {
         obj.images?.entries?.forEach {
             val imageKey = it.key
-//            options.inPreferredConfig = Bitmap.Config.RGB_565
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888
+            options.inPreferredConfig = Bitmap.Config.RGB_565
+//            options.inPreferredConfig = Bitmap.Config.ARGB_4444
             val byteArray = it.value.toByteArray()
             if (byteArray.count() < 4) {
                 return@forEach

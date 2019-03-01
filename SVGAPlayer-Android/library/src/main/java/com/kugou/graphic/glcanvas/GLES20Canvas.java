@@ -953,6 +953,13 @@ public class GLES20Canvas implements GLCanvas {
         GLUtils.texSubImage2D(target, 0, xOffset, yOffset, bitmap, format, type);
     }
 
+    public void texSubImage2D(BasicTexture texture, int xOffset, int yOffset, Bitmap bitmap) {
+        int target = texture.getTarget();
+        GLES20.glBindTexture(target, texture.getId());
+        checkError();
+        GLUtils.texSubImage2D(target, 0, xOffset, yOffset, bitmap);
+    }
+
     @Override
     public int uploadBuffer(FloatBuffer buf) {
         return uploadBuffer(buf, FLOAT_SIZE);

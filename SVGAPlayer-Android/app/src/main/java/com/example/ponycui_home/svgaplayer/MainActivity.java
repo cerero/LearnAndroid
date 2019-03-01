@@ -71,7 +71,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void setupData() {
-        this.items.add(new SampleItem("Animation From Assets", new Intent(this, AnimationFromAssetsActivity.class)));
+
+        this.items.add(new SampleItem("Animation With ImageView", new Intent(this, AnimationWithImageViewActivity.class)));
+        this.items.add(new SampleItem("Animation With SurfaceView", new Intent(this, AnimationWithSurfaceViewActivity.class)));
+        this.items.add(new SampleItem("Animation With GLView", new Intent(this, AnimationFromAssetsActivity.class)));
         this.items.add(new SampleItem("Animation From Network", new Intent(this, AnimationFromNetworkActivity.class)));
         this.items.add(new SampleItem("Animation From Layout XML", new Intent(this, AnimationFromLayoutActivity.class)));
         this.items.add(new SampleItem("Animation With Dynamic Image", new Intent(this, AnimationWithDynamicImageActivity.class)));

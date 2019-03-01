@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.widget.ImageView
 import com.opensource.svgaplayer.drawer.SVGACanvasDrawer
 
@@ -34,7 +35,10 @@ class SVGADrawable(val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynamicE
     private val drawer = SVGACanvasDrawer(videoItem, dynamicItem)
     private var canvasWrapper : CanvasWrapper = CanvasWrapper(null ,null)
 
+    private var startTime: Long = 0
     override fun draw(canvas: Canvas?) {
+        var deltaTime = (System.nanoTime() - startTime) / 1000000000.0f
+
         if (cleared) {
             return
         }
@@ -42,6 +46,9 @@ class SVGADrawable(val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynamicE
         canvasWrapper?.let {
             drawer.drawFrame(it, currentFrame, scaleType)
         }
+
+        Log.d("SVGASurfaceView", "render thread " + Thread.currentThread().name + " running, deltatime: " + deltaTime)
+        startTime = System.nanoTime()
     }
 
     override fun setAlpha(alpha: Int) { }
