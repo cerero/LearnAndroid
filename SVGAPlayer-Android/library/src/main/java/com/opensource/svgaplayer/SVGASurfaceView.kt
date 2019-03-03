@@ -18,7 +18,7 @@ import java.net.URL
  * Created by PonyCui on 2017/3/29.
  */
 
-open class SVGASurfaceView : SurfaceView, Runnable {
+open class SVGASurfaceView : SurfaceView, Runnable {//, SurfaceHolder.Callback
 
     enum class FillMode {
         Backward,
@@ -44,63 +44,75 @@ open class SVGASurfaceView : SurfaceView, Runnable {
     @Volatile private var running: Boolean = false
 
     constructor(context: Context?) : super(context) {
-        setSoftwareLayerType()
+//        setSoftwareLayerType()
         init()
     }
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        setSoftwareLayerType()
-        attrs?.let { loadAttrs(it) }
-        init()
-    }
+//    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+//        setSoftwareLayerType()
+//        attrs?.let { loadAttrs(it) }
+//        init()
+//    }
+//
+//    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+//        setSoftwareLayerType()
+//        attrs?.let { loadAttrs(it) }
+//        init()
+//    }
+//
+//    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
+//        setSoftwareLayerType()
+//        attrs?.let { loadAttrs(it) }
+//        init()
+//    }
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        setSoftwareLayerType()
-        attrs?.let { loadAttrs(it) }
-        init()
-    }
-
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        setSoftwareLayerType()
-        attrs?.let { loadAttrs(it) }
-        init()
-    }
-
-    private fun setSoftwareLayerType() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
-    }
+//    private fun setSoftwareLayerType() {
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+//            this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+//        }
+//    }
 
     private fun init() {
         surfaceHolder = getHolder()
     }
 
+//    override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+//        synchronized(running) {
+//            surfaceHolder = holder
+//        }
+//    }
+//
+//    override fun surfaceDestroyed(holder: SurfaceHolder?) {
+//        synchronized(running) {
+//            surfaceHolder = null
+//        }
+//    }
+//
+//    override fun surfaceCreated(holder: SurfaceHolder?) {
+//        synchronized(running) {
+//            surfaceHolder = holder
+//        }
+//    }
+
     override fun run() {
 //        var startTime = System.nanoTime()
         while (running) {
+//            synchronized(
             var surfaceHolder = surfaceHolder as? SurfaceHolder ?: continue
             var drawable = drawable as? SVGASurfaceViewDrawable ?: continue
-
-            if (surfaceHolder.surface.isValid && drawable != null) {
-//                var deltaTime = (System.nanoTime() - startTime) / 1000000000.0f
-//                Log.d("SVGASurfaceView", "render thread " + Thread.currentThread().name + " is running, deltatime: " + deltaTime)
-//                startTime = System.nanoTime()
-//                synchronized(drawable) {
-                    var canvas = holder.lockCanvas()
-                    canvas.drawRGB(0, 0, 0)
-                    drawable.draw(canvas)
-                    holder.unlockCanvasAndPost(canvas)
-//                }
+            if (surfaceHolder.surface.isValid) {
+                var canvas = surfaceHolder.lockCanvas()
+                drawable.draw(canvas)
+                surfaceHolder.unlockCanvasAndPost(canvas)
             }
+//            try {
+//                Thread.sleep(30)
+//            } catch (e: java.lang.Exception) {}
         }
 
     }
 
     private fun resume() {
-        if (renderThread != null)
-            pause()
-
         running = true
         renderThread = Thread(this)
         renderThread?.start()
@@ -200,10 +212,13 @@ open class SVGASurfaceView : SurfaceView, Runnable {
             animator.duration = ((endFrame - startFrame + 1) * (1000 / it.FPS) / durationScale).toLong()
             animator.repeatCount = if (loops <= 0) 99999 else loops - 1
             animator.addUpdateListener {
-//                synchronized(drawable) {
-                    drawable.currentFrame = animator.animatedValue as Int
-                    callback?.onStep(drawable.currentFrame, ((drawable.currentFrame + 1).toDouble() / drawable.videoItem.frames.toDouble()))
+//                if (renderThread?.isAlive() ?: false) {
+//
+//                } else {
+//                    renderThread?.interrupt()
 //                }
+                drawable.currentFrame = animator.animatedValue as Int
+                callback?.onStep(drawable.currentFrame, ((drawable.currentFrame + 1).toDouble() / drawable.videoItem.frames.toDouble()))
             }
             animator.addListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(animation: Animator?) {
@@ -254,13 +269,13 @@ open class SVGASurfaceView : SurfaceView, Runnable {
     }
 
     fun stopAnimation(clear: Boolean) {
-        pause()
         animator?.cancel()
         animator?.removeAllListeners()
         animator?.removeAllUpdateListeners()
-        (drawable as? SVGADrawable)?.let {
+        (drawable as? SVGASurfaceViewDrawable)?.let {
             it.cleared = clear
         }
+        pause()
     }
 
     fun setVideoItem(videoItem: SVGAVideoEntity?) {
@@ -278,7 +293,7 @@ open class SVGASurfaceView : SurfaceView, Runnable {
 
     fun stepToFrame(frame: Int, andPlay: Boolean) {
         pauseAnimation()
-        val drawable = drawable as? SVGADrawable ?: return
+        val drawable = drawable as? SVGASurfaceViewDrawable ?: return
         drawable.currentFrame = frame
         if (andPlay) {
             startAnimation()
@@ -289,7 +304,7 @@ open class SVGASurfaceView : SurfaceView, Runnable {
     }
 
     fun stepToPercentage(percentage: Double, andPlay: Boolean) {
-        val drawable = drawable as? SVGADrawable ?: return
+        val drawable = drawable as? SVGASurfaceViewDrawable ?: return
 //        synchronized(drawable) {
             var frame = (drawable.videoItem.frames * percentage).toInt()
             if (frame >= drawable.videoItem.frames && frame > 0) {

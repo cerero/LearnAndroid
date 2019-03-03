@@ -9,7 +9,7 @@ import com.kugou.graphic.glview.GLView
 import com.opensource.svgaplayer.drawer.SVGACanvasDrawer
 
 class SVGASurfaceViewDrawable (val videoItem: SVGAVideoEntity, val dynamicItem: SVGADynamicEntity, val surfaceView : SurfaceView) {
-    var isDirty = true
+    private var isDirty = true
     var cleared = true
         internal set (value) {
             if (field == value) {
@@ -39,6 +39,7 @@ class SVGASurfaceViewDrawable (val videoItem: SVGAVideoEntity, val dynamicItem: 
         var deltaTime = (System.nanoTime() - startTime) / 1000000000.0f
         synchronized(lock) {
             if (cleared) {
+                canvas?.drawRGB(0, 0, 0)
                 return
             }
 
@@ -46,6 +47,7 @@ class SVGASurfaceViewDrawable (val videoItem: SVGAVideoEntity, val dynamicItem: 
                 lock.wait()
             }
 
+            canvas?.drawRGB(0, 0, 0)
             canvasWrapper.normCavas = canvas
             canvasWrapper.let {
                 drawer.drawFrame(it, currentFrame, scaleType)
@@ -58,7 +60,6 @@ class SVGASurfaceViewDrawable (val videoItem: SVGAVideoEntity, val dynamicItem: 
     }
 
     private fun invalidateSelf() {
-//        surfaceView.invalidate()
         synchronized(lock) {
             isDirty = true
             lock.notifyAll()
