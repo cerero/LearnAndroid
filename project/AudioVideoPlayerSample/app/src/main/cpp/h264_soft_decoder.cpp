@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <string>
+#include "h264_soft_decoder.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -11,6 +12,7 @@ extern "C" {
 #define COLOR_FORMAT_YUV420 0
 #define COLOR_FORMAT_RGB565LE 1
 #define COLOR_FORMAT_BGR32 2
+//#define COLOR_FORMAT_RGBA32 3
 
 class DecoderContext {
 public:
@@ -25,6 +27,9 @@ public:
             case COLOR_FORMAT_BGR32:
                 color_format = PIX_FMT_BGR32;
                 break;
+//            case COLOR_FORMAT_RGBA32:
+//                color_format = PIX_FMT_RGBA;
+//                break;
         }
 
         codec = avcodec_find_decoder(CODEC_ID_H264);
@@ -84,13 +89,10 @@ jint getHeight(JNIEnv* env, jobject thiz);
 jint getOutputByteSize(JNIEnv* env, jobject thiz);
 jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer);
 
-namespace h264softdecoder{
-    void OnLoad(JNIEnv* env, void* reserved);
-}
 void h264softdecoder::OnLoad(JNIEnv* env, void* reserved) {
     av_register_all();
 
-    JNINativeMethod nm[7];
+    JNINativeMethod nm[8];
     nm[0].name = "nativeInit";
     nm[0].signature = "(I)V";
     nm[0].fnPtr = (void *)nativeInit;
@@ -166,7 +168,7 @@ jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_unit
 
     int frameFinished = 0;
     int res = avcodec_decode_video2(ctx->codec_ctx, ctx->src_frame, &frameFinished, &packet);
-
+    LOGD("NativeSoftDecode", "consumeNalUnitsFromDirectBuffer frameFinished:%d", frameFinished);
     if (frameFinished)
         ctx->frame_ready = 1;
 

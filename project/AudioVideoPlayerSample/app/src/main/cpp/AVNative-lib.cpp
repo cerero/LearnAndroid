@@ -1,5 +1,7 @@
 #include <jni.h>
 #include <string>
+#include "h264_soft_decoder.h"
+
 extern "C" {
 #include <libavutil/log.h>
 #include "my_log.h"
@@ -17,6 +19,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* pVm, void* reserved){
     if (pVm->GetEnv((void **)&env, JNI_VERSION_1_6) != JNI_OK) {
         return -1;
     }
+    init_my_log();
 
     JNINativeMethod nm[1];
     nm[0].name = "stringFromJNI";
@@ -25,6 +28,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* pVm, void* reserved){
     jclass cls = env->FindClass("com/kugou/audiovideoplayersample/MainActivity");
     env->RegisterNatives(cls, nm, 1);
 
-    init_my_log();
+    h264softdecoder::OnLoad(env, reserved);
+
     return JNI_VERSION_1_6;
 }

@@ -31,15 +31,18 @@ public class MediaMoviePlayer {
 
 	private final IFrameCallback mCallback;
 	private final boolean mAudioEnabled;
+	private final boolean mCanHardDecodeH264;
 
 	public MediaMoviePlayer(@NonNull final Surface outputSurface,
-		@NonNull final IFrameCallback callback, final boolean audio_enable) {
+		@NonNull final IFrameCallback callback, final boolean audio_enable, final boolean canHardDecodeH264) {
 
     	if (DEBUG) Log.v(TAG, "Constructor:");
 
 		mOutputSurface = outputSurface;
 		mCallback = callback;
 		mAudioEnabled = audio_enable;
+		mCanHardDecodeH264 = canHardDecodeH264;
+
 		new Thread(mMoviePlayerTask, TAG).start();
 
 		//下面只所以进行线程同步，是为了让playertask正常初始化，设置好状态
@@ -229,6 +232,11 @@ public class MediaMoviePlayer {
 	private final Object mVideoSync = new Object();
 	private final Surface mOutputSurface;
 	protected MediaExtractor mVideoMediaExtractor;
+
+	private H264SoftDecoder mH264SoftDecoder;
+	private ByteBuffer mVideoSoftDecodeInputBuffer;
+    private ByteBuffer mVideoSoftDecodeOutBuffer;
+
 	private MediaCodec mVideoMediaCodec;
 	private MediaCodec.BufferInfo mVideoBufferInfo;
 	private ByteBuffer[] mVideoInputBuffers;
@@ -673,13 +681,18 @@ public class MediaMoviePlayer {
 		mVideoInputDone = mVideoOutputDone = true;
 		Thread videoThread = null, audioThread = null;
 		if (mVideoTrackIndex >= 0) {
-			final MediaCodec codec = internalStartVideo(mVideoMediaExtractor, mVideoTrackIndex);
-			if (codec != null) {
-		        mVideoMediaCodec = codec;
-		        mVideoBufferInfo = new MediaCodec.BufferInfo();
-		        mVideoInputBuffers = codec.getInputBuffers();
-		        mVideoOutputBuffers = codec.getOutputBuffers();
-			}
+		    if (mCanHardDecodeH264) {
+                final MediaCodec codec = internalStartVideo(mVideoMediaExtractor, mVideoTrackIndex);
+                if (codec != null) {
+                    mVideoMediaCodec = codec;
+                    mVideoBufferInfo = new MediaCodec.BufferInfo();
+                    mVideoInputBuffers = codec.getInputBuffers();
+                    mVideoOutputBuffers = codec.getOutputBuffers();
+                }
+            } else {
+                mH264SoftDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_BGR32);
+            }
+
 			mVideoInputDone = mVideoOutputDone = false;
 			videoThread = new Thread(mVideoTask, "VideoTask");
 		}
@@ -784,7 +797,48 @@ public class MediaMoviePlayer {
         }
 	}
 
+    protected boolean internal_process_input_with_soft_decode(final H264SoftDecoder softDecoder, final MediaExtractor extractor, final long presentationTimeUs) {
+//		if (DEBUG) Log.v(TAG, "internalProcessInput:presentationTimeUs=" + presentationTimeUs);
+        boolean result = true;
+        boolean frame_ready = false;
+        while (mIsRunning && !frame_ready && result) {
+            if (mVideoSoftDecodeInputBuffer == null) {
+                mVideoSoftDecodeInputBuffer = ByteBuffer.allocateDirect(mVideoWidth * mVideoHeight);
+            }
+            //1 extrator 取出sample data
+            final int size = extractor.readSampleData(mVideoSoftDecodeInputBuffer, 0);
+
+            //2 转换为nalu
+            //3 传给 softDecoder解码
+            softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, size, presentationTimeUs);
+            frame_ready = softDecoder.isFrameReady();
+            if (frame_ready) {
+                Log.i(TAG, String.format("softdecode width=%1$d height=%2$d", softDecoder.getWidth(), softDecoder.getHeight()));
+            }
+
+            result = extractor.advance();	// return false if no data is available
+
+            ByteBuffer tmp = mVideoSoftDecodeInputBuffer.duplicate();
+//            final int inputBufIndex = codec.dequeueInputBuffer(TIMEOUT_USEC);
+//            if (inputBufIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
+//                break;
+//            if (inputBufIndex >= 0) {
+//                final int size = extractor.readSampleData(inputBuffers[inputBufIndex], 0);
+//                if (size > 0) {
+////                    ByteBuffer tmp = inputBuffers[inputBufIndex].duplicate();
+////                    Log.i(TAG, "sample size:" + tmp.capacity() + "," + tmp.get(0) + " " + tmp.get(1) + " " + tmp.get(2) + " " + tmp.get(3) + " " + tmp.get(4) + " " + tmp.get(5) + " " + tmp.get(6) + " " + tmp.get(7) + " " + tmp.get(8));
+//                    codec.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
+//                }
+//                result = extractor.advance();	// return false if no data is available
+//                break;
+//            }
+        }
+        return result;
+    }
 	/**
+     * 取出MediaCodec的inputbuffer
+     * 调用MediaExtractor的readSampleData
+     * 写入inputbuffer
 	 * @param codec
 	 * @param extractor
 	 * @param inputBuffers
@@ -818,19 +872,30 @@ public class MediaMoviePlayer {
     		presentationTimeUs += previousVideoPresentationTimeUs - presentationTimeUs; // + EPS;
     	}
     	previousVideoPresentationTimeUs = presentationTimeUs; */
-        final boolean b = internal_process_input(mVideoMediaCodec, mVideoMediaExtractor, mVideoInputBuffers,
-        		presentationTimeUs, false);
+        final boolean b;
+        if (mCanHardDecodeH264) {
+            b = internal_process_input(mVideoMediaCodec, mVideoMediaExtractor, mVideoInputBuffers,
+                    presentationTimeUs, false);
+        } else {
+            b = internal_process_input_with_soft_decode(mH264SoftDecoder, mVideoMediaExtractor, presentationTimeUs);
+        }
+
         if (!b) {//no data is available in extrator
         	if (DEBUG) Log.i(TAG, "video track input reached EOS");
-    		while (mIsRunning) {
-                final int inputBufIndex = mVideoMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
-                if (inputBufIndex >= 0) {
-                	mVideoMediaCodec.queueInputBuffer(inputBufIndex, 0, 0, 0L,
-                		MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-                	if (DEBUG) Log.v(TAG, "sent input EOS:" + mVideoMediaCodec);
-                	break;
+        	if (mCanHardDecodeH264) {//通知硬解码起结束接收数据
+                while (mIsRunning) {
+                    final int inputBufIndex = mVideoMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
+                    if (inputBufIndex >= 0) {
+                        mVideoMediaCodec.queueInputBuffer(inputBufIndex, 0, 0, 0L,
+                                MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                        if (DEBUG) Log.v(TAG, "sent input EOS:" + mVideoMediaCodec);
+                        break;
+                    }
                 }
-        	}
+            } else {//软解结束逻辑
+
+            }
+
     		synchronized (mVideoTask) {
     			mVideoInputDone = true;
     			mVideoTask.notifyAll();
@@ -842,40 +907,45 @@ public class MediaMoviePlayer {
 	 */
 	private final void handleOutputVideo(final IFrameCallback frameCallback) {
 //    	if (DEBUG) Log.v(TAG, "handleDrainVideo:");
-		while (mIsRunning && !mVideoOutputDone) {
-			final int decoderStatus = mVideoMediaCodec.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
-			if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
-				return;
-			} else if (decoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-				mVideoOutputBuffers = mVideoMediaCodec.getOutputBuffers();
-				if (DEBUG) Log.d(TAG, "INFO_OUTPUT_BUFFERS_CHANGED:");
-			} else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-				final MediaFormat newFormat = mVideoMediaCodec.getOutputFormat();
-				if (DEBUG) Log.d(TAG, "video decoder output format changed: " + newFormat);
-			} else if (decoderStatus < 0) {
-				throw new RuntimeException(
-					"unexpected result from video decoder.dequeueOutputBuffer: " + decoderStatus);
-			} else { // decoderStatus >= 0
-				boolean doRender = false;
-				if (mVideoBufferInfo.size > 0) {
-					doRender = (mVideoBufferInfo.size != 0)
-						&& !internalWriteVideo(mVideoOutputBuffers[decoderStatus],
-							0, mVideoBufferInfo.size, mVideoBufferInfo.presentationTimeUs);
-					if (doRender) {
-						if (!frameCallback.onFrameAvailable(mVideoBufferInfo.presentationTimeUs))
-							mVideoStartTime = adjustPresentationTime(mVideoSync, mVideoStartTime, mVideoBufferInfo.presentationTimeUs);
-					}
-				}
-				mVideoMediaCodec.releaseOutputBuffer(decoderStatus, doRender);
-				if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-					if (DEBUG) Log.d(TAG, "video:output EOS");
-					synchronized (mVideoTask) {
-						mVideoOutputDone = true;
-						mVideoTask.notifyAll();
-					}
-				}
-			}
-		}
+        if (mCanHardDecodeH264) {
+            while (mIsRunning && !mVideoOutputDone) { //硬解后的图像，输出到surface，并按照pts进行帧同步显示
+                final int decoderStatus = mVideoMediaCodec.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
+                if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                    return;
+                } else if (decoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                    mVideoOutputBuffers = mVideoMediaCodec.getOutputBuffers();
+                    if (DEBUG) Log.d(TAG, "INFO_OUTPUT_BUFFERS_CHANGED:");
+                } else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    final MediaFormat newFormat = mVideoMediaCodec.getOutputFormat();
+                    if (DEBUG) Log.d(TAG, "video decoder output format changed: " + newFormat);
+                } else if (decoderStatus < 0) {
+                    throw new RuntimeException(
+                            "unexpected result from video decoder.dequeueOutputBuffer: " + decoderStatus);
+                } else { // decoderStatus >= 0
+                    boolean doRender = false;
+                    if (mVideoBufferInfo.size > 0) {
+                        doRender = (mVideoBufferInfo.size != 0)
+                                && !internalWriteVideo(mVideoOutputBuffers[decoderStatus],
+                                0, mVideoBufferInfo.size, mVideoBufferInfo.presentationTimeUs);
+                        if (doRender) {
+                            if (!frameCallback.onFrameAvailable(mVideoBufferInfo.presentationTimeUs))
+                                mVideoStartTime = adjustPresentationTime(mVideoSync, mVideoStartTime, mVideoBufferInfo.presentationTimeUs);
+                        }
+                    }
+                    mVideoMediaCodec.releaseOutputBuffer(decoderStatus, doRender);
+                    if ((mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                        if (DEBUG) Log.d(TAG, "video:output EOS");
+                        synchronized (mVideoTask) {
+                            mVideoOutputDone = true;
+                            mVideoTask.notifyAll();
+                        }
+                    }
+                }
+            }
+        } else {
+
+        }
+
 	}
 
 	/**
@@ -1045,6 +1115,11 @@ public class MediaMoviePlayer {
 			mAudioMediaExtractor.release();
 			mAudioMediaExtractor = null;
 		}
+
+        mH264SoftDecoder = null;
+        mVideoSoftDecodeInputBuffer = null;
+        mVideoSoftDecodeOutBuffer = null;
+
         mVideoBufferInfo = mAudioBufferInfo = null;
         mVideoInputBuffers = mVideoOutputBuffers = null;
         mAudioInputBuffers = mAudioOutputBuffers = null;
