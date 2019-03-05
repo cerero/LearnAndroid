@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <string>
+#include <cstdint>
 #include "h264_soft_decoder.h"
 
 extern "C" {
@@ -32,7 +33,8 @@ public:
 //                break;
         }
 
-        codec = avcodec_find_decoder(CODEC_ID_H264);
+        frame_ready = 0;
+        codec = avcodec_find_decoder(AV_CODEC_ID_H264);//CODEC_ID_H264
         codec_ctx = avcodec_alloc_context3(codec);
 
         codec_ctx->pix_fmt = PIX_FMT_YUV420P;
@@ -51,6 +53,7 @@ public:
     AVFrame *dst_frame;
     SwsContext *convert_ctx;
     int frame_ready;
+    int64_t pkt_pts;
 
     ~DecoderContext() {
         if (codec_ctx)
@@ -87,12 +90,14 @@ jboolean isFrameReady(JNIEnv* env, jobject thiz);
 jint getWidth(JNIEnv* env, jobject thiz);
 jint getHeight(JNIEnv* env, jobject thiz);
 jint getOutputByteSize(JNIEnv* env, jobject thiz);
+jlong getLastPTS(JNIEnv* env, jobject thiz);
 jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer);
 
 void h264softdecoder::OnLoad(JNIEnv* env, void* reserved) {
     av_register_all();
 
-    JNINativeMethod nm[8];
+    JNINativeMethod nm[9];
+
     nm[0].name = "nativeInit";
     nm[0].signature = "(I)V";
     nm[0].fnPtr = (void *)nativeInit;
@@ -124,9 +129,14 @@ void h264softdecoder::OnLoad(JNIEnv* env, void* reserved) {
     nm[7].name = "decodeFrameToDirectBuffer";
     nm[7].signature = "(Ljava/nio/ByteBuffer;)J";
     nm[7].fnPtr = (void *)decodeFrameToDirectBuffer;
+
+    nm[8].name = "getLastPTS";
+    nm[8].signature = "()J";
+    nm[8].fnPtr = (void *)getLastPTS;
+
     jclass cls = env->FindClass("com/kugou/media/H264SoftDecoder");
 
-    env->RegisterNatives(cls, nm, 8);
+    env->RegisterNatives(cls, nm, 9);
 }
 
 //JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
@@ -165,19 +175,26 @@ jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_unit
             .size = num_bytes,
             .pts = pkt_pts
     };
+    ctx->pkt_pts = pkt_pts;
 
-    int frameFinished = 0;
-    int res = avcodec_decode_video2(ctx->codec_ctx, ctx->src_frame, &frameFinished, &packet);
-    LOGD("NativeSoftDecode", "consumeNalUnitsFromDirectBuffer frameFinished:%d", frameFinished);
-    if (frameFinished)
+    int got_picture = 0;
+    ctx->frame_ready = 0;
+    int ret = avcodec_decode_video2(ctx->codec_ctx, ctx->src_frame, &got_picture, &packet);
+//    LOGD("NativeSoftDecode", "consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d", got_picture, ret);
+    if (ret > 0 && got_picture) {
         ctx->frame_ready = 1;
-
-    return res;
+    }
+    return ret;
 }
 
 jboolean isFrameReady(JNIEnv* env, jobject thiz) {
     DecoderContext *ctx = (DecoderContext *)DecoderContext::get_ctx(env, thiz);
     return ctx->frame_ready ? JNI_TRUE : JNI_FALSE;
+}
+
+jlong getLastPTS(JNIEnv* env, jobject thiz) {
+    DecoderContext *ctx = (DecoderContext *)DecoderContext::get_ctx(env, thiz);
+    return ctx->pkt_pts
 }
 
 jint getWidth(JNIEnv* env, jobject thiz) {
@@ -212,7 +229,7 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
     int pic_buf_size = avpicture_get_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
 
     if (out_buf_len < pic_buf_size) {
-//        D("Input buffer too small");
+        LOGE("NativeSoftDecode", "Input buffer too small, couldn't decode to direct buffer");
         return -1;
     }
 

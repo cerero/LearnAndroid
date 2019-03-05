@@ -27,4 +27,5 @@ public class H264SoftDecoder {
     public native int getHeight();
     public native int getOutputByteSize();
     public native long decodeFrameToDirectBuffer(ByteBuffer buffer);
+    public native long getLastPTS();
 }

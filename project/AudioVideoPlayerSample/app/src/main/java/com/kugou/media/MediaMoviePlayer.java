@@ -690,7 +690,7 @@ public class MediaMoviePlayer {
                     mVideoOutputBuffers = codec.getOutputBuffers();
                 }
             } else {
-                mH264SoftDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_BGR32);
+                mH264SoftDecoder = internalStartVideoWithSoftDecode(mVideoMediaExtractor, mVideoTrackIndex);
             }
 
 			mVideoInputDone = mVideoOutputDone = false;
@@ -712,6 +712,72 @@ public class MediaMoviePlayer {
 		if (audioThread != null) audioThread.start();
 	}
 
+	protected H264SoftDecoder internalStartVideoWithSoftDecode(final MediaExtractor media_extractor, final int trackIndex) {
+		if (DEBUG) Log.v(TAG, "internalStartVideoWithSoftDecode: format width=" + mVideoWidth + ",height=" + mVideoHeight);
+		H264SoftDecoder softDecoder = null;
+		if (trackIndex >= 0) {
+			final MediaFormat format = media_extractor.getTrackFormat(trackIndex);
+			final String mime = format.getString(MediaFormat.KEY_MIME);
+
+			ByteBuffer spsByteBuffer = format.getByteBuffer("csd-0");
+			ByteBuffer ppsByteBuffer = format.getByteBuffer("csd-1");
+
+			int spsByteLen = spsByteBuffer.limit();
+			int ppsByteLen = ppsByteBuffer.limit();
+
+			mVideoSoftDecodeInputBuffer = ByteBuffer.allocateDirect(mVideoWidth * mVideoHeight * 4);
+			mVideoSoftDecodeInputBuffer.order(spsByteBuffer.order());
+
+			mVideoSoftDecodeInputBuffer.put(spsByteBuffer);
+			mVideoSoftDecodeInputBuffer.put(ppsByteBuffer);
+
+//			mVideoSoftDecodeInputBuffer.put(0, (byte) ((spsByteLen & 0xff000000) >> 24));
+//			mVideoSoftDecodeInputBuffer.put(1, (byte) ((spsByteLen & 0xff0000)   >> 16));
+//			mVideoSoftDecodeInputBuffer.put(2, (byte) ((spsByteLen & 0xff00)	 >> 8));
+//			mVideoSoftDecodeInputBuffer.put(3, (byte) (spsByteLen & 0xff));
+//
+//			mVideoSoftDecodeInputBuffer.put(spsByteLen + 0, (byte) ((ppsByteLen & 0xff000000) >> 24));
+//			mVideoSoftDecodeInputBuffer.put(spsByteLen + 1, (byte) ((ppsByteLen & 0xff0000)   >> 16));
+//			mVideoSoftDecodeInputBuffer.put(spsByteLen + 2, (byte) ((ppsByteLen & 0xff00) 	 >> 8));
+//			mVideoSoftDecodeInputBuffer.put(spsByteLen + 3, (byte) (ppsByteLen & 0xff));
+
+			mVideoSoftDecodeInputBuffer.rewind();
+
+//			Log.i(TAG, "after sps:" + mVideoSoftDecodeInputBuffer.get(0) + " " + mVideoSoftDecodeInputBuffer.get(1) + " " + mVideoSoftDecodeInputBuffer.get(2) + " " + mVideoSoftDecodeInputBuffer.get(3));
+			Log.i(TAG, "nalu type " + mVideoSoftDecodeInputBuffer.get(4));
+			Log.i(TAG, "sps size " + spsByteLen);
+
+//			Log.i(TAG, "after pps:" + mVideoSoftDecodeInputBuffer.get(spsByteLen + 0) + " " + mVideoSoftDecodeInputBuffer.get(spsByteLen + 1) + " " + mVideoSoftDecodeInputBuffer.get(spsByteLen + 2) + " " + mVideoSoftDecodeInputBuffer.get(spsByteLen + 3));
+			Log.i(TAG, "nalu type " + mVideoSoftDecodeInputBuffer.get(spsByteLen + 4));
+			Log.i(TAG, "pps size " + ppsByteLen);
+
+			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_YUV420);
+			softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, spsByteLen + ppsByteLen, 0);
+
+			if (DEBUG) Log.v(TAG, "internalStartVideoWithSoftDecode:codec started width:" + softDecoder.getWidth() + ",height:" + softDecoder.getHeight());
+
+//			if (!softDecoder.isFrameReady()) {
+//				throw new IllegalStateException(TAG + ":解析sps/pps异常");
+//			}
+
+//			mVideoSoftDecodeInputBuffer.put(ppsByteBuffer);
+//			mVideoSoftDecodeInputBuffer.put(0, (byte) ((ppsByteLen & 0xff000000) >> 24));
+//			mVideoSoftDecodeInputBuffer.put(1, (byte) ((ppsByteLen & 0xff0000)   >> 16));
+//			mVideoSoftDecodeInputBuffer.put(2, (byte) ((ppsByteLen & 0xff00) 	 >> 8));
+//			mVideoSoftDecodeInputBuffer.put(3, (byte) (ppsByteLen & 0xff));
+//			mVideoSoftDecodeInputBuffer.rewind();
+//			Log.i(TAG, "after pps:" + mVideoSoftDecodeInputBuffer.get(0) + " " + mVideoSoftDecodeInputBuffer.get(1) + " " + mVideoSoftDecodeInputBuffer.get(2) + " " + mVideoSoftDecodeInputBuffer.get(3));
+//			Log.i(TAG, "nalu type " + mVideoSoftDecodeInputBuffer.get(4));
+//			Log.i(TAG, "pps size " + ppsByteLen);
+
+//			softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, ppsByteLen, 0);
+//
+//			if (!softDecoder.isFrameReady()) {
+//				throw new IllegalStateException(TAG + ":解析pps异常");
+//			}
+		}
+		return softDecoder;
+	}
 	/**
 	 * @param media_extractor
 	 * @param trackIndex
@@ -801,37 +867,19 @@ public class MediaMoviePlayer {
 //		if (DEBUG) Log.v(TAG, "internalProcessInput:presentationTimeUs=" + presentationTimeUs);
         boolean result = true;
         boolean frame_ready = false;
-        while (mIsRunning && !frame_ready && result) {
-            if (mVideoSoftDecodeInputBuffer == null) {
-                mVideoSoftDecodeInputBuffer = ByteBuffer.allocateDirect(mVideoWidth * mVideoHeight);
-            }
-            //1 extrator 取出sample data
-            final int size = extractor.readSampleData(mVideoSoftDecodeInputBuffer, 0);
+        if (mIsRunning) {
+            final int sample_size = extractor.readSampleData(mVideoSoftDecodeInputBuffer, 0);
+			mVideoSoftDecodeInputBuffer.rewind();
+			if (sample_size > 0) {
+				if(DEBUG) Log.d(TAG, "extrator readSampleData nalu type: " + (mVideoSoftDecodeInputBuffer.get(4) & 0x1f) + ",sample_size: " + sample_size + ", pts: " + presentationTimeUs);
 
-            //2 转换为nalu
-            //3 传给 softDecoder解码
-            softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, size, presentationTimeUs);
-            frame_ready = softDecoder.isFrameReady();
-            if (frame_ready) {
-                Log.i(TAG, String.format("softdecode width=%1$d height=%2$d", softDecoder.getWidth(), softDecoder.getHeight()));
-            }
-
+				softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, sample_size, presentationTimeUs);
+				frame_ready = softDecoder.isFrameReady();
+				if (frame_ready) {
+					if(DEBUG) Log.d(TAG, String.format("soft_decode width=%1$d height=%2$d", softDecoder.getWidth(), softDecoder.getHeight()));
+				}
+			}
             result = extractor.advance();	// return false if no data is available
-
-            ByteBuffer tmp = mVideoSoftDecodeInputBuffer.duplicate();
-//            final int inputBufIndex = codec.dequeueInputBuffer(TIMEOUT_USEC);
-//            if (inputBufIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
-//                break;
-//            if (inputBufIndex >= 0) {
-//                final int size = extractor.readSampleData(inputBuffers[inputBufIndex], 0);
-//                if (size > 0) {
-////                    ByteBuffer tmp = inputBuffers[inputBufIndex].duplicate();
-////                    Log.i(TAG, "sample size:" + tmp.capacity() + "," + tmp.get(0) + " " + tmp.get(1) + " " + tmp.get(2) + " " + tmp.get(3) + " " + tmp.get(4) + " " + tmp.get(5) + " " + tmp.get(6) + " " + tmp.get(7) + " " + tmp.get(8));
-//                    codec.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
-//                }
-//                result = extractor.advance();	// return false if no data is available
-//                break;
-//            }
         }
         return result;
     }
@@ -943,7 +991,19 @@ public class MediaMoviePlayer {
                 }
             }
         } else {
+			if (mIsRunning && !mVideoOutputDone) {
+				//取出软解后的rgb
+				if (mVideoSoftDecodeOutBuffer == null) {
+					mVideoSoftDecodeOutBuffer = ByteBuffer.allocateDirect(mH264SoftDecoder.getOutputByteSize());
+				}
 
+				if (mH264SoftDecoder.isFrameReady()) {
+					mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer)
+				}
+
+				if (!frameCallback.onFrameAvailable(mH264SoftDecoder.getLastPTS()))
+					mVideoStartTime = adjustPresentationTime(mVideoSync, mVideoStartTime, mH264SoftDecoder.getLastPTS());
+			}
         }
 
 	}
