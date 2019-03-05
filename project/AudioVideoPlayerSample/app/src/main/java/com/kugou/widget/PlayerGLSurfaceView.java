@@ -9,6 +9,9 @@ import android.util.AttributeSet;
 import android.view.Surface;
 
 import com.kugou.glutils.GLDrawer2D;
+import com.kugou.media.IYUVDataReceiver;
+
+import java.nio.ByteBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -35,7 +38,7 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         getHolder().setFormat(PixelFormat.RGBA_8888);
 
-        mRender = new Render();
+        mRender = new Render(false);
         setRenderer(mRender);
 
         this.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
@@ -95,6 +98,7 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
 
     }
 
+    /**用于硬解，获取输入用surface，传给MediaCodec**/
     public Surface getInputSurface(){
         if (mRender != null)
             return mRender.getInputSurface();
@@ -102,32 +106,49 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
             return null;
     }
 
-    private class Render implements GLSurfaceView.Renderer {
+    public IYUVDataReceiver getYUVReceiver() {
+        return mRender != null ? mRender : null;
+    }
+
+    private class Render implements GLSurfaceView.Renderer, IYUVDataReceiver {
         private int mExternalTexId = -1;
         private GLDrawer2D mOutputVideoFrame;
         private SurfaceTexture mInputSurfaceTexture;
+        private ByteBuffer mYUVData;
         private Surface mInputSurface;
+        private boolean mSupportHWDecode;
         private Object locker = new Object();
+
+        public Render(boolean supportHWDecode) {
+            super();
+            this.mSupportHWDecode = supportHWDecode;
+        }
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             mOutputVideoFrame = new GLDrawer2D();
-            mExternalTexId = GLDrawer2D.initTex();
-            mInputSurfaceTexture = new SurfaceTexture(mExternalTexId);
-            mInputSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
-                @Override
-                public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-                    requestRender();
+
+            if (mSupportHWDecode) { //初始化硬解的外部纹理
+                mExternalTexId = GLDrawer2D.initTex();
+                mInputSurfaceTexture = new SurfaceTexture(mExternalTexId);
+                mInputSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
+                    @Override
+                    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                        requestRender();
+                    }
+                });
+
+                if (mInputSurface != null) {
+                    mInputSurface.release();
                 }
-            });
 
-            if (mInputSurface != null) {
-                mInputSurface.release();
+                synchronized (locker) {
+                    mInputSurface = new Surface(mInputSurfaceTexture);
+                    locker.notifyAll();
+                }
+            } else {
+
             }
 
-            synchronized (locker) {
-                mInputSurface = new Surface(mInputSurfaceTexture);
-                locker.notifyAll();
-            }
         }
 
         @Override
@@ -141,28 +162,48 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         public void onDrawFrame(GL10 gl) {
 //            GLES20.glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
 //            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            if (mSupportHWDecode) { //硬解渲染
+                if(mInputSurfaceTexture != null){
+                    mInputSurfaceTexture.updateTexImage();
 
-            if(mInputSurfaceTexture != null){
-                mInputSurfaceTexture.updateTexImage();
-
-                if (mOutputVideoFrame != null) {
-                    mOutputVideoFrame.draw(mExternalTexId, null);
+                    if (mOutputVideoFrame != null) {
+                        mOutputVideoFrame.draw(mExternalTexId, null);
+                    }
                 }
+            } else { //软解渲染
+
             }
 
         }
 
         public Surface getInputSurface(){
-            synchronized (locker) {
-                while (mInputSurface == null) {
-                    try {
-                        locker.wait();
-                    } catch (InterruptedException e) {
+            if (mSupportHWDecode) {
+                synchronized (locker) {
+                    while (mInputSurface == null) {
+                        try {
+                            locker.wait();
+                        } catch (InterruptedException e) {
 
+                        }
                     }
                 }
+                return mInputSurface;
+            } else {
+                return null;
             }
-            return mInputSurface;
+        }
+
+        @Override
+        public void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight, int outputSize) {
+            //软解时用于接收解码后的yuv数据，该方法在解码子线程中执行
+            synchronized (locker) {
+                if (mYUVData == null) {
+                    mYUVData = ByteBuffer.allocate(outputSize);
+                }
+                mYUVData.rewind();
+                mYUVData.put(yuvData);
+                requestRender();
+            }
         }
     }
 

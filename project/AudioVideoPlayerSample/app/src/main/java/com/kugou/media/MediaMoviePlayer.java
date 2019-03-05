@@ -233,6 +233,7 @@ public class MediaMoviePlayer {
 	private final Surface mOutputSurface;
 	protected MediaExtractor mVideoMediaExtractor;
 
+	private IYUVDataReceiver mYUVReceiver;
 	private H264SoftDecoder mH264SoftDecoder;
 	private ByteBuffer mVideoSoftDecodeInputBuffer;
     private ByteBuffer mVideoSoftDecodeOutBuffer;
@@ -992,13 +993,16 @@ public class MediaMoviePlayer {
             }
         } else {
 			if (mIsRunning && !mVideoOutputDone) {
-				//取出软解后的rgb
+				//取出软解后的yuv
 				if (mVideoSoftDecodeOutBuffer == null) {
 					mVideoSoftDecodeOutBuffer = ByteBuffer.allocateDirect(mH264SoftDecoder.getOutputByteSize());
 				}
 
 				if (mH264SoftDecoder.isFrameReady()) {
-					mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer)
+					mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer);
+					if (mYUVReceiver != null) {
+                        mYUVReceiver.onYUVData(mVideoSoftDecodeOutBuffer, mVideoWidth, mVideoHeight, mH264SoftDecoder.getOutputByteSize());
+                    }
 				}
 
 				if (!frameCallback.onFrameAvailable(mH264SoftDecoder.getLastPTS()))
