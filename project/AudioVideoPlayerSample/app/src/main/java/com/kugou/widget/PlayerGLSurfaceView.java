@@ -3,11 +3,9 @@ package com.kugou.widget;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
-import android.nfc.Tag;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Surface;
 
 import com.kugou.glutils.GLDrawer2D;
@@ -125,9 +123,19 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         private int mYTexId = -1;
         //用于软解的uv部分的texture id
         private int mUVTexId = -1;
+        private int mUTexId = -1;
+        private int mVTexId = -1;
         private int mFrameWidth;
         private int mFrameHeight;
+        //yuv的分辨率
+        private int mResolution;
+        //u / v 各自的分辨率
+        private int mUorVResolution;
+
         private ByteBuffer mYBuffer;
+        private ByteBuffer mUBuffer;
+        private ByteBuffer mVBuffer;
+
         private ByteBuffer mUVBuffer;
 
         private Object locker = new Object();
@@ -160,7 +168,9 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
                 }
             } else {
                 mYTexId = GLDrawer2D.initTex();
-                mUVTexId = GLDrawer2D.initTex();
+//                mUVTexId = GLDrawer2D.initTex();
+                mUTexId = GLDrawer2D.initTex();
+                mVTexId = GLDrawer2D.initTex();
             }
 
         }
@@ -186,10 +196,9 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
                 }
             } else { //软解渲染
                 synchronized (locker) {
-//                    if (mYBuffer != null && mUVBuffer != null) {
-//                        Log.d(INNER_TAG, "onDrawFrame mFrameWidth=" + mFrameWidth + ",mFrameHeight=" + mFrameHeight + ",mYBuffer.limit()=" + mYBuffer.limit() + ",mUVBuffer.limit()=" + mUVBuffer.limit());
-//                    }
-                    mOutputVideoFrame.drawYUVTex(mYTexId, mUVTexId, mFrameWidth, mFrameHeight, mYBuffer, mUVBuffer, null);
+//                    mOutputVideoFrame.drawYUVTex(mYTexId, mUVTexId, mFrameWidth, mFrameHeight, mYBuffer, mUVBuffer, null);
+                    mOutputVideoFrame.drawYUVTex(mYTexId, mUTexId, mVTexId, mFrameWidth, mFrameHeight, mYBuffer, mUBuffer, mVBuffer, null);
+
                     //draw完后，通知video解码线程继续执行
                     locker.notifyAll();
                 }
@@ -218,21 +227,30 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         public void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight, int outputSize) {
             //软解时用于接收解码后的yuv数据，该方法在解码线程中执行
             synchronized (locker) {
-                mFrameWidth = frameWidth;
-                mFrameHeight = frameHeight;
-
-                final int bufferSize = mFrameWidth * mFrameHeight;
-
                 if (mYBuffer == null) {
+                    mFrameWidth = frameWidth;
+                    mFrameHeight = frameHeight;
+
+                    mResolution = mFrameWidth * mFrameHeight;
+                    mUorVResolution = mResolution >> 2;
+
                     mYBuffer = ByteBuffer.allocate(outputSize);
                     mYBuffer.order(yuvData.order());
 
-                    mUVBuffer = ByteBuffer.allocate(outputSize/2);
-                    mUVBuffer.order(yuvData.order());
+//                    mUVBuffer = ByteBuffer.allocate(outputSize/2);
+//                    mUVBuffer.order(yuvData.order());
+
+                    mUBuffer = ByteBuffer.allocate(outputSize/4);
+                    mUBuffer.order(yuvData.order());
+
+                    mVBuffer = ByteBuffer.allocate(outputSize/4);
+                    mVBuffer.order(yuvData.order());
                 }
 
-                mYBuffer.put(yuvData.array(), 0, bufferSize).flip();
-                mUVBuffer.put(yuvData.array(), bufferSize, bufferSize >> 1).flip();
+                mYBuffer.put(yuvData.array(), 0, mResolution).flip();
+//                mUVBuffer.put(yuvData.array(), mResolution, mResolution >> 1).flip();
+                mUBuffer.put(yuvData.array(), mResolution, mUorVResolution).flip();
+                mVBuffer.put(yuvData.array(), mResolution + mUorVResolution, mUorVResolution).flip();
 
                 requestRender();
 
