@@ -13,31 +13,29 @@ extern "C" {
 #define COLOR_FORMAT_YUV420 0
 #define COLOR_FORMAT_RGB565LE 1
 #define COLOR_FORMAT_BGR32 2
-//#define COLOR_FORMAT_RGBA32 3
+
+static char TAG[] = "NativeSoftDecode";
 
 class DecoderContext {
 public:
     DecoderContext(jint color_format) {
         switch (color_format) {
             case COLOR_FORMAT_YUV420:
-                color_format = PIX_FMT_YUV420P;
+                this->color_format = AV_PIX_FMT_YUV420P;
                 break;
             case COLOR_FORMAT_RGB565LE:
-                color_format = PIX_FMT_RGB565LE;
+                this->color_format = AV_PIX_FMT_RGB565LE;
                 break;
             case COLOR_FORMAT_BGR32:
-                color_format = PIX_FMT_BGR32;
+                this->color_format = AV_PIX_FMT_RGB32;
                 break;
-//            case COLOR_FORMAT_RGBA32:
-//                color_format = PIX_FMT_RGBA;
-//                break;
         }
 
         frame_ready = 0;
         codec = avcodec_find_decoder(AV_CODEC_ID_H264);//CODEC_ID_H264
         codec_ctx = avcodec_alloc_context3(codec);
 
-        codec_ctx->pix_fmt = PIX_FMT_YUV420P;
+        codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
         codec_ctx->flags2 |= CODEC_FLAG2_CHUNKS;
 
         src_frame = av_frame_alloc();
@@ -180,10 +178,11 @@ jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_unit
     int got_picture = 0;
     ctx->frame_ready = 0;
     int ret = avcodec_decode_video2(ctx->codec_ctx, ctx->src_frame, &got_picture, &packet);
-//    LOGD("NativeSoftDecode", "consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d", got_picture, ret);
-    if (ret > 0 && got_picture) {
+    if (ret > 0 && got_picture > 0) {
         ctx->frame_ready = 1;
     }
+
+    LOGD(TAG, "consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d, frame ready:%d", got_picture, ret, ctx->frame_ready);
     return ret;
 }
 
@@ -194,7 +193,7 @@ jboolean isFrameReady(JNIEnv* env, jobject thiz) {
 
 jlong getLastPTS(JNIEnv* env, jobject thiz) {
     DecoderContext *ctx = (DecoderContext *)DecoderContext::get_ctx(env, thiz);
-    return ctx->pkt_pts
+    return ctx->pkt_pts;
 }
 
 jint getWidth(JNIEnv* env, jobject thiz) {
@@ -218,7 +217,8 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
     if (!ctx->frame_ready)
         return -1;
 
-    void *out_buf = env->GetDirectBufferAddress(out_buffer);
+    jbyte *out_buf = (jbyte *)env->GetDirectBufferAddress(out_buffer);
+
     if (out_buf == NULL) {
 //        D("Error getting direct buffer address");
         return -1;
@@ -227,14 +227,39 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
     long out_buf_len = env->GetDirectBufferCapacity(out_buffer);
 
     int pic_buf_size = avpicture_get_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
-
+    LOGD(TAG, "decodeFrameToDirectBuffer-> avpicture_get_size=%d, out_buf_len=%ld", pic_buf_size, out_buf_len);
     if (out_buf_len < pic_buf_size) {
-        LOGE("NativeSoftDecode", "Input buffer too small, couldn't decode to direct buffer");
+        LOGD(TAG, "Input buffer size:%ld too small, couldn't decode to direct buffer, need size:%d", out_buf_len, pic_buf_size);
         return -1;
     }
 
-    if (ctx->color_format == COLOR_FORMAT_YUV420) {
-        memcpy(ctx->src_frame->data, out_buffer, pic_buf_size);
+    jbyte *out_buf_end = out_buf + out_buf_len;
+    if (ctx->color_format == AV_PIX_FMT_YUV420P) {
+//        memcpy(ctx->src_frame->data, out_buffer, pic_buf_size);
+
+        /**
+         * ffmpeg解码得到的AVFrame里面有data数组和linesize数组，
+         * data[0]是Y平面数据，其大小是linesize[0]，
+         * data[1]是U,大小linesize[1]，
+         * data[2]是V平面数据大小linesize[2]，
+         * **/
+        int i;
+        //写入Y数据
+        for (i = 0; i < ctx->codec_ctx->height; i++) {
+            memcpy(out_buf, ctx->src_frame->data[0] + i * ctx->src_frame->linesize[0], ctx->src_frame->linesize[0]);
+            out_buf += ctx->src_frame->linesize[0];
+        }
+        //写入U数据
+        for (i = 0; i < ctx->codec_ctx->height / 2; i++) {
+            memcpy(out_buf, ctx->src_frame->data[1] + i * ctx->src_frame->linesize[1], ctx->src_frame->linesize[1]);
+            out_buf += ctx->src_frame->linesize[1];
+        }
+        //写入V数据
+        for (i = 0; i < ctx->codec_ctx->height / 2; i++) {
+            memcpy(out_buf, ctx->src_frame->data[2] + i * ctx->src_frame->linesize[2], ctx->src_frame->linesize[2]);
+            out_buf += ctx->src_frame->linesize[2];
+        }
+//        LOGD(TAG, "写入yuv完毕 out_buf_end=%x, out_buf=%x", out_buf_end, out_buf);
     } else {
         if (ctx->convert_ctx == NULL) {
             ctx->convert_ctx = sws_getContext(ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->codec_ctx->pix_fmt,

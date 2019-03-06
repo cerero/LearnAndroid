@@ -98,7 +98,7 @@ public class EGLBase {
 	}
 
 	/**
-	 * change context to draw this window surface
+	 * change context to drawExternalTex this window surface
 	 * @return
 	 */
 	private boolean makeCurrent(EGLSurface surface) {

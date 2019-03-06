@@ -3,9 +3,11 @@ package com.kugou.widget;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
+import android.nfc.Tag;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Surface;
 
 import com.kugou.glutils.GLDrawer2D;
@@ -111,12 +113,23 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
     }
 
     private class Render implements GLSurfaceView.Renderer, IYUVDataReceiver {
+        private boolean mSupportHWDecode;
+        private String INNER_TAG = "Render";
+        //用于接收外部硬解来源的texture id
         private int mExternalTexId = -1;
         private GLDrawer2D mOutputVideoFrame;
         private SurfaceTexture mInputSurfaceTexture;
-        private ByteBuffer mYUVData;
         private Surface mInputSurface;
-        private boolean mSupportHWDecode;
+
+        //用于软解的y部分的texture id
+        private int mYTexId = -1;
+        //用于软解的uv部分的texture id
+        private int mUVTexId = -1;
+        private int mFrameWidth;
+        private int mFrameHeight;
+        private ByteBuffer mYBuffer;
+        private ByteBuffer mUVBuffer;
+
         private Object locker = new Object();
 
         public Render(boolean supportHWDecode) {
@@ -125,10 +138,10 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         }
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            mOutputVideoFrame = new GLDrawer2D();
+            mOutputVideoFrame = new GLDrawer2D(mSupportHWDecode);
 
             if (mSupportHWDecode) { //初始化硬解的外部纹理
-                mExternalTexId = GLDrawer2D.initTex();
+                mExternalTexId = GLDrawer2D.initExternalOESTex();
                 mInputSurfaceTexture = new SurfaceTexture(mExternalTexId);
                 mInputSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
                     @Override
@@ -146,7 +159,8 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
                     locker.notifyAll();
                 }
             } else {
-
+                mYTexId = GLDrawer2D.initTex();
+                mUVTexId = GLDrawer2D.initTex();
             }
 
         }
@@ -167,11 +181,18 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
                     mInputSurfaceTexture.updateTexImage();
 
                     if (mOutputVideoFrame != null) {
-                        mOutputVideoFrame.draw(mExternalTexId, null);
+                        mOutputVideoFrame.drawExternalTex(mExternalTexId, null);
                     }
                 }
             } else { //软解渲染
-
+                synchronized (locker) {
+//                    if (mYBuffer != null && mUVBuffer != null) {
+//                        Log.d(INNER_TAG, "onDrawFrame mFrameWidth=" + mFrameWidth + ",mFrameHeight=" + mFrameHeight + ",mYBuffer.limit()=" + mYBuffer.limit() + ",mUVBuffer.limit()=" + mUVBuffer.limit());
+//                    }
+                    mOutputVideoFrame.drawYUVTex(mYTexId, mUVTexId, mFrameWidth, mFrameHeight, mYBuffer, mUVBuffer, null);
+                    //draw完后，通知video解码线程继续执行
+                    locker.notifyAll();
+                }
             }
 
         }
@@ -195,14 +216,30 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
 
         @Override
         public void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight, int outputSize) {
-            //软解时用于接收解码后的yuv数据，该方法在解码子线程中执行
+            //软解时用于接收解码后的yuv数据，该方法在解码线程中执行
             synchronized (locker) {
-                if (mYUVData == null) {
-                    mYUVData = ByteBuffer.allocate(outputSize);
+                mFrameWidth = frameWidth;
+                mFrameHeight = frameHeight;
+
+                final int bufferSize = mFrameWidth * mFrameHeight;
+
+                if (mYBuffer == null) {
+                    mYBuffer = ByteBuffer.allocate(outputSize);
+                    mYBuffer.order(yuvData.order());
+
+                    mUVBuffer = ByteBuffer.allocate(outputSize/2);
+                    mUVBuffer.order(yuvData.order());
                 }
-                mYUVData.rewind();
-                mYUVData.put(yuvData);
+
+                mYBuffer.put(yuvData.array(), 0, bufferSize).flip();
+                mUVBuffer.put(yuvData.array(), bufferSize, bufferSize >> 1).flip();
+
                 requestRender();
+
+                try {
+                    locker.wait();//等待渲染线程把 yuvdata渲染好
+                } catch (InterruptedException e) {
+                }
             }
         }
     }

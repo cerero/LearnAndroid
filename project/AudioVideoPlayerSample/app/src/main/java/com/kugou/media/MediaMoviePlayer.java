@@ -33,12 +33,13 @@ public class MediaMoviePlayer {
 	private final boolean mAudioEnabled;
 	private final boolean mCanHardDecodeH264;
 
-	public MediaMoviePlayer(@NonNull final Surface outputSurface,
+	public MediaMoviePlayer(final Surface outputSurface, final IYUVDataReceiver yuvReceiver,
 		@NonNull final IFrameCallback callback, final boolean audio_enable, final boolean canHardDecodeH264) {
 
     	if (DEBUG) Log.v(TAG, "Constructor:");
 
 		mOutputSurface = outputSurface;
+		mYUVReceiver = yuvReceiver;
 		mCallback = callback;
 		mAudioEnabled = audio_enable;
 		mCanHardDecodeH264 = canHardDecodeH264;
@@ -993,20 +994,31 @@ public class MediaMoviePlayer {
             }
         } else {
 			if (mIsRunning && !mVideoOutputDone) {
-				//取出软解后的yuv
-				if (mVideoSoftDecodeOutBuffer == null) {
-					mVideoSoftDecodeOutBuffer = ByteBuffer.allocateDirect(mH264SoftDecoder.getOutputByteSize());
-				}
+				int output_size = mH264SoftDecoder.getOutputByteSize();
+				if (output_size > 0) {
+					//取出软解后的yuv
+					if (mVideoSoftDecodeOutBuffer == null) {
+						mVideoSoftDecodeOutBuffer = ByteBuffer.allocateDirect(output_size);
+					}
 
-				if (mH264SoftDecoder.isFrameReady()) {
-					mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer);
-					if (mYUVReceiver != null) {
-                        mYUVReceiver.onYUVData(mVideoSoftDecodeOutBuffer, mVideoWidth, mVideoHeight, mH264SoftDecoder.getOutputByteSize());
-                    }
+					if (mH264SoftDecoder.isFrameReady()) {
+						mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer);
+						if (mYUVReceiver != null) {
+							mYUVReceiver.onYUVData(mVideoSoftDecodeOutBuffer, mVideoWidth, mVideoHeight, output_size);
+						}
+					}
 				}
 
 				if (!frameCallback.onFrameAvailable(mH264SoftDecoder.getLastPTS()))
 					mVideoStartTime = adjustPresentationTime(mVideoSync, mVideoStartTime, mH264SoftDecoder.getLastPTS());
+
+				synchronized (mVideoTask) {
+					if (mVideoInputDone) {
+						mVideoOutputDone = true;
+						mVideoTask.notifyAll();
+					}
+				}
+
 			}
         }
 

@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.Surface;
 
 /**
- * Helper class to draw texture to whole view on private thread
+ * Helper class to drawExternalTex texture to whole view on private thread
  */
 public final class RenderHandler extends Handler {
 	private static final boolean DEBUG = false;	// TODO set false on release
@@ -158,14 +158,14 @@ public final class RenderHandler extends Handler {
     		mEgl = new EGLBase(shard_context, false);
     		mInputSurface = mEgl.createFromSurface(surface);
     		mInputSurface.makeCurrent();
-    		mDrawer = new GLDrawer2D();
+    		mDrawer = new GLDrawer2D(true);
     	}
  
     	private void draw(int tex_id, final float[] tex_matrix) {
-    		if (DEBUG) Log.i(TAG, "RenderThread:draw");
+    		if (DEBUG) Log.i(TAG, "RenderThread:drawExternalTex");
     		if (tex_id >= 0) {
 	    		mInputSurface.makeCurrent();
-	    		mDrawer.draw(tex_id, tex_matrix);
+	    		mDrawer.drawExternalTex(tex_id, tex_matrix);
 	    		mInputSurface.swap();
     		}
     	}

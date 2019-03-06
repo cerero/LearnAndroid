@@ -114,7 +114,7 @@ public class PlayerFragment extends Fragment {
 //			mPlayer = new MediaVideoPlayer(mPlayerView.getSurface(), mIFrameCallback);
 //			mPlayer = new MediaMoviePlayer(mPlayerView.getSurface(), mIFrameCallback, true);
 //          mPlayer = new MediaMoviePlayer(mPlayerView.getInputSurface(), mIFrameCallback, true, true);
-            mPlayer = new MediaMoviePlayer(mPlayerView.getInputSurface(), mIFrameCallback, true, false);
+            mPlayer = new MediaMoviePlayer(mPlayerView.getInputSurface(), mPlayerView.getYUVReceiver(), mIFrameCallback, true, false);
 
             mPlayer.prepare(path.toString());
 		} catch (IOException e) {

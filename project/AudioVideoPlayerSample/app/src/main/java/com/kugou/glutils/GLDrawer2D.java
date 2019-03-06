@@ -1,5 +1,6 @@
 package com.kugou.glutils;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -10,10 +11,10 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 /**
- * Helper class to draw to whole view using specific texture and texture matrix
+ * Helper class to drawExternalTex to whole view using specific texture and texture matrix
  */
 public class GLDrawer2D {
-	private static final boolean DEBUG = false; // TODO set false on release
+	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = "GLDrawer2D";
 
 	private static final String vss
@@ -27,6 +28,7 @@ public class GLDrawer2D {
 		    + "gl_Position = uMVPMatrix * aPosition;\n"
 		    + "vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n"
 		+ "}\n";
+
 	private static final String fss
 		= "#extension GL_OES_EGL_image_external : require\n"
 		+ "precision mediump float;\n"
@@ -37,7 +39,30 @@ public class GLDrawer2D {
             + "vec4 refColor = texture2D(sTexture, refTextureCoord);\n"
             + "vec4 texel = texture2D(sTexture, vTextureCoord);\n"
             + "gl_FragColor = vec4(texel.rgb, refColor.b);\n"
-		+ "}";
+		+ "} \n";
+
+	private static final String yuvFSS
+            = "precision highp float; \n"
+            + "varying vec2 vTextureCoord; \n"
+            + "uniform sampler2D y_texture; \n"
+            + "uniform sampler2D uv_texture; \n"
+            + "void main (void){  \n"
+                + "float r, g, b, y, u, v; \n"
+                + "float y1, u1, v1, a; \n"
+                + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t); \n"
+                + "y1 = texture2D(y_texture, refTextureCoord).r;\n"
+                + "u1 = texture2D(uv_texture, refTextureCoord).a - 0.5;\n"
+                + "v1 = texture2D(uv_texture, refTextureCoord).r - 0.5;\n"
+                + "y = texture2D(y_texture, vTextureCoord).r;  \n"
+                + "u = texture2D(uv_texture, vTextureCoord).a - 0.5; \n"
+                + "v = texture2D(uv_texture, vTextureCoord).r - 0.5; \n"
+                + "r = y + 1.402 * v; \n"
+                + "g = y - 0.34414 * u - 0.71414 * v; \n"
+                + "b = y + 1.772 * u; \n"
+                + "a = y1 - 0.34414 * u1 - 0.71414 * v1;\n"
+                + "gl_FragColor = vec4(r, g, b, a);  \n"
+            + "} \n";
+
 
 	private static final float[] VERTICES = {
 	        1.0f, 1.0f,
@@ -66,7 +91,7 @@ public class GLDrawer2D {
 	 * Constructor
 	 * this should be called in GL context
 	 */
-	public GLDrawer2D() {
+	public GLDrawer2D(boolean supportHWDecode) {
 		pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ).order(ByteOrder.nativeOrder()).asFloatBuffer();
 		pVertex.put(VERTICES);
 		pVertex.flip();
@@ -75,7 +100,11 @@ public class GLDrawer2D {
 		pTexCoord.put(TEXCOORD);
 		pTexCoord.flip();
 
-		hProgram = loadShader(vss, fss);
+		if (supportHWDecode) {
+            hProgram = loadShader(vss, fss);
+        } else {
+            hProgram = loadShader(vss, yuvFSS);
+        }
 		GLES20.glUseProgram(hProgram);
 
         maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
@@ -102,11 +131,11 @@ public class GLDrawer2D {
 	}
 	
 	/**
-	 * draw specific texture with specific texture matrix
+	 * drawExternalTex specific texture with specific texture matrix
 	 * @param tex_id texture ID
 	 * @param tex_matrix texture matrix、if this is null, the last one use(we don't check size of this array and needs at least 16 of float)
 	 */
-	public void draw(int tex_id, float[] tex_matrix) {
+	public void drawExternalTex(int tex_id, float[] tex_matrix) {
 		GLES20.glUseProgram(hProgram);
 		if (tex_matrix != null)
 			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
@@ -116,13 +145,58 @@ public class GLDrawer2D {
 		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
         GLES20.glUseProgram(0);
 	}
-	
+
+    public void drawYUVTex(int y_tex_id, int uv_tex_id, int yuv_width, int yuv_height, final Buffer channelY, final Buffer channelUV, float[] tex_matrix) {
+        if (channelY == null || channelUV == null) {
+            return;
+        }
+
+        GLES20.glUseProgram(hProgram);
+
+        if (tex_matrix != null)
+            GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
+
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, y_tex_id);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, yuv_width, yuv_height, 0,
+                GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channelY);
+
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, uv_tex_id);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE_ALPHA, yuv_width / 2,
+                yuv_height / 2, 0,
+                GLES20.GL_LUMINANCE_ALPHA, GLES20.GL_UNSIGNED_BYTE, channelUV);
+
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+        GLES20.glUseProgram(0);
+    }
+
+	/**创建普通的内部纹理
+     * @return texture ID
+     * **/
+	public static int initTex() {
+        if (DEBUG) Log.v(TAG, "initTex:");
+        final int[] tex = new int[1];
+        GLES20.glGenTextures(1, tex, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tex[0]);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+                GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+                GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+                GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+                GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+        return tex[0];
+    }
+
 	/**
 	 * 创建一个外部纹理，硬解后的输出纹理，也是openGL的读取用纹理
 	 * @return texture ID
 	 */
-	public static int initTex() {
-		if (DEBUG) Log.v(TAG, "initTex:");
+	public static int initExternalOESTex() {
+		if (DEBUG) Log.v(TAG, "initExternalOESTex:");
 		final int[] tex = new int[1];
 		GLES20.glGenTextures(1, tex, 0);
 		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, tex[0]);
