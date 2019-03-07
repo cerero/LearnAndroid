@@ -51,18 +51,18 @@ public class GLDrawer2D {
             + "void main (void){  \n"
                 + "float r, g, b, y, u, v; \n"
                 + "float y1, u1, v1, a; \n"
-//                + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t); \n"
-//                + "y1 = texture2D(y_texture, refTextureCoord).r;\n"
-//                + "u1 = texture2D(u_texture, refTextureCoord).r - 0.5;\n"
-//                + "v1 = texture2D(v_texture, refTextureCoord).r - 0.5;\n"
+                + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t); \n"
+                + "y1 = texture2D(y_texture, refTextureCoord).r;\n"
+                + "u1 = texture2D(u_texture, refTextureCoord).r - 0.5;\n"
+                + "v1 = texture2D(v_texture, refTextureCoord).r - 0.5;\n"
                 + "y = texture2D(y_texture, vTextureCoord).r;  \n"
                 + "u = texture2D(u_texture, vTextureCoord).r - 0.5; \n"
                 + "v = texture2D(v_texture, vTextureCoord).r - 0.5; \n"
                 + "r = y + 1.402 * v; \n"
                 + "g = y - 0.34414 * u - 0.71414 * v; \n"
                 + "b = y + 1.772 * u; \n"
-//                + "a = y1 - 0.34414 * u1 - 0.71414 * v1;\n"
-                + "gl_FragColor = vec4(r, g, b, 1.0);  \n"
+                + "a = y1 - 0.34414 * u1 - 0.71414 * v1;\n"
+                + "gl_FragColor = vec4(r, g, b, a);  \n"
             + "} \n";
 
 
@@ -71,15 +71,11 @@ public class GLDrawer2D {
             -1.0f, 1.0f,
             1.0f, -1.0f,
             -1.0f, -1.0f };
-//    private static final float[] TEXCOORD = {
-//            0.5f, 0.0f,
-//            0.0f, 0.0f,
-//            0.5f, 1.0f,
-//            0.0f, 1.0f };
+
     private static final float[] TEXCOORD = {
-            1.0f, 0.0f,
+            0.5f, 0.0f,
             0.0f, 0.0f,
-            1.0f, 1.0f,
+            0.5f, 1.0f,
             0.0f, 1.0f };
 
 	private final FloatBuffer pVertex;
@@ -177,19 +173,19 @@ public class GLDrawer2D {
         // bind textures
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, y_tex_id);
-        GLES20.glUniform1i(mYTextureLoc, y_tex_id);
+        GLES20.glUniform1i(mYTextureLoc, 0);
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, yuvWidth, yuvHeight, 0,
                 GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channelY);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, u_tex_id);
-        GLES20.glUniform1i(mUTextureLoc, u_tex_id);
+        GLES20.glUniform1i(mUTextureLoc, 1);
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, uvWidth, uvHeight, 0,
                 GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channelU);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, v_tex_id);
-        GLES20.glUniform1i(mVTextureLoc, v_tex_id);
+        GLES20.glUniform1i(mVTextureLoc, 2);
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, uvWidth, uvHeight, 0,
                 GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channelV);
 
