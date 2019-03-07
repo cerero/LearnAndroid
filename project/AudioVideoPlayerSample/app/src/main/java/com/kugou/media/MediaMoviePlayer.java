@@ -753,8 +753,8 @@ public class MediaMoviePlayer {
 			Log.i(TAG, "nalu type " + mVideoSoftDecodeInputBuffer.get(spsByteLen + 4));
 			Log.i(TAG, "pps size " + ppsByteLen);
 
-//			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_YUV420);
-			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_BGR32);
+			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_YUV420);
+//			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_BGR32);
 			softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, spsByteLen + ppsByteLen, 0);
 
 			if (DEBUG) Log.v(TAG, "internalStartVideoWithSoftDecode:codec started width:" + softDecoder.getWidth() + ",height:" + softDecoder.getHeight());
@@ -874,7 +874,7 @@ public class MediaMoviePlayer {
             final int sample_size = extractor.readSampleData(mVideoSoftDecodeInputBuffer, 0);
 			mVideoSoftDecodeInputBuffer.rewind();
 			if (sample_size > 0) {
-				if(DEBUG) Log.d(TAG, "extrator readSampleData nalu type: " + (mVideoSoftDecodeInputBuffer.get(4) & 0x1f) + ",sample_size: " + sample_size + ", pts: " + presentationTimeUs);
+//				if(DEBUG) Log.d(TAG, "extrator readSampleData nalu type: " + (mVideoSoftDecodeInputBuffer.get(4) & 0x1f) + ",sample_size: " + sample_size + ", pts: " + presentationTimeUs);
 
 				softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, sample_size, presentationTimeUs);
 				frame_ready = softDecoder.isFrameReady();
@@ -907,7 +907,7 @@ public class MediaMoviePlayer {
                 final int size = extractor.readSampleData(inputBuffers[inputBufIndex], 0);
                 if (size > 0) {
 //                    ByteBuffer tmp = inputBuffers[inputBufIndex].duplicate();
-//                    Log.i(TAG, "sample size:" + tmp.capacity() + "," + tmp.get(0) + " " + tmp.get(1) + " " + tmp.get(2) + " " + tmp.get(3) + " " + tmp.get(4) + " " + tmp.get(5) + " " + tmp.get(6) + " " + tmp.get(7) + " " + tmp.get(8));
+//                    Log.i(TAG, "sample size:" + tmp.capacity() + "," + tmp.get(0) + " " + tmp.get(1) + " " + tmp.get(2) + " " + tmp.get(3) + " " + tmp.get(4) + " " + tmp.get(5) + " " + tmp.get(6) + " " + tmp.get(test_7) + " " + tmp.get(8));
                 	codec.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
                 }
             	result = extractor.advance();	// return false if no data is available

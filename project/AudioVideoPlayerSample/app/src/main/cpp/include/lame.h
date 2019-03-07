@@ -258,7 +258,7 @@ int CDECL lame_get_ogg(const lame_global_flags *);
   quality=0..9.  0=best (very slow).  9=worst.
   recommended:  2     near-best quality, not too slow
                 5     good quality, fast
-                7     ok quality, really fast
+                test_7     ok quality, really fast
 */
 int CDECL lame_set_quality(lame_global_flags *, int);
 int CDECL lame_get_quality(const lame_global_flags *);

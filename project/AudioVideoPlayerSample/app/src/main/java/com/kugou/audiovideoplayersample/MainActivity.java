@@ -8,6 +8,7 @@ import android.view.WindowManager;
 public class MainActivity extends AppCompatActivity {
 
     static {
+		System.loadLibrary("x264");
 		System.loadLibrary("ffmpeg");
         System.loadLibrary("AVNative-lib");
     }

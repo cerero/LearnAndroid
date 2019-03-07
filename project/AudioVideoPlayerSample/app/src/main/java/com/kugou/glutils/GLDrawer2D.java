@@ -41,73 +41,45 @@ public class GLDrawer2D {
             + "gl_FragColor = vec4(texel.rgb, refColor.b);\n"
 		+ "} \n";
 
-	/*
-	private static final String yuvFSS
-            = "precision highp float; \n"
-            + "varying vec2 vTextureCoord; \n"
-            + "uniform sampler2D y_texture; \n"
-            + "uniform sampler2D uv_texture; \n"
-            + "void main (void){  \n"
-                + "float r, g, b, y, u, v; \n"
-                + "float y1, u1, v1, a; \n"
-                + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t); \n"
-                + "y1 = texture2D(y_texture, refTextureCoord).r;\n"
-                + "u1 = texture2D(uv_texture, refTextureCoord).a - 0.5;\n"
-                + "v1 = texture2D(uv_texture, refTextureCoord).r - 0.5;\n"
-                + "y = texture2D(y_texture, vTextureCoord).r;  \n"
-                + "u = texture2D(uv_texture, vTextureCoord).a - 0.5; \n"
-                + "v = texture2D(uv_texture, vTextureCoord).r - 0.5; \n"
-                + "r = y + 1.402 * v; \n"
-                + "g = y - 0.34414 * u - 0.71414 * v; \n"
-                + "b = y + 1.772 * u; \n"
-                + "a = y1 - 0.34414 * u1 - 0.71414 * v1;\n"
-                + "gl_FragColor = vec4(r, g, b, a);  \n"
-            + "} \n";
-    */
 
-    private static final String yuvFSS
-            = "precision highp float; \n"
+	private static final String yuvFSS
+            = "precision mediump float; \n"
             + "varying vec2 vTextureCoord; \n"
             + "uniform sampler2D y_texture; \n"
             + "uniform sampler2D u_texture; \n"
             + "uniform sampler2D v_texture; \n"
             + "void main (void){  \n"
-            + "float r, g, b, y, u, v; \n"
-            + "float y1, u1, v1, a; \n"
-            + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t); \n"
-            + "y1 = texture2D(y_texture, refTextureCoord).r;\n"
-            + "u1 = texture2D(u_texture, refTextureCoord).r - 0.5;\n"
-            + "v1 = texture2D(v_texture, refTextureCoord).r - 0.5;\n"
-            + "y = texture2D(y_texture, vTextureCoord).r;  \n"
-            + "u = texture2D(u_texture, vTextureCoord).r - 0.5; \n"
-            + "v = texture2D(v_texture, vTextureCoord).r - 0.5; \n"
-            + "r = y + 1.402 * v; \n"
-            + "g = y - 0.34414 * u - 0.71414 * v; \n"
-            + "b = y + 1.772 * u; \n"
-            + "a = y1 - 0.34414 * u1 - 0.71414 * v1;\n"
-            + "gl_FragColor = vec4(r, g, b, 1.0);  \n"
+                + "float r, g, b, y, u, v; \n"
+                + "float y1, u1, v1, a; \n"
+//                + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t); \n"
+//                + "y1 = texture2D(y_texture, refTextureCoord).r;\n"
+//                + "u1 = texture2D(u_texture, refTextureCoord).r - 0.5;\n"
+//                + "v1 = texture2D(v_texture, refTextureCoord).r - 0.5;\n"
+                + "y = texture2D(y_texture, vTextureCoord).r;  \n"
+                + "u = texture2D(u_texture, vTextureCoord).r - 0.5; \n"
+                + "v = texture2D(v_texture, vTextureCoord).r - 0.5; \n"
+                + "r = y + 1.402 * v; \n"
+                + "g = y - 0.34414 * u - 0.71414 * v; \n"
+                + "b = y + 1.772 * u; \n"
+//                + "a = y1 - 0.34414 * u1 - 0.71414 * v1;\n"
+                + "gl_FragColor = vec4(r, g, b, 1.0);  \n"
             + "} \n";
 
-    private static final String rgbFss
-            = "precision mediump float;\n"
-            + "uniform sampler2D sTexture;\n"
-            + "varying highp vec2 vTextureCoord;\n"
-            + "void main() {\n"
-            + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t);\n"
-            + "vec4 refColor = texture2D(sTexture, refTextureCoord);\n"
-            + "vec4 texel = texture2D(sTexture, vTextureCoord);\n"
-            + "gl_FragColor = vec4(texel.rgb, refColor.b);\n"
-            + "} \n";
 
 	private static final float[] VERTICES = {
 	        1.0f, 1.0f,
             -1.0f, 1.0f,
             1.0f, -1.0f,
             -1.0f, -1.0f };
+//    private static final float[] TEXCOORD = {
+//            0.5f, 0.0f,
+//            0.0f, 0.0f,
+//            0.5f, 1.0f,
+//            0.0f, 1.0f };
     private static final float[] TEXCOORD = {
-            0.5f, 0.0f,
+            1.0f, 0.0f,
             0.0f, 0.0f,
-            0.5f, 1.0f,
+            1.0f, 1.0f,
             0.0f, 1.0f };
 
 	private final FloatBuffer pVertex;
@@ -117,6 +89,11 @@ public class GLDrawer2D {
     int maTextureCoordLoc;
     int muMVPMatrixLoc;
     int muTexMatrixLoc;
+
+    int mYTextureLoc;
+    int mUTextureLoc;
+    int mVTextureLoc;
+
 	private final float[] mMvpMatrix = new float[16];
 
 	private static final int FLOAT_SZ = Float.SIZE / 8;
@@ -138,8 +115,8 @@ public class GLDrawer2D {
 		if (supportHWDecode) {
             hProgram = loadShader(vss, fss);
         } else {
-//            hProgram = loadShader(vss, yuvFSS);
-            hProgram = loadShader(vss, rgbFss);
+            hProgram = loadShader(vss, yuvFSS);
+//            hProgram = loadShader(vss, rgbFss);
 
         }
 		GLES20.glUseProgram(hProgram);
@@ -148,6 +125,10 @@ public class GLDrawer2D {
         maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");
         muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
         muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
+
+        mYTextureLoc = GLES20.glGetUniformLocation(hProgram, "y_texture");
+        mUTextureLoc = GLES20.glGetUniformLocation(hProgram, "u_texture");
+        mVTextureLoc = GLES20.glGetUniformLocation(hProgram, "v_texture");
 
 		Matrix.setIdentityM(mMvpMatrix, 0);
         GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
@@ -183,36 +164,7 @@ public class GLDrawer2D {
         GLES20.glUseProgram(0);
 	}
 
-//    public void drawYUVTex(int y_tex_id, int uv_tex_id, int yuv_width, int yuv_height, final Buffer channelY, final Buffer channelUV, float[] tex_matrix) {
-//        if (channelY == null || channelUV == null) {
-//            return;
-//        }
-//
-//        GLES20.glUseProgram(hProgram);
-//
-//        if (tex_matrix != null)
-//            GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
-//
-//        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, y_tex_id);
-//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, yuv_width, yuv_height, 0,
-//                GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channelY);
-//
-//        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-//        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, uv_tex_id);
-//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE_ALPHA, yuv_width / 2,
-//                yuv_height / 2, 0,
-//                GLES20.GL_LUMINANCE_ALPHA, GLES20.GL_UNSIGNED_BYTE, channelUV);
-//
-//        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
-//        GLES20.glUseProgram(0);
-//    }
-
-    public void drawYUVTex(int y_tex_id, int u_tex_id, int v_tex_id,
-                           int yuv_width, int yuv_height,
-                           final Buffer channelY, final Buffer channelU, final Buffer channelV,
-                           float[] tex_matrix) {
-
+    public void drawYUVTex(int y_tex_id, int u_tex_id, int v_tex_id, Buffer channelY, Buffer channelU, Buffer channelV, int yuvWidth, int yuvHeight, int uvWidth, int uvHeight, float[] tex_matrix) {
         if (channelY == null || channelU == null || channelV == null) {
             return;
         }
@@ -222,67 +174,52 @@ public class GLDrawer2D {
         if (tex_matrix != null)
             GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
 
+        // bind textures
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, y_tex_id);
-        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, yuv_width, yuv_height, 0,
+        GLES20.glUniform1i(mYTextureLoc, y_tex_id);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, yuvWidth, yuvHeight, 0,
                 GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channelY);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, u_tex_id);
-        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, yuv_width/4,
-                yuv_height/4, 0,
+        GLES20.glUniform1i(mUTextureLoc, u_tex_id);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, uvWidth, uvHeight, 0,
                 GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channelU);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, v_tex_id);
-        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, yuv_width/4,
-                yuv_height/4, 0,
+        GLES20.glUniform1i(mVTextureLoc, v_tex_id);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, uvWidth, uvHeight, 0,
                 GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channelV);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
-        GLES20.glUseProgram(0);
+        GLES20.glFinish();
+//        GLES20.glUseProgram(0);
     }
 
-	public void drawRGBTex(int tex_id,
-						   int width, int height,
-						   final Buffer channelRGB,
-						   float[] tex_matrix) {
-
-		if (channelRGB == null) {
-			return;
-		}
-
-		GLES20.glUseProgram(hProgram);
-
-		if (tex_matrix != null)
-			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
-
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tex_id);
-		GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGB, width, height, 0,
-				GLES20.GL_RGB, GLES20.GL_UNSIGNED_BYTE, channelRGB);
-
-		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
-		GLES20.glUseProgram(0);
-	}
-
+    private void checkGlError(String op) {
+        int error;
+        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+//            Utils.LOGE("***** " + op + ": glError " + error, null);
+            throw new RuntimeException(op + ": glError " + error);
+        }
+    }
 	/**创建普通的内部纹理
      * @return texture ID
      * **/
-	public static int initTex() {
+	public static int initTex(int texUnit) {
         if (DEBUG) Log.v(TAG, "initTex:");
         final int[] tex = new int[1];
         GLES20.glGenTextures(1, tex, 0);
+//        GLES20.glActiveTexture(texUnit);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tex[0]);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-
+//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, width, height, 0,
+//                GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, channel);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         return tex[0];
     }
 

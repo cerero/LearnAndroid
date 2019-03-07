@@ -1,5 +1,8 @@
 package com.kugou.media;
 
+import android.os.Environment;
+
+import java.io.File;
 import java.nio.ByteBuffer;
 
 public class H264SoftDecoder {
@@ -8,7 +11,9 @@ public class H264SoftDecoder {
     public static final int COLOR_FORMAT_BGR32 = 2;
 
     public H264SoftDecoder(int colorFormat) {
-        nativeInit(colorFormat);
+        String external_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "myyuv";
+//        String external_dir = "/sdcard/myyuv";
+        nativeInit(colorFormat, external_dir);
     }
 
     protected void finalize() throws Throwable {
@@ -18,7 +23,7 @@ public class H264SoftDecoder {
 
     private int cdata;
 
-    private native void nativeInit(int colorFormat);
+    private native void nativeInit(int colorFormat, String externalDir);
     private native void nativeDestroy();
 
     public native void consumeNalUnitsFromDirectBuffer(ByteBuffer nalUnits, int numBytes, long packetPTS);

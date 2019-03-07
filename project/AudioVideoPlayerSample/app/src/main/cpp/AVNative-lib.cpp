@@ -10,8 +10,8 @@ extern "C" {
 void stringFromJNI(JNIEnv *env,jobject obj) {
 //    std::string hello = "Hello from C++";
 //    return env->NewStringUTF(hello.c_str());
-    LOGD("AVNative", "stringFromJNI call frome native: %s\n", "Hello World!");
-    av_log(NULL, AV_LOG_ERROR, "this is ffmpeg log func: %s\n", "hello ffmpeg!");
+//    LOGD("AVNative", "stringFromJNI call frome native: %s\n", "Hello World!");
+//    av_log(NULL, AV_LOG_ERROR, "this is ffmpeg log func: %s\n", "hello ffmpeg!");
 }
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* pVm, void* reserved){

@@ -126,8 +126,10 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         private int mUTexId = -1;
         private int mVTexId = -1;
         private int mRGBTexId = -1;
-        private int mFrameWidth;
-        private int mFrameHeight;
+        private int mYWidth;
+        private int mYHeight;
+        private int mUVWidth;
+        private int mUVHeight;
         //yuv的分辨率
         private int mResolution;
         //u / v 各自的分辨率
@@ -137,7 +139,6 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         private ByteBuffer mUBuffer;
         private ByteBuffer mVBuffer;
 
-        private ByteBuffer mUVBuffer;
         private ByteBuffer mRGBBuffer;
 
         private Object locker = new Object();
@@ -169,13 +170,10 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
                     locker.notifyAll();
                 }
             } else {
-//                mYTexId = GLDrawer2D.initTex();
-//                mUVTexId = GLDrawer2D.initTex();
-
-//                mUTexId = GLDrawer2D.initTex();
-//                mVTexId = GLDrawer2D.initTex();
-
-                mRGBTexId = GLDrawer2D.initTex();
+                mYTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE0);
+                mUTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE1);
+                mVTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE2);
+//                mRGBTexId = GLDrawer2D.initTex();
             }
 
         }
@@ -184,7 +182,7 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         public void onSurfaceChanged(GL10 gl, int width, int height) {
             GLES20.glViewport(0, 0, width, height);
             float ratio = (float) width / height;
-//		    Matrix.frustumM(mProjectionMatrix, 0, -ratio,ratio, -1, 1, 3, 7);
+//		    Matrix.frustumM(mProjectionMatrix, 0, -ratio,ratio, -1, 1, 3, test_7);
         }
 
         @Override
@@ -201,9 +199,7 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
                 }
             } else { //软解渲染
                 synchronized (locker) {
-//                    mOutputVideoFrame.drawYUVTex(mYTexId, mUVTexId, mFrameWidth, mFrameHeight, mYBuffer, mUVBuffer, null);
-//                    mOutputVideoFrame.drawYUVTex(mYTexId, mUTexId, mVTexId, mFrameWidth, mFrameHeight, mYBuffer, mUBuffer, mVBuffer, null);
-                    mOutputVideoFrame.drawRGBTex(mRGBTexId, mFrameWidth, mFrameHeight, mRGBBuffer, null);
+                    mOutputVideoFrame.drawYUVTex(mYTexId, mUTexId, mVTexId, mYBuffer,  mUBuffer, mVBuffer, mYWidth, mYHeight, mUVWidth, mUVHeight, null);
                     //draw完后，通知video解码线程继续执行
                     locker.notifyAll();
                 }
@@ -232,36 +228,35 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         public void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight, int outputSize) {
             //软解时用于接收解码后的yuv数据，该方法在解码线程中执行
             synchronized (locker) {
-//                if (mYBuffer == null) {
-                if (mRGBBuffer == null) {
-                    mFrameWidth = frameWidth;
-                    mFrameHeight = frameHeight;
+                if (mYBuffer == null) {
+//                if (mRGBBuffer == null) {
+                    mYWidth = frameWidth;
+                    mYHeight = frameHeight;
 
-                    mResolution = mFrameWidth * mFrameHeight;
+                    mUVWidth = frameWidth / 2;
+                    mUVHeight = frameHeight / 2;
+
+                    mResolution = mYWidth * mYHeight;
                     mUorVResolution = mResolution >> 2;
 
-//                    mYBuffer = ByteBuffer.allocate(outputSize);
-//                    mYBuffer.order(yuvData.order());
+                    mYBuffer = ByteBuffer.allocate(mResolution);
+                    mYBuffer.order(yuvData.order());
 
-//                    mUVBuffer = ByteBuffer.allocate(outputSize/2);
-//                    mUVBuffer.order(yuvData.order());
+                    mUBuffer = ByteBuffer.allocate(mUorVResolution);
+                    mUBuffer.order(yuvData.order());
 
-//                    mUBuffer = ByteBuffer.allocate(outputSize/4);
-//                    mUBuffer.order(yuvData.order());
-//
-//                    mVBuffer = ByteBuffer.allocate(outputSize/4);
-//                    mVBuffer.order(yuvData.order());
+                    mVBuffer = ByteBuffer.allocate(mUorVResolution);
+                    mVBuffer.order(yuvData.order());
 
-                    mRGBBuffer = ByteBuffer.allocate(outputSize);
-                    mRGBBuffer.order(yuvData.order());
+//                    mRGBBuffer = ByteBuffer.allocate(outputSize);
+//                    mRGBBuffer.order(yuvData.order());
                 }
 
-//                mYBuffer.put(yuvData.array(), 0, mResolution).flip();
-//                mUVBuffer.put(yuvData.array(), mResolution, mResolution >> 1).flip();
-//                mUBuffer.put(yuvData.array(), mResolution, mUorVResolution).flip();
-//                mVBuffer.put(yuvData.array(), mResolution + mUorVResolution, mUorVResolution).flip();
+                mYBuffer.put(yuvData.array(), 0, mResolution).flip();
+                mUBuffer.put(yuvData.array(), mResolution, mUorVResolution).flip();
+                mVBuffer.put(yuvData.array(), mResolution + mUorVResolution, mUorVResolution).flip();
 
-                mRGBBuffer.put(yuvData).flip();
+//                mRGBBuffer.put(yuvData).flip();
 
                 requestRender();
 
