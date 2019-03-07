@@ -122,12 +122,12 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         //用于软解的y部分的texture id
         private int mYTexId = -1;
         //用于软解的uv部分的texture id
-        private int mUVTexId = -1;
         private int mUTexId = -1;
         private int mVTexId = -1;
-        private int mRGBTexId = -1;
+        //y平面的宽高
         private int mYWidth;
         private int mYHeight;
+        //u或n平面的宽高
         private int mUVWidth;
         private int mUVHeight;
         //yuv的分辨率
@@ -138,8 +138,6 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         private ByteBuffer mYBuffer;
         private ByteBuffer mUBuffer;
         private ByteBuffer mVBuffer;
-
-        private ByteBuffer mRGBBuffer;
 
         private Object locker = new Object();
 
@@ -173,7 +171,6 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
                 mYTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE0);
                 mUTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE1);
                 mVTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE2);
-//                mRGBTexId = GLDrawer2D.initTex();
             }
 
         }
@@ -229,7 +226,6 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
             //软解时用于接收解码后的yuv数据，该方法在解码线程中执行
             synchronized (locker) {
                 if (mYBuffer == null) {
-//                if (mRGBBuffer == null) {
                     mYWidth = frameWidth;
                     mYHeight = frameHeight;
 
@@ -247,16 +243,11 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
 
                     mVBuffer = ByteBuffer.allocate(mUorVResolution);
                     mVBuffer.order(yuvData.order());
-
-//                    mRGBBuffer = ByteBuffer.allocate(outputSize);
-//                    mRGBBuffer.order(yuvData.order());
                 }
 
                 mYBuffer.put(yuvData.array(), 0, mResolution).flip();
                 mUBuffer.put(yuvData.array(), mResolution, mUorVResolution).flip();
                 mVBuffer.put(yuvData.array(), mResolution + mUorVResolution, mUorVResolution).flip();
-
-//                mRGBBuffer.put(yuvData).flip();
 
                 requestRender();
 

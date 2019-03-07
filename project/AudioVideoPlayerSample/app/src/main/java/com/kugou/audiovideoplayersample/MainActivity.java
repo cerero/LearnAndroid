@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.kugou.uiperformance.core.UIPerformance;
+
 public class MainActivity extends AppCompatActivity {
 
     static {
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.container, new PlayerFragment()).commit();
 		}
+
+		UIPerformance.getInstance(this).start();
 	}
 
 	public native void stringFromJNI();
