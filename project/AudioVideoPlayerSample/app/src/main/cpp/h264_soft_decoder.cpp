@@ -89,7 +89,8 @@ public:
 
 };
 
-void nativeInit(JNIEnv* env, jobject thiz, jint color_format, jstring external_dir);
+//void nativeInit(JNIEnv* env, jobject thiz, jint color_format, jstring external_dir);
+void nativeInit(JNIEnv* env, jobject thiz, jint color_format);
 void nativeDestroy(JNIEnv* env, jobject thiz);
 jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_units, jint num_bytes, jlong pkt_pts);
 jboolean isFrameReady(JNIEnv* env, jobject thiz);
@@ -105,7 +106,8 @@ void h264softdecoder::OnLoad(JNIEnv* env, void* reserved) {
     JNINativeMethod nm[9];
 
     nm[0].name = "nativeInit";
-    nm[0].signature = "(ILjava/lang/String;)V";
+//    nm[0].signature = "(ILjava/lang/String;)V";
+    nm[0].signature = "(I)V";
     nm[0].fnPtr = (void *)nativeInit;
 
     nm[1].name = "nativeDestroy";
@@ -164,21 +166,20 @@ static void save_raw_yuv(uint8_t *yBuf, uint8_t *uBuf, uint8_t *vBuf,
     } else {
         LOGE(TAG, "file %s can not write!!!", filename);
     }
-
-
 }
 
 
-void nativeInit(JNIEnv* env, jobject thiz, jint color_format, jstring external_dir) {
+//void nativeInit(JNIEnv* env, jobject thiz, jint color_format, jstring external_dir) {
+void nativeInit(JNIEnv* env, jobject thiz, jint color_format) {
     DecoderContext *ctx = new DecoderContext(color_format);
 
-    const char* c_external_dir = env->GetStringUTFChars(external_dir, NULL);
-    ctx->external_dir = (char *)malloc(sizeof(char) * (strlen(c_external_dir) + 1));
-    strcpy(ctx->external_dir, c_external_dir);
-    LOGD(TAG, "setting external_dir:%s", ctx->external_dir);
+//    const char* c_external_dir = env->GetStringUTFChars(external_dir, NULL);
+//    ctx->external_dir = (char *)malloc(sizeof(char) * (strlen(c_external_dir) + 1));
+//    strcpy(ctx->external_dir, c_external_dir);
+//    LOGD(TAG, "setting external_dir:%s", ctx->external_dir);
+//    env->ReleaseStringUTFChars(external_dir, c_external_dir);
 
     DecoderContext::set_ctx(env, thiz, ctx);
-    env->ReleaseStringUTFChars(external_dir, c_external_dir);
 }
 
 void nativeDestroy(JNIEnv* env, jobject thiz) {
@@ -268,7 +269,6 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
         return -1;
     }
 
-//    jbyte *out_buf_end = out_buf + out_buf_len;
     if (ctx->color_format == AV_PIX_FMT_YUV420P) {
         /**
          * ffmpeg解码得到的AVFrame里面有data数组和linesize数组，
@@ -300,28 +300,24 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
 
 //        LOGD(TAG, "写入yuv完毕 out_buf_end=%x, out_buf=%x", out_buf_end, out_buf);
     } else {
-
         if (ctx->convert_ctx == NULL) {
             ctx->convert_ctx = sws_getContext(ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->codec_ctx->pix_fmt,
                                               ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->color_format, SWS_FAST_BILINEAR, NULL, NULL, NULL);//SWS_BILINEAR SWS_FAST_BILINEAR
         }
-
         avpicture_fill((AVPicture*)ctx->dst_frame, (uint8_t*)out_buf, ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
-
-        LOGD(TAG, "width:%d, height:%d, src pix_fmt:%d ,dst pix_fmt:%d, pic_buf_size:%d, out_buf_len:%d", ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->codec_ctx->pix_fmt, ctx->color_format, pic_buf_size, out_buf_len);
-        LOGD(TAG, "ctx->src_frame->linesize[0]: %d", ctx->src_frame->linesize[0]);
-        LOGD(TAG, "ctx->src_frame->linesize[1]: %d", ctx->src_frame->linesize[1]);
-        LOGD(TAG, "ctx->src_frame->linesize[2]: %d", ctx->src_frame->linesize[2]);
-        LOGD(TAG, "ctx->src_frame->data[0] addr:%x", ctx->src_frame->data[0]);
-        LOGD(TAG, "ctx->src_frame->data[1] addr:%x", ctx->src_frame->data[1]);
-        LOGD(TAG, "ctx->src_frame->data[2] addr:%x", ctx->src_frame->data[2]);
-
-        LOGD(TAG, "ctx->dst_frame->linesize[0]: %d", ctx->dst_frame->linesize[0]);
-        LOGD(TAG, "ctx->dst_frame->data[0] addr:%x", ctx->dst_frame->data[0]);
-        LOGD(TAG, "                out_buf addr:%x ", out_buf);
+//        LOGD(TAG, "width:%d, height:%d, src pix_fmt:%d ,dst pix_fmt:%d, pic_buf_size:%d, out_buf_len:%d", ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->codec_ctx->pix_fmt, ctx->color_format, pic_buf_size, out_buf_len);
+//        LOGD(TAG, "ctx->src_frame->linesize[0]: %d", ctx->src_frame->linesize[0]);
+//        LOGD(TAG, "ctx->src_frame->linesize[1]: %d", ctx->src_frame->linesize[1]);
+//        LOGD(TAG, "ctx->src_frame->linesize[2]: %d", ctx->src_frame->linesize[2]);
+//        LOGD(TAG, "ctx->src_frame->data[0] addr:%x", ctx->src_frame->data[0]);
+//        LOGD(TAG, "ctx->src_frame->data[1] addr:%x", ctx->src_frame->data[1]);
+//        LOGD(TAG, "ctx->src_frame->data[2] addr:%x", ctx->src_frame->data[2]);
+//
+//        LOGD(TAG, "ctx->dst_frame->linesize[0]: %d", ctx->dst_frame->linesize[0]);
+//        LOGD(TAG, "ctx->dst_frame->data[0] addr:%x", ctx->dst_frame->data[0]);
+//        LOGD(TAG, "                out_buf addr:%x ", out_buf);
 
         sws_scale(ctx->convert_ctx, (const uint8_t **)ctx->src_frame->data, ctx->src_frame->linesize, 0, ctx->codec_ctx->height, ctx->dst_frame->data, ctx->dst_frame->linesize);
-
     }
 
     ctx->frame_ready = 0;
