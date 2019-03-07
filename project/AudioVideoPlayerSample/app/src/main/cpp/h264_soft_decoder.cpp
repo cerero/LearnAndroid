@@ -4,9 +4,10 @@
 #include "h264_soft_decoder.h"
 
 extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libswscale/swscale.h>
+#include "libavformat/avformat.h"
+#include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
+#include "libavutil/imgutils.h"
 #include "my_log.h"
 }
 
@@ -208,6 +209,7 @@ jint getHeight(JNIEnv* env, jobject thiz) {
 
 jint getOutputByteSize(JNIEnv* env, jobject thiz) {
     DecoderContext *ctx = (DecoderContext *)DecoderContext::get_ctx(env, thiz);
+//    return av_image_get_buffer_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height, 0);
     return avpicture_get_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
 }
 
@@ -226,8 +228,9 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
 
     long out_buf_len = env->GetDirectBufferCapacity(out_buffer);
 
+//    int pic_buf_size = av_image_get_buffer_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height, 0);
     int pic_buf_size = avpicture_get_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
-    LOGD(TAG, "decodeFrameToDirectBuffer-> avpicture_get_size=%d, out_buf_len=%ld", pic_buf_size, out_buf_len);
+//    LOGD(TAG, "decodeFrameToDirectBuffer-> avpicture_get_size=%d, out_buf_len=%ld", pic_buf_size, out_buf_len);
     if (out_buf_len < pic_buf_size) {
         LOGD(TAG, "Input buffer size:%ld too small, couldn't decode to direct buffer, need size:%d", out_buf_len, pic_buf_size);
         return -1;
@@ -263,14 +266,18 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
     } else {
         if (ctx->convert_ctx == NULL) {
             ctx->convert_ctx = sws_getContext(ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->codec_ctx->pix_fmt,
-                                              ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->color_format, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+                                              ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->color_format, SWS_BILINEAR, NULL, NULL, NULL);//SWS_BILINEAR SWS_FAST_BILINEAR
         }
 
-        avpicture_fill((AVPicture*)ctx->dst_frame, (uint8_t*)out_buf, ctx->color_format, ctx->codec_ctx->width,
-                       ctx->codec_ctx->height);
+        avpicture_fill((AVPicture*)ctx->dst_frame, (uint8_t*)out_buf, ctx->color_format,
+                  ctx->codec_ctx->width, ctx->codec_ctx->height);
 
-        sws_scale(ctx->convert_ctx, (const uint8_t**)ctx->src_frame->data, ctx->src_frame->linesize, 0, ctx->codec_ctx->height,
+        int out_h = sws_scale(ctx->convert_ctx, (const uint8_t * const*)ctx->src_frame->data,
+                  ctx->src_frame->linesize, 0, 0,//ctx->codec_ctx->height,
                   ctx->dst_frame->data, ctx->dst_frame->linesize);
+
+        LOGD(TAG, "width:%d, height:%d, out_h:%d, src pix_fmt:%s ,dst pix_fmt:%s, pic_buf_size:%d", ctx->codec_ctx->width, ctx->codec_ctx->height, out_h, av_get_pix_fmt_name(ctx->codec_ctx->pix_fmt), av_get_pix_fmt_name(ctx->color_format), pic_buf_size);
+        LOGD(TAG, "ctx->dst_frame->linesize[0]: %d, x%d = %d", ctx->dst_frame->linesize[0], ctx->codec_ctx->height, ctx->codec_ctx->height * ctx->dst_frame->linesize[0]);
     }
 
     ctx->frame_ready = 0;

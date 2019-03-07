@@ -753,7 +753,8 @@ public class MediaMoviePlayer {
 			Log.i(TAG, "nalu type " + mVideoSoftDecodeInputBuffer.get(spsByteLen + 4));
 			Log.i(TAG, "pps size " + ppsByteLen);
 
-			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_YUV420);
+//			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_YUV420);
+			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_BGR32);
 			softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, spsByteLen + ppsByteLen, 0);
 
 			if (DEBUG) Log.v(TAG, "internalStartVideoWithSoftDecode:codec started width:" + softDecoder.getWidth() + ",height:" + softDecoder.getHeight());
@@ -877,9 +878,9 @@ public class MediaMoviePlayer {
 
 				softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, sample_size, presentationTimeUs);
 				frame_ready = softDecoder.isFrameReady();
-				if (frame_ready) {
-					if(DEBUG) Log.d(TAG, String.format("soft_decode width=%1$d height=%2$d", softDecoder.getWidth(), softDecoder.getHeight()));
-				}
+//				if (frame_ready) {
+//					if(DEBUG) Log.d(TAG, String.format("soft_decode width=%1$d height=%2$d", softDecoder.getWidth(), softDecoder.getHeight()));
+//				}
 			}
             result = extractor.advance();	// return false if no data is available
         }

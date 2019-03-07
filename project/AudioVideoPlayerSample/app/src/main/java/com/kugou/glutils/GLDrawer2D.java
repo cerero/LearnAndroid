@@ -88,6 +88,17 @@ public class GLDrawer2D {
             + "gl_FragColor = vec4(r, g, b, 1.0);  \n"
             + "} \n";
 
+    private static final String rgbFss
+            = "precision mediump float;\n"
+            + "uniform sampler2D sTexture;\n"
+            + "varying highp vec2 vTextureCoord;\n"
+            + "void main() {\n"
+            + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t);\n"
+            + "vec4 refColor = texture2D(sTexture, refTextureCoord);\n"
+            + "vec4 texel = texture2D(sTexture, vTextureCoord);\n"
+            + "gl_FragColor = vec4(texel.rgb, refColor.b);\n"
+            + "} \n";
+
 	private static final float[] VERTICES = {
 	        1.0f, 1.0f,
             -1.0f, 1.0f,
@@ -127,7 +138,9 @@ public class GLDrawer2D {
 		if (supportHWDecode) {
             hProgram = loadShader(vss, fss);
         } else {
-            hProgram = loadShader(vss, yuvFSS);
+//            hProgram = loadShader(vss, yuvFSS);
+            hProgram = loadShader(vss, rgbFss);
+
         }
 		GLES20.glUseProgram(hProgram);
 
@@ -229,6 +242,29 @@ public class GLDrawer2D {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
         GLES20.glUseProgram(0);
     }
+
+	public void drawRGBTex(int tex_id,
+						   int width, int height,
+						   final Buffer channelRGB,
+						   float[] tex_matrix) {
+
+		if (channelRGB == null) {
+			return;
+		}
+
+		GLES20.glUseProgram(hProgram);
+
+		if (tex_matrix != null)
+			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
+
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tex_id);
+		GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGB, width, height, 0,
+				GLES20.GL_RGB, GLES20.GL_UNSIGNED_BYTE, channelRGB);
+
+		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+		GLES20.glUseProgram(0);
+	}
 
 	/**创建普通的内部纹理
      * @return texture ID
