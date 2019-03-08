@@ -23,7 +23,6 @@ public class GLDrawer2D {
 		+ "attribute highp vec4 aPosition;\n"
 		+ "attribute highp vec4 aTextureCoord;\n"
 		+ "varying highp vec2 vTextureCoord;\n"
-		+ "\n"
 		+ "void main() {\n"
 		    + "gl_Position = uMVPMatrix * aPosition;\n"
 		    + "vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n"
@@ -31,7 +30,7 @@ public class GLDrawer2D {
 
 	private static final String fss
 		= "#extension GL_OES_EGL_image_external : require\n"
-		+ "precision mediump float;\n"
+		+ "precision highp float;\n"
 		+ "uniform samplerExternalOES sTexture;\n"
 		+ "varying highp vec2 vTextureCoord;\n"
 		+ "void main() {\n"
@@ -41,30 +40,29 @@ public class GLDrawer2D {
             + "gl_FragColor = vec4(texel.rgb, refColor.b);\n"
 		+ "} \n";
 
-
 	private static final String yuvFSS
             = "precision mediump float; \n"
+            + "uniform mat3 uYUVTransform;\n"
             + "varying vec2 vTextureCoord; \n"
             + "uniform sampler2D y_texture; \n"
             + "uniform sampler2D u_texture; \n"
             + "uniform sampler2D v_texture; \n"
             + "void main (void){  \n"
-                + "float r, g, b, y, u, v; \n"
-                + "float y1, u1, v1, a; \n"
+                + "mediump vec3 yuv; \n"
+                + "mediump vec3 yuv_ref; \n"
+                + "mediump vec3 rgb; \n"
+                + "float a; \n"
                 + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t); \n"
-                + "y1 = texture2D(y_texture, refTextureCoord).r;\n"
-                + "u1 = texture2D(u_texture, refTextureCoord).r - 0.5;\n"
-                + "v1 = texture2D(v_texture, refTextureCoord).r - 0.5;\n"
-                + "y = texture2D(y_texture, vTextureCoord).r;  \n"
-                + "u = texture2D(u_texture, vTextureCoord).r - 0.5; \n"
-                + "v = texture2D(v_texture, vTextureCoord).r - 0.5; \n"
-                + "r = y + 1.402 * v; \n"
-                + "g = y - 0.34414 * u - 0.71414 * v; \n"
-                + "b = y + 1.772 * u; \n"
-                + "a = y1 - 0.34414 * u1 - 0.71414 * v1;\n"
-                + "gl_FragColor = vec4(r, g, b, a);  \n"
-            + "} \n";
-
+                + "yuv_ref.x = texture2D(y_texture, refTextureCoord).r;\n"
+                + "yuv_ref.y = texture2D(u_texture, refTextureCoord).r - 0.5;\n"
+                + "yuv_ref.z = texture2D(v_texture, refTextureCoord).r - 0.5;\n"
+                + "yuv.x = texture2D(y_texture, vTextureCoord).r;\n"
+                + "yuv.y = texture2D(u_texture, vTextureCoord).r - 0.5;\n"
+                + "yuv.z = texture2D(v_texture, vTextureCoord).r - 0.5;\n"
+                + "rgb = uYUVTransform * yuv; \n"
+                + "a = yuv_ref.x - 0.34414 * yuv_ref.y - 0.71414 * yuv_ref.z;\n"
+                + "gl_FragColor = vec4(rgb, a);  \n"
+                + "} \n";
 
 	private static final float[] VERTICES = {
 	        1.0f, 1.0f,
@@ -78,6 +76,12 @@ public class GLDrawer2D {
             0.5f, 1.0f,
             0.0f, 1.0f };
 
+//    private static final float[] TEXCOORD = {
+//            1.0f, 0.0f,
+//            0.0f, 0.0f,
+//            1.0f, 1.0f,
+//            0.0f, 1.0f };
+
 	private final FloatBuffer pVertex;
 	private final FloatBuffer pTexCoord;
 	private int hProgram;
@@ -85,12 +89,15 @@ public class GLDrawer2D {
     int maTextureCoordLoc;
     int muMVPMatrixLoc;
     int muTexMatrixLoc;
+    int muYUVTransform;
 
     int mYTextureLoc;
     int mUTextureLoc;
     int mVTextureLoc;
 
 	private final float[] mMvpMatrix = new float[16];
+
+    private float[] mYUVTransformMatrix;
 
 	private static final int FLOAT_SZ = Float.SIZE / 8;
 	private static final int VERTEX_NUM = 4;
@@ -112,8 +119,6 @@ public class GLDrawer2D {
             hProgram = loadShader(vss, fss);
         } else {
             hProgram = loadShader(vss, yuvFSS);
-//            hProgram = loadShader(vss, rgbFss);
-
         }
 		GLES20.glUseProgram(hProgram);
 
@@ -122,9 +127,21 @@ public class GLDrawer2D {
         muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
         muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
 
-        mYTextureLoc = GLES20.glGetUniformLocation(hProgram, "y_texture");
-        mUTextureLoc = GLES20.glGetUniformLocation(hProgram, "u_texture");
-        mVTextureLoc = GLES20.glGetUniformLocation(hProgram, "v_texture");
+        if (!supportHWDecode) {
+            muYUVTransform = GLES20.glGetUniformLocation(hProgram, "uYUVTransform");
+            mYTextureLoc = GLES20.glGetUniformLocation(hProgram, "y_texture");
+            mUTextureLoc = GLES20.glGetUniformLocation(hProgram, "u_texture");
+            mVTextureLoc = GLES20.glGetUniformLocation(hProgram, "v_texture");
+
+            //yuv 转 rgb的矩阵
+            mYUVTransformMatrix = new float[]{
+                    1.0f,   1.0f,   1.0f,
+                    0.0f, -0.39465f,  2.03211f,
+                    1.13983f,   -0.58060f,  0.0f
+            };
+
+            GLES20.glUniformMatrix3fv(muYUVTransform, 1, false, mYUVTransformMatrix, 0);
+        }
 
 		Matrix.setIdentityM(mMvpMatrix, 0);
         GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);

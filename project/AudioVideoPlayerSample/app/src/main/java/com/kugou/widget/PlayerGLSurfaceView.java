@@ -38,7 +38,7 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         getHolder().setFormat(PixelFormat.RGBA_8888);
 
-        mRender = new Render(false);
+        mRender = new Render(true);
         setRenderer(mRender);
 
         this.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
@@ -95,6 +95,10 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
 
     @Override
     public void onResume() {
+
+    }
+
+    public void onFinish() {
 
     }
 
@@ -184,8 +188,9 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
 
         @Override
         public void onDrawFrame(GL10 gl) {
-//            GLES20.glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
-//            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
             if (mSupportHWDecode) { //硬解渲染
                 if(mInputSurfaceTexture != null){
                     mInputSurfaceTexture.updateTexImage();
@@ -201,7 +206,6 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
                     locker.notifyAll();
                 }
             }
-
         }
 
         public Surface getInputSurface(){
