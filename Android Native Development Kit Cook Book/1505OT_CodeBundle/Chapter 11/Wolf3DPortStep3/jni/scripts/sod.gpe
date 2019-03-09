@@ -1,6 +1,0 @@
-#!/bin/sh
-cd /mnt/sd/wolf3d/wolf3d/
-./wolf3d.gpe --sod
-
-cd /usr/gp2x
-./gp2xmenu
