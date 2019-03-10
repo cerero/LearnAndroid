@@ -38,7 +38,7 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         getHolder().setFormat(PixelFormat.RGBA_8888);
 
-        mRender = new Render(true);
+        mRender = new Render(false);
         setRenderer(mRender);
 
         this.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);

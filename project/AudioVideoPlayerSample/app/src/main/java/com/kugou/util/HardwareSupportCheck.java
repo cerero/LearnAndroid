@@ -52,7 +52,6 @@ public class HardwareSupportCheck {
                     } else {
                         ret = true;
                     }
-
                 }
             }catch (Exception e){
                 Log.d("===HardwareSupportCheck isSupport===", "Exception:"+e );
@@ -61,9 +60,7 @@ public class HardwareSupportCheck {
             finally {
                 return ret;
             }
-        }
-        else
-        {
+        } else {
             return false;
         }
     }

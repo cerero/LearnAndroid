@@ -486,7 +486,7 @@ public class MediaVideoPlayer {
 		synchronized (mSync) {
 			mState = STATE_PREPARED;
 		}
-		mCallback.onPrepared();
+		mCallback.onPrepared(false);
 	}
 
 	/**

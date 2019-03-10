@@ -76,12 +76,6 @@ public class GLDrawer2D {
             0.5f, 1.0f,
             0.0f, 1.0f };
 
-//    private static final float[] TEXCOORD = {
-//            1.0f, 0.0f,
-//            0.0f, 0.0f,
-//            1.0f, 1.0f,
-//            0.0f, 1.0f };
-
 	private final FloatBuffer pVertex;
 	private final FloatBuffer pTexCoord;
 	private int hProgram;

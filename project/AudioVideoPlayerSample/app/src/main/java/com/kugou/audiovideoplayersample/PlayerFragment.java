@@ -111,7 +111,7 @@ public class PlayerFragment extends Fragment {
 
 			prepareSampleMovie(path);
 			mPlayerButton.setColorFilter(0x7fff0000);	// turn red
-            mPlayer = new MediaMoviePlayer(mPlayerView.getInputSurface(), mPlayerView.getYUVReceiver(), mIFrameCallback, true, true);
+            mPlayer = new MediaMoviePlayer(mPlayerView.getInputSurface(), mPlayerView.getYUVReceiver(), mIFrameCallback, true, false);
             mPlayer.prepare(path.toString());
 		} catch (IOException e) {
 			Log.e(TAG, "startPlay:", e);
@@ -136,7 +136,7 @@ public class PlayerFragment extends Fragment {
 	 */
 	private final IFrameCallback mIFrameCallback = new IFrameCallback() {
 		@Override
-		public void onPrepared() {
+		public void onPrepared(Boolean canHardWareDecode) {
 			final float aspect = mPlayer.getWidth() / (float)mPlayer.getHeight();
 			final Activity activity = getActivity();
 			if ((activity != null) && !activity.isFinishing())

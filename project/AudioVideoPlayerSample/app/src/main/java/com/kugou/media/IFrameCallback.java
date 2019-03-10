@@ -7,7 +7,7 @@ public interface IFrameCallback {
 	/**
 	 * called when preparing finshed
 	 */
-	void onPrepared();
+	void onPrepared(Boolean canHardWareDecode);
 	/**
 	 * called when playing finished
 	 */
