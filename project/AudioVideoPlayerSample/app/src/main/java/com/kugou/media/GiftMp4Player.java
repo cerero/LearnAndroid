@@ -12,7 +12,7 @@ import com.kugou.widget.MP4GLSurfaceView;
 import java.io.File;
 
 public class GiftMp4Player implements IMP4Player {
-
+    private static final String TAG = "GiftMp4Player";
     /**播放器内部状态**/
     private int mInnerStatus = EventCallBack.STATE_NONE;
     /**外部调用方状态**/
@@ -20,17 +20,17 @@ public class GiftMp4Player implements IMP4Player {
     private Object mLock = new Object();
     private EventCallBack mCallBack;
     private ViewGroup mParent;
-//    private Activity mParent;
     private String mLocalMp4ResPath;
     private MP4GLSurfaceView mGLSurfaceView;
     private MP4GLRender mGLRender;
     private MediaContentProducer mContentProducer;
+    private int mLoops = 1;
 
     public GiftMp4Player(ViewGroup parent, EventCallBack callBack){
-//    public GiftMp4Player(Activity parent, EventCallBack callBack){
         this.mParent = parent;
         this.mCallBack = callBack;
         initGLSurfaceView();
+        initContentProducer();
     }
 
     private void initGLSurfaceView() {
@@ -43,8 +43,22 @@ public class GiftMp4Player implements IMP4Player {
     private void initContentProducer() {
         mContentProducer = new MediaContentProducer(mGLRender, null, new IFrameCallback() {
             @Override
+            public void onFinishing() {
+                Log.d(TAG, "onFinishing");
+                synchronized (mLock) {
+                    mLoops--;
+                    if (mLoops == 0) {
+                        mInnerStatus = EventCallBack.STATE_FINISHING;
+                        mContentProducer.stop();
+                    } else {
+                        mContentProducer.play();
+                    }
+                }
+            }
+
+            @Override
             public void onPrepared(Boolean canHardWareDecode) {
-                Log.d(Tag, "onPrepared canHardWareDecode:" + canHardWareDecode);
+                Log.d(TAG, "onPrepared");
 //                Activity activity = (Activity)mParent.getContext();
 //                if ((activity != null) && !activity.isFinishing()) {
 //                    activity.runOnUiThread(new Runnable() {
@@ -59,6 +73,7 @@ public class GiftMp4Player implements IMP4Player {
 
             @Override
             public void onFinished() {
+                Log.d(TAG, "onFinished");
                 synchronized (mLock) {
                     mInnerStatus = EventCallBack.STATE_FINISHED;
                 }
@@ -94,7 +109,7 @@ public class GiftMp4Player implements IMP4Player {
             mCallBack.onErrorOccur(EventCallBack.ERROR_RES_NOT_EXIT, localMp4ResPath + " not exit");
         } else {
             this.mLocalMp4ResPath = localMp4ResPath;
-            initContentProducer();
+            mLoops = loops;
             mContentProducer.prepare(localMp4ResPath);
         }
     }
@@ -121,8 +136,10 @@ public class GiftMp4Player implements IMP4Player {
     @Override
     public void stop() {
         if (mContentProducer != null) {
-            mContentProducer.release();
-            mContentProducer = null;
+            synchronized (mLock) {
+                mLoops = 1;
+            }
+            mContentProducer.finishing();
         }
     }
 

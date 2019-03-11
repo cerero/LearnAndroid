@@ -217,7 +217,7 @@ jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_unit
         ctx->total_decode_frame ++;
     }
 
-    LOGD(TAG, "consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d, total decode:%d", got_picture, ret, ctx->total_decode_frame);
+//    LOGD(TAG, "consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d, total decode:%d", got_picture, ret, ctx->total_decode_frame);
     return ret;
 }
 

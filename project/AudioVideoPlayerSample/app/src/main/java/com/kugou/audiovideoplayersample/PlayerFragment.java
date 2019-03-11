@@ -136,6 +136,11 @@ public class PlayerFragment extends Fragment {
 	 */
 	private final IFrameCallback mIFrameCallback = new IFrameCallback() {
 		@Override
+		public void onFinishing() {
+
+		}
+
+		@Override
 		public void onPrepared(Boolean canHardWareDecode) {
 			final float aspect = mPlayer.getWidth() / (float)mPlayer.getHeight();
 			final Activity activity = getActivity();

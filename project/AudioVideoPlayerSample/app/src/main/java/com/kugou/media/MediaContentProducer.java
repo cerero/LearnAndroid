@@ -13,7 +13,6 @@ import android.media.AudioTrack;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -104,7 +103,7 @@ public class MediaContentProducer {
     	}
     }
 
-    /**
+	/**
      * request to start playing movie
      * this method can be called after prepare
      */
@@ -113,6 +112,7 @@ public class MediaContentProducer {
     	synchronized (mSync) {
     		if (mState == STATE_PLAYING)
     			return;
+//    		mRequestTime = 1;
     		mRequest = REQ_START;
     		mSync.notifyAll();
     	}
@@ -132,6 +132,22 @@ public class MediaContentProducer {
     	}
     }
 
+    public final void finishing() {
+		if (DEBUG) Log.v(TAG, "finishing:");
+		synchronized (mSync) {
+			if (mState == STATE_PLAYING
+					|| mState == STATE_PREPARED
+					|| mState == STATE_PAUSED) {
+				mRequest = REQ_FINISHING;
+				mSync.notifyAll();
+//				try {
+//					mSync.wait(50);
+//				} catch (final InterruptedException e) {
+//					// ignore
+//				}
+			}
+		}
+	}
     /**
      * request stop playing
      */
@@ -199,6 +215,7 @@ public class MediaContentProducer {
     private static final int STATE_PREPARED = 1;
     private static final int STATE_PLAYING = 2;
     private static final int STATE_PAUSED = 3;
+	private static final int STATE_FINISHING = 4;
 
     // request code
     private static final int REQ_NON = 0;
@@ -208,8 +225,8 @@ public class MediaContentProducer {
     private static final int REQ_STOP = 4;
     private static final int REQ_PAUSE = 5;
     private static final int REQ_RESUME = 6;
-    private static final int REQ_QUIT = 9;
-
+    private static final int REQ_QUIT = 7;
+	private static final int REQ_FINISHING = 8;
 //	private static final long EPS = (long)(1 / 240.0f * 1000000);	// 1/240 seconds[micro seconds]
 
 	private final Object mSync = new Object();
@@ -219,6 +236,8 @@ public class MediaContentProducer {
 	private long mDuration;
 	private int mRequest;
 	private long mRequestTime;
+	private long mFirstVideoPTS = -1;
+	private long mFirstAudioPTS = -1;
     // for video playback
 	private final Object mVideoSync = new Object();
 	private Surface mOutputSurface;
@@ -301,6 +320,9 @@ public class MediaContentProducer {
                                 case STATE_PAUSED:
                                     local_isRunning = runPausedStateByPlayerTask(local_req);
                                     break;
+								case STATE_FINISHING:
+									local_isRunning = runFinishingStateByPlayerTask(local_req);
+									break;
 							}
 						}
 					} catch (final InterruptedException e) {
@@ -343,6 +365,10 @@ public class MediaContentProducer {
 				mVideoInputDone = mVideoOutputDone = true;
 				mVideoTask.notifyAll();
 			}
+
+			synchronized (mSync) {
+				mSync.notifyAll();//playertask线程可能处于looping waiting中，通知激活
+			}
 		}
 	};
 
@@ -372,6 +398,10 @@ public class MediaContentProducer {
 				mAudioInputDone = mAudioOutputDone = true;
 				mAudioTask.notifyAll();
 			}
+
+			synchronized (mSync) {
+				mSync.notifyAll();//playertask线程可能处于looping waiting中，通知激活
+			}
 		}
 	};
 
@@ -392,6 +422,7 @@ public class MediaContentProducer {
             case REQ_START:
             case REQ_PAUSE:
             case REQ_RESUME:
+			case REQ_FINISHING:
                 throw new IllegalStateException("invalid state:" + mState);
             case REQ_QUIT:
                 local_isRunning = false;
@@ -420,11 +451,14 @@ public class MediaContentProducer {
 		boolean local_isRunning = true;
 		switch (req) {
             case REQ_START:
-                handleStartByPlayerTask();
+                handleStart();
                 break;
             case REQ_PAUSE:
             case REQ_RESUME:
-                throw new IllegalStateException("invalid state:" + mState);
+				throw new IllegalStateException("invalid state:" + mState);
+			case REQ_FINISHING:
+				handleFinishing();
+				break;
             case REQ_STOP:
                 handleStop();
                 break;
@@ -445,6 +479,32 @@ public class MediaContentProducer {
 		return local_isRunning;
 	}
 
+	private final boolean runFinishingStateByPlayerTask(final int req) {
+		boolean local_isRunning = true;
+		switch (req) {
+			case REQ_START:
+				handleStart();
+				break;
+			case REQ_STOP:
+				handleStop();
+				break;
+			case REQ_QUIT:
+				local_isRunning = false;
+				break;
+			case REQ_PREPARE:
+			case REQ_SEEK:
+			case REQ_RESUME:
+			case REQ_FINISHING:
+			case REQ_PAUSE:
+				throw new IllegalStateException("invalid state:" + mState);
+		}
+
+		synchronized (mSync) {
+			local_isRunning &= mIsRunning;
+		}
+		return local_isRunning;
+	}
+
 	/**
      * STATE_PLAYING状态下只能处理 REQ_SEEK / REQ_STOP / REQ_PAUSE / REQ_QUIT 等请求
 	 * @param req
@@ -457,6 +517,9 @@ public class MediaContentProducer {
 			case REQ_START:
 			case REQ_RESUME:
 				throw new IllegalStateException("invalid state:" + mState);
+			case REQ_FINISHING:
+				handleFinishing();
+				break;
 			case REQ_SEEK:
 				handleSeek(mRequestTime);
 				break;
@@ -470,7 +533,7 @@ public class MediaContentProducer {
 				local_isRunning = false;
 				break;
 			default:
-				handleLoopInPlayingStateByPlayerTask(mCallback);
+				handleLoopInPlayingState(mCallback);
 				break;
 		} // end of switch (req)
 		synchronized (mSync) {
@@ -491,6 +554,9 @@ public class MediaContentProducer {
             case REQ_PREPARE:
             case REQ_START:
                 throw new IllegalStateException("invalid state:" + mState);
+			case REQ_FINISHING:
+				handleFinishing();
+				break;
             case REQ_SEEK:
                 handleSeek(mRequestTime);
                 break;
@@ -647,36 +713,43 @@ public class MediaContentProducer {
 		return trackIndex;
 	}
 
-	private final void handleStartByPlayerTask() {
-    	if (DEBUG) Log.v(TAG, "handleStartByPlayerTask:");
+	private final void handleStart() {
+    	if (DEBUG) Log.v(TAG, "handleStart:");
 		synchronized (mSync) {
-			if (mState != STATE_PREPARED)
+			if (mState != STATE_PREPARED && mState != STATE_FINISHING)
 				throw new RuntimeException("invalid state:" + mState);
 			mState = STATE_PLAYING;
 		}
-        if (mRequestTime > 0) {
-        	handleSeek(mRequestTime);
-        }
+//        if (mRequestTime > 0) {
+//			if (DEBUG) Log.v(TAG, "seektime:" + mRequestTime);
+//        	handleSeek(mRequestTime);
+//        }
+		handleReplaySeek();
         previousVideoPresentationTimeUs = previousAudioPresentationTimeUs = -1;
 
+		mVideoStartTime = mAudioStartTime = -1;
         //-----初始化硬解码器或软解码器-----
 		mVideoInputDone = mVideoOutputDone = true;
 		Thread videoThread = null, audioThread = null;
 		if (mVideoTrackIndex >= 0) {
 		    if (mCanHardDecodeH264) {
-                final MediaCodec codec = internalStartVideo(mVideoMediaExtractor, mVideoTrackIndex);
-                if (codec != null) {
-                    mVideoMediaCodec = codec;
-                    mVideoBufferInfo = new MediaCodec.BufferInfo();
-                    mVideoInputBuffers = codec.getInputBuffers();
-                    mVideoOutputBuffers = codec.getOutputBuffers();
-                } else {
-                	//硬解码器创建失败,降级走软解
-					mCanHardDecodeH264 = false;
-					mH264SoftDecoder = internalStartVideoWithSoftDecode(mVideoMediaExtractor, mVideoTrackIndex);
+		    	if (mVideoMediaCodec == null) {
+					final MediaCodec codec = internalStartVideo(mVideoMediaExtractor, mVideoTrackIndex);
+					if (codec != null) {
+						mVideoMediaCodec = codec;
+						mVideoBufferInfo = new MediaCodec.BufferInfo();
+						mVideoInputBuffers = codec.getInputBuffers();
+						mVideoOutputBuffers = codec.getOutputBuffers();
+					} else {
+						//硬解码器创建失败,降级走软解
+						mCanHardDecodeH264 = false;
+						mH264SoftDecoder = internalStartVideoWithSoftDecode(mVideoMediaExtractor, mVideoTrackIndex);
+					}
 				}
             } else {
-                mH264SoftDecoder = internalStartVideoWithSoftDecode(mVideoMediaExtractor, mVideoTrackIndex);
+		    	if (mH264SoftDecoder == null) {
+					mH264SoftDecoder = internalStartVideoWithSoftDecode(mVideoMediaExtractor, mVideoTrackIndex);
+				}
             }
 
 			mVideoInputDone = mVideoOutputDone = false;
@@ -686,12 +759,14 @@ public class MediaContentProducer {
 
 		mAudioInputDone = mAudioOutputDone = true;
 		if (mAudioTrackIndex >= 0) {
-			final MediaCodec codec = internalStartAudio(mAudioMediaExtractor, mAudioTrackIndex);
-			if (codec != null) {
-		        mAudioMediaCodec = codec;
-		        mAudioBufferInfo = new MediaCodec.BufferInfo();
-		        mAudioInputBuffers = codec.getInputBuffers();
-		        mAudioOutputBuffers = codec.getOutputBuffers();
+			if (mAudioMediaCodec == null) {
+				final MediaCodec codec = internalStartAudio(mAudioMediaExtractor, mAudioTrackIndex);
+				if (codec != null) {
+					mAudioMediaCodec = codec;
+					mAudioBufferInfo = new MediaCodec.BufferInfo();
+					mAudioInputBuffers = codec.getInputBuffers();
+					mAudioOutputBuffers = codec.getOutputBuffers();
+				}
 			}
 			mAudioInputDone = mAudioOutputDone = false;
 	        audioThread = new Thread(mAudioTask, "AudioTask");
@@ -808,8 +883,23 @@ public class MediaContentProducer {
         mRequestTime = -1;
 	}
 
-	private final void handleLoopInPlayingStateByPlayerTask(final IFrameCallback frameCallback) {
-//		if (DEBUG) Log.d(TAG, "handleLoopInPlayingStateByPlayerTask");
+	private final void handleReplaySeek() {
+		if (DEBUG) Log.d(TAG, "handleReplaySeek mFirstAudioPTS:" + mFirstAudioPTS + ", mFirstVideoPTS=" + mFirstVideoPTS);
+		if (mFirstAudioPTS < 0 || mFirstVideoPTS < 0) return;
+
+		if (mVideoTrackIndex >= 0) {
+			mVideoMediaExtractor.seekTo(mFirstVideoPTS, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
+			mVideoMediaExtractor.advance();
+		}
+		if (mAudioTrackIndex >= 0) {
+			mAudioMediaExtractor.seekTo(mFirstAudioPTS, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
+			mAudioMediaExtractor.advance();
+		}
+//		mFirstAudioPTS = mFirstVideoPTS = -1;
+	}
+
+	private final void handleLoopInPlayingState(final IFrameCallback frameCallback) {
+//		if (DEBUG) Log.d(TAG, "handleLoopInPlayingState");
 
 		synchronized (mSync) {
 			try {
@@ -819,12 +909,13 @@ public class MediaContentProducer {
 		}
         if (mVideoInputDone && mVideoOutputDone && mAudioInputDone && mAudioOutputDone) {
             if (DEBUG) Log.d(TAG, "Reached EOS, looping check");
-        	handleStop();
+//        	handleStop();
+			handleFinishing();
         }
 	}
 
     protected boolean internal_process_input_with_soft_decode(final H264SoftDecoder softDecoder, final MediaExtractor extractor, final long presentationTimeUs) {
-//		if (DEBUG) Log.v(TAG, "internalProcessInput:presentationTimeUs=" + presentationTimeUs);
+//		if (DEBUG) Log.v(TAG, "internal_process_input_with_soft_decode:presentationTimeUs=" + presentationTimeUs);
         boolean result = true;
         boolean frame_ready = false;
         if (mIsRunning) {
@@ -837,6 +928,11 @@ public class MediaContentProducer {
 //				if (frame_ready) {
 //					if(DEBUG) Log.d(TAG, String.format("soft_decode width=%1$d height=%2$d", softDecoder.getWidth(), softDecoder.getHeight()));
 //				}
+
+				if (frame_ready && mFirstVideoPTS < 0) {
+					mFirstVideoPTS = presentationTimeUs;
+					if (DEBUG) Log.d(TAG, "mFirstVideoPTS:" + mFirstVideoPTS);
+				}
 			}
             result = extractor.advance();	// return false if no data is available
         }
@@ -865,6 +961,12 @@ public class MediaContentProducer {
 //                    ByteBuffer tmp = inputBuffers[inputBufIndex].duplicate();
 //                    Log.i(TAG, "sample size:" + tmp.capacity() + "," + tmp.get(0) + " " + tmp.get(1) + " " + tmp.get(2) + " " + tmp.get(3) + " " + tmp.get(4) + " " + tmp.get(5) + " " + tmp.get(6) + " " + tmp.get(test_7) + " " + tmp.get(8));
                 	codec.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
+                	if (!isAudio) {
+						if (mFirstVideoPTS < 0) {
+							mFirstVideoPTS = presentationTimeUs;
+							if (DEBUG) Log.d(TAG, "mFirstVideoPTS:" + mFirstVideoPTS);
+						}
+					}
                 }
             	result = extractor.advance();	// return false if no data is available
                 break;
@@ -875,6 +977,11 @@ public class MediaContentProducer {
 
 	private final void handleInputVideo() {
     	final long presentationTimeUs = mVideoMediaExtractor.getSampleTime();
+//    	if (mFirstVideoPTS < 0) {
+//			mFirstVideoPTS = presentationTimeUs;
+//			if (DEBUG) Log.d(TAG, "mFirstVideoPTS:" + mFirstVideoPTS);
+//		}
+
 /*		if (presentationTimeUs < previousVideoPresentationTimeUs) {
     		presentationTimeUs += previousVideoPresentationTimeUs - presentationTimeUs; // + EPS;
     	}
@@ -998,6 +1105,10 @@ public class MediaContentProducer {
 
 	private final void handleInputAudio() {
 		final long presentationTimeUs = mAudioMediaExtractor.getSampleTime();
+		if (mFirstAudioPTS < 0) {
+			mFirstAudioPTS = presentationTimeUs;
+			if (DEBUG) Log.d(TAG, "mFirstAudioPTS:" + mFirstAudioPTS);
+		}
 /*		if (presentationTimeUs < previousAudioPresentationTimeUs) {
     		presentationTimeUs += previousAudioPresentationTimeUs - presentationTimeUs; //  + EPS;
     	}
@@ -1101,6 +1212,66 @@ public class MediaContentProducer {
 		} else {
 			return System.nanoTime() / 1000;
 		}
+	}
+
+	/***
+	 * finishing处理与stop类似，区别是只停止解码与渲染，不会销毁. 方便后续复用解码器，重新开始播放
+	 * */
+	private final void handleFinishing() {
+		synchronized (mSync) {
+			if (mState == STATE_STOP)
+				return;
+		}
+
+		if (DEBUG) Log.v(TAG, "handleFinishing:");
+		synchronized (mVideoTask) {
+			if (mVideoTrackIndex >= 0) {
+				mVideoOutputDone = true;
+				while (!mVideoInputDone) {
+					try {
+						mVideoTask.wait();
+					} catch (final InterruptedException e) {
+						break;
+					}
+				}
+			}
+
+			if (mCanHardDecodeH264 && mVideoBufferInfo != null && (mVideoBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+				if (mVideoMediaCodec != null) {
+					if (DEBUG) Log.d(TAG, "video codec flush()");
+					mVideoMediaCodec.flush();
+				}
+			}
+
+			mVideoOutputDone = mVideoInputDone = true;
+		}
+
+		synchronized (mAudioTask) {
+			if (mAudioTrackIndex >= 0) {
+				mAudioOutputDone = true;
+				while (!mAudioInputDone) {
+					try {
+						mAudioTask.wait();
+					} catch (final InterruptedException e) {
+						break;
+					}
+				}
+			}
+
+			if (mAudioBufferInfo != null && (mAudioBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+				if (mAudioMediaCodec != null) {
+					if (DEBUG) Log.d(TAG, "audio codec flush()");
+					mAudioMediaCodec.flush();
+				}
+			}
+			mAudioOutputDone = mAudioInputDone = true;
+		}
+
+		synchronized (mSync) {
+			mState = STATE_FINISHING;
+		}
+
+		mCallback.onFinishing();
 	}
 
 	private final void handleStop() {

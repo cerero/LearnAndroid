@@ -95,13 +95,13 @@ public class MainActivity extends Activity {
             }
         });
 //
-//        mp4Player.start(localRes, 1);
+        mp4Player.start(localRes, 1);
 
         Button btn_start = (Button)findViewById(R.id.button_start);
 		btn_start.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {//点击开始
-                mp4Player.start(localRes, 1);
+                mp4Player.start(localRes, 3);
 			}
 		});
 
@@ -109,7 +109,7 @@ public class MainActivity extends Activity {
         btn_stop.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {//点击停止
-
+				mp4Player.stop();
 			}
 		});
     }
