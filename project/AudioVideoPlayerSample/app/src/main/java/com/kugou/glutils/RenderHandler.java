@@ -158,7 +158,10 @@ public final class RenderHandler extends Handler {
     		mEgl = new EGLBase(shard_context, false);
     		mInputSurface = mEgl.createFromSurface(surface);
     		mInputSurface.makeCurrent();
-    		mDrawer = new GLDrawer2D(true);
+
+			int[] compileRet = {-1, -1};
+			int shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, GLDrawer2D.fss, compileRet);
+    		mDrawer = new GLDrawer2D(true, shaderProgram);
     	}
  
     	private void draw(int tex_id, final float[] tex_matrix) {

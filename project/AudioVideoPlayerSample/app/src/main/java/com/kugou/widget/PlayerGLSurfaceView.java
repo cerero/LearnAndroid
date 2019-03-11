@@ -151,7 +151,9 @@ public class PlayerGLSurfaceView extends GLSurfaceView implements AspectRatioVie
         }
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            mOutputVideoFrame = new GLDrawer2D(mSupportHWDecode);
+            int[] compileRet = {-1, -1};
+            int shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, GLDrawer2D.fss, compileRet);
+            mOutputVideoFrame = new GLDrawer2D(mSupportHWDecode, shaderProgram);
 
             if (mSupportHWDecode) { //初始化硬解的外部纹理
                 mExternalTexId = GLDrawer2D.initExternalOESTex();

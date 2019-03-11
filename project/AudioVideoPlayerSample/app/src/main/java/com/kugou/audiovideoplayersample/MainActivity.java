@@ -2,19 +2,16 @@ package com.kugou.audiovideoplayersample;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.Button;
 
 import com.kugou.media.GiftMp4Player;
-import com.kugou.media.IGiftMp4Player;
-import com.kugou.uiperformance.core.UIPerformance;
+import com.kugou.media.IMP4Player;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -40,33 +37,7 @@ public class MainActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		final File dir = getFilesDir();
-		dir.mkdirs();
-		final File path = new File(dir, "gift_480.mp4");
-
-		try {
-			prepareSampleMovie(path);
-		} catch (IOException e){}
-
-		String localRes = path.toString();//Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "gift_750.mp4";
-		Log.i("MainActivity", "localRes=" + localRes);
-		GiftMp4Player mp4Player = GiftMp4Player.getInstance();
-		mp4Player.startGift(this, localRes, 1, new IGiftMp4Player.EventCallBack() {
-			@Override
-			public void onActionFeedBack() {
-
-			}
-
-			@Override
-			public void onErrorOccur(int errorId) {
-
-			}
-
-			@Override
-			public void onStatusChange() {
-
-			}
-		});
+        setContentView(R.layout.test_main);
 
 //		setContentView(R.layout.activity_main);
 //		if (savedInstanceState == null) {
@@ -95,4 +66,51 @@ public class MainActivity extends Activity {
 		}
 	}
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        ViewGroup parentViewGroup = findViewById(R.id.mylayout);
+
+        final File dir = getFilesDir();
+        dir.mkdirs();
+        final File path = new File(dir, "gift_480.mp4");
+
+        try {
+            prepareSampleMovie(path);
+        } catch (IOException e){}
+
+        String localRes = path.toString();
+        Log.i("MainActivity", "localRes=" + localRes);
+
+        GiftMp4Player mp4Player = new GiftMp4Player(parentViewGroup, new IMP4Player.EventCallBack() {
+            @Override
+            public void onErrorOccur(int errorId, String desc) {
+                Log.e("MainActivity", "onErrorOccur errorId:" + errorId + ", desc:" + desc);
+            }
+
+            @Override
+            public void onStatusChange(int status) {
+                Log.i("MainActivity", "onStatusChange:" + status);
+            }
+        });
+//
+//        mp4Player.start(localRes, 1);
+
+        Button btn_start = (Button)findViewById(R.id.button_start);
+		btn_start.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {//点击开始
+                mp4Player.start(localRes, 1);
+			}
+		});
+
+		Button btn_stop = (Button)findViewById(R.id.button_stop);
+        btn_stop.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {//点击停止
+
+			}
+		});
+    }
 }

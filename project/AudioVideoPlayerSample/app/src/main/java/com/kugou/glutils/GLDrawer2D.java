@@ -17,7 +17,7 @@ public class GLDrawer2D {
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = "GLDrawer2D";
 
-	private static final String vss
+	public static final String vss
 		= "uniform mat4 uMVPMatrix;\n"
 		+ "uniform mat4 uTexMatrix;\n"
 		+ "attribute highp vec4 aPosition;\n"
@@ -28,7 +28,7 @@ public class GLDrawer2D {
 		    + "vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n"
 		+ "}\n";
 
-	private static final String fss
+	public static final String fss
 		= "#extension GL_OES_EGL_image_external : require\n"
 		+ "precision highp float;\n"
 		+ "uniform samplerExternalOES sTexture;\n"
@@ -40,7 +40,7 @@ public class GLDrawer2D {
             + "gl_FragColor = vec4(texel.rgb, refColor.b);\n"
 		+ "} \n";
 
-	private static final String yuvFSS
+	public static final String yuvFSS
             = "precision mediump float; \n"
             + "uniform mat3 uYUVTransform;\n"
             + "varying vec2 vTextureCoord; \n"
@@ -100,7 +100,8 @@ public class GLDrawer2D {
 	 * Constructor
 	 * this should be called in GL context
 	 */
-	public GLDrawer2D(boolean supportHWDecode) {
+	public GLDrawer2D(boolean supportHWDecode, int hProgram) {
+		this.hProgram = hProgram;
 		pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ).order(ByteOrder.nativeOrder()).asFloatBuffer();
 		pVertex.put(VERTICES);
 		pVertex.flip();
@@ -109,11 +110,11 @@ public class GLDrawer2D {
 		pTexCoord.put(TEXCOORD);
 		pTexCoord.flip();
 
-		if (supportHWDecode) {
-            hProgram = loadShader(vss, fss);
-        } else {
-            hProgram = loadShader(vss, yuvFSS);
-        }
+//		if (supportHWDecode) {
+//            hProgram = loadShader(vss, fss);
+//        } else {
+//            hProgram = loadShader(vss, yuvFSS);
+//        }
 		GLES20.glUseProgram(hProgram);
 
         maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
@@ -202,7 +203,8 @@ public class GLDrawer2D {
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
         GLES20.glFinish();
-//        GLES20.glUseProgram(0);
+
+        GLES20.glUseProgram(0);
     }
 
     private void checkGlError(String op) {
@@ -262,7 +264,40 @@ public class GLDrawer2D {
 	 * @param fss source of fragment shader
 	 * @return
 	 */
-	public static int loadShader(String vss, String fss) {
+//	public static int loadShader(String vss, String fss) {
+//		if (DEBUG) Log.v(TAG, "loadShader:");
+//		int vs = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
+//		GLES20.glShaderSource(vs, vss);
+//		GLES20.glCompileShader(vs);
+//		final int[] compiled = new int[1];
+//		GLES20.glGetShaderiv(vs, GLES20.GL_COMPILE_STATUS, compiled, 0);
+//		if (compiled[0] == 0) {
+//			if (DEBUG) Log.e(TAG, "Failed to compile vertex shader:"
+//					+ GLES20.glGetShaderInfoLog(vs));
+//			GLES20.glDeleteShader(vs);
+//			vs = 0;
+//		}
+//
+//		int fs = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
+//		GLES20.glShaderSource(fs, fss);
+//		GLES20.glCompileShader(fs);
+//		GLES20.glGetShaderiv(fs, GLES20.GL_COMPILE_STATUS, compiled, 0);
+//		if (compiled[0] == 0) {
+//			if (DEBUG) Log.w(TAG, "Failed to compile fragment shader:"
+//				+ GLES20.glGetShaderInfoLog(fs));
+//			GLES20.glDeleteShader(fs);
+//			fs = 0;
+//		}
+//
+//		final int program = GLES20.glCreateProgram();
+//		GLES20.glAttachShader(program, vs);
+//		GLES20.glAttachShader(program, fs);
+//		GLES20.glLinkProgram(program);
+//
+//		return program;
+//	}
+
+	public static int loadShader(String vss, String fss, int[] result) {
 		if (DEBUG) Log.v(TAG, "loadShader:");
 		int vs = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
 		GLES20.glShaderSource(vs, vss);
@@ -274,6 +309,9 @@ public class GLDrawer2D {
 					+ GLES20.glGetShaderInfoLog(vs));
 			GLES20.glDeleteShader(vs);
 			vs = 0;
+			result[0] = -1;
+		} else {
+			result[0] = 0;
 		}
 
 		int fs = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
@@ -281,10 +319,13 @@ public class GLDrawer2D {
 		GLES20.glCompileShader(fs);
 		GLES20.glGetShaderiv(fs, GLES20.GL_COMPILE_STATUS, compiled, 0);
 		if (compiled[0] == 0) {
-			if (DEBUG) Log.w(TAG, "Failed to compile fragment shader:"
-				+ GLES20.glGetShaderInfoLog(fs));
+			if (DEBUG) Log.e(TAG, "Failed to compile fragment shader:"
+					+ GLES20.glGetShaderInfoLog(fs));
 			GLES20.glDeleteShader(fs);
 			fs = 0;
+			result[1] = -1;
+		} else {
+			result[1] = 0;
 		}
 
 		final int program = GLES20.glCreateProgram();

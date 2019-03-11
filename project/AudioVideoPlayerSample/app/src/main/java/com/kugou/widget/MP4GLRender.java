@@ -50,12 +50,15 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     private Boolean hasSurfaceCreate = false;
     private Boolean hasChoseMode = false;
+    private Boolean hasInit = false;
+
     public MP4GLRender(GLSurfaceView surfaceView) {
         this.mSurfacdeView = surfaceView;
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+//        Log.i(TAG, "onSurfaceCreated hasChoseMode:" + hasChoseMode);
         hasSurfaceCreate = true;
         if (hasChoseMode) {
             initRenderStuff();
@@ -64,6 +67,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+//        Log.i(TAG, "onSurfaceChanged width:" + width + ",height:" + height);
         GLES20.glViewport(0, 0, width, height);
         float ratio = (float) width / height;
 //		    Matrix.frustumM(mProjectionMatrix, 0, -ratio,ratio, -1, 1, 3, test_7);
@@ -71,8 +75,17 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+//        Log.i(TAG, "onDrawFrame");
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
+        if (!hasInit && hasChoseMode && hasSurfaceCreate) {
+            initRenderStuff();
+        }
+
+        if (!hasInit) {
+            return;
+        }
 
         if (mSupportHWDecode) { //硬解渲染
             if(mInputSurfaceTexture != null){
@@ -95,15 +108,22 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void choseRenderMode(int mode) {
+//        Log.i(TAG, "choseRenderMode mode:" + mode + ",hasSurfaceCreate:" + hasSurfaceCreate);
         mSupportHWDecode = mode == 1 ? true : false;
         hasChoseMode = true;
-        if (hasSurfaceCreate) {
-            initRenderStuff();
-        }
+        mSurfacdeView.requestRender();
     }
 
     private void initRenderStuff() {
-        mOutputVideoFrame = new GLDrawer2D(mSupportHWDecode);
+        int[] compileRet = {-1, -1};
+        int shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, mSupportHWDecode ? GLDrawer2D.fss : GLDrawer2D.yuvFSS, compileRet);
+        if (compileRet[0] != 0) {
+            Log.e(TAG, "vertext shader编译失败");
+        } else if (compileRet[1] != 0) {
+            Log.e(TAG, "fragment shader编译失败");
+        }
+
+        mOutputVideoFrame = new GLDrawer2D(mSupportHWDecode, shaderProgram);
 
         if (mSupportHWDecode) { //初始化硬解的外部纹理
             mExternalTexId = GLDrawer2D.initExternalOESTex();
@@ -129,6 +149,8 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
             mUTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE1);
             mVTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE2);
         }
+
+        hasInit = true;
     }
 
     @Override
@@ -146,13 +168,13 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
                 mResolution = mYWidth * mYHeight;
                 mUorVResolution = mResolution >> 2;
 
-                mYBuffer = ByteBuffer.allocate(mResolution);
+                mYBuffer = ByteBuffer.allocateDirect(mResolution);
                 mYBuffer.order(yuvData.order());
 
-                mUBuffer = ByteBuffer.allocate(mUorVResolution);
+                mUBuffer = ByteBuffer.allocateDirect(mUorVResolution);
                 mUBuffer.order(yuvData.order());
 
-                mVBuffer = ByteBuffer.allocate(mUorVResolution);
+                mVBuffer = ByteBuffer.allocateDirect(mUorVResolution);
                 mVBuffer.order(yuvData.order());
             }
 

@@ -1,70 +1,76 @@
 package com.kugou.media;
 
 import android.app.Activity;
+import android.nfc.Tag;
+import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.kugou.widget.MP4GLRender;
 import com.kugou.widget.MP4GLSurfaceView;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 
-public class GiftMp4Player implements IGiftMp4Player {
-    private static GiftMp4Player instance;
-    public static GiftMp4Player getInstance() {
-        if (instance == null) {
-            instance = new GiftMp4Player();
-        }
-        return instance;
-    }
+public class GiftMp4Player implements IMP4Player {
 
-    private GiftMp4Player(){
-
-    }
-
-    private EventCallBack callBack;
-    private WeakReference<Activity> mCurrentActivity;
+    /**播放器内部状态**/
+    private int mInnerStatus = EventCallBack.STATE_NONE;
+    /**外部调用方状态**/
+    private int mOuterStatus = EventCallBack.STATE_NONE;
+    private Object mLock = new Object();
+    private EventCallBack mCallBack;
+    private ViewGroup mParent;
+//    private Activity mParent;
     private String mLocalMp4ResPath;
     private MP4GLSurfaceView mGLSurfaceView;
     private MP4GLRender mGLRender;
-    private MediaContentProducer mMediaProducer;
+    private MediaContentProducer mContentProducer;
 
-    private void initGLSurfaceView(Activity activity) {
-        mCurrentActivity = new WeakReference<Activity>(activity);
-
-        mGLSurfaceView = new MP4GLSurfaceView(activity);
-        mGLRender = new MP4GLRender(mGLSurfaceView);
-        mGLSurfaceView.setRenderer(mGLRender);
-        activity.setContentView(mGLSurfaceView);
+    public GiftMp4Player(ViewGroup parent, EventCallBack callBack){
+//    public GiftMp4Player(Activity parent, EventCallBack callBack){
+        this.mParent = parent;
+        this.mCallBack = callBack;
+        initGLSurfaceView();
     }
 
-    private void initMediaPlayer() {
-        mMediaProducer = new MediaContentProducer(mGLRender, null, new IFrameCallback() {
+    private void initGLSurfaceView() {
+        mGLSurfaceView = new MP4GLSurfaceView(mParent.getContext());
+        mGLRender = new MP4GLRender(mGLSurfaceView);
+        mGLSurfaceView.setRenderer(mGLRender);
+        mParent.addView(mGLSurfaceView);
+    }
+
+    private void initContentProducer() {
+        mContentProducer = new MediaContentProducer(mGLRender, null, new IFrameCallback() {
             @Override
             public void onPrepared(Boolean canHardWareDecode) {
-                Activity activity = mCurrentActivity.get();
-                if ((activity != null) && !activity.isFinishing()) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "开始播放", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-                mMediaProducer.play();
+                Log.d(Tag, "onPrepared canHardWareDecode:" + canHardWareDecode);
+//                Activity activity = (Activity)mParent.getContext();
+//                if ((activity != null) && !activity.isFinishing()) {
+//                    activity.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(activity, "开始播放", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
+//                }
+                mContentProducer.play();
             }
 
             @Override
             public void onFinished() {
-                Activity activity = mCurrentActivity.get();
-                if ((activity != null) && !activity.isFinishing()) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "结束播放", Toast.LENGTH_LONG).show();
-                        }
-                    });
+                synchronized (mLock) {
+                    mInnerStatus = EventCallBack.STATE_FINISHED;
                 }
+//                Activity activity = (Activity)mParent.getContext();
+//                if ((activity != null) && !activity.isFinishing()) {
+//                    activity.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(activity, "结束播放", Toast.LENGTH_LONG).show();
+//                        }
+//                    });
+//                }
             }
 
             @Override
@@ -74,46 +80,55 @@ public class GiftMp4Player implements IGiftMp4Player {
         });
     }
 
+    private void destroyContentProducer() {
+        if (mContentProducer != null) {
+            mContentProducer.release();
+            mContentProducer = null;
+        }
+    }
+
     @Override
-    public void startGift(Activity activity, String localMp4ResPath, int loops, EventCallBack callBack) {
-        this.callBack = callBack;
+    public void start(String localMp4ResPath, int loops) {
         final File fd = new File(localMp4ResPath);
         if (!fd.exists()) {
-            callBack.onErrorOccur(EventCallBack.ERROR_RES_NOT_EXIT);
+            mCallBack.onErrorOccur(EventCallBack.ERROR_RES_NOT_EXIT, localMp4ResPath + " not exit");
         } else {
             this.mLocalMp4ResPath = localMp4ResPath;
-            initGLSurfaceView(activity);
-            initMediaPlayer();
-
-            mMediaProducer.prepare(localMp4ResPath);
+            initContentProducer();
+            mContentProducer.prepare(localMp4ResPath);
         }
     }
 
     @Override
-    public void addLoops(int loops) {
-
+    public Boolean addLoops(int loops) {
+        return true;
     }
 
     @Override
-    public void pauseGift() {
-        if (mMediaProducer != null) {
-            mMediaProducer.pause();
+    public void pause() {
+        if (mContentProducer != null) {
+            mContentProducer.pause();
         }
     }
 
     @Override
-    public void resumeGift() {
-        if (mMediaProducer != null) {
-            mMediaProducer.resume();
+    public void resume() {
+        if (mContentProducer != null) {
+            mContentProducer.resume();
         }
     }
 
     @Override
-    public void stopGift() {
-        if (mMediaProducer != null) {
-            mMediaProducer.release();
-            mMediaProducer = null;
+    public void stop() {
+        if (mContentProducer != null) {
+            mContentProducer.release();
+            mContentProducer = null;
         }
+    }
+
+    @Override
+    public void confirmStatus(int status) {
+
     }
 
     @Override

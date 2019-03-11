@@ -1218,4 +1218,9 @@ public class MediaContentProducer {
         }
         return -1;
     }
+
+    /**音视频子线程检测能否进入stop状态**/
+    private void checkCanStopBySubTask() {
+
+	}
 }
