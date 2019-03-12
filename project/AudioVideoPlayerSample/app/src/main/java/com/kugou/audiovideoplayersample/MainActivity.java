@@ -141,8 +141,14 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
+//        if (mp4Player != null) {
+//            mp4Player.onActivityStop();
+//        }
+
         if (mp4Player != null) {
-            mp4Player.onActivityStop();
+            mp4Player.release();
+            mp4Player = null;
         }
+
     }
 }

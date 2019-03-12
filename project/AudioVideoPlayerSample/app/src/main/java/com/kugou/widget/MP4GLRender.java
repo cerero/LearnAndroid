@@ -53,6 +53,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     private Boolean hasInit = false;
     private Boolean isEOS = false;
     private Boolean isVisible = true;
+    private Boolean hasRelease = false;
 
     public MP4GLRender(GLSurfaceView surfaceView) {
         this.mSurfacdeView = surfaceView;
@@ -77,7 +78,9 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-//        Log.i(TAG, "onDrawFrame");
+        if (hasRelease)
+            return;
+
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -121,7 +124,8 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 //        Log.i(TAG, "choseRenderMode mode:" + mode + ",hasSurfaceCreate:" + hasSurfaceCreate);
         mSupportHWDecode = mode == 1 ? true : false;
         hasChoseMode = true;
-        mSurfacdeView.requestRender();
+        if (mSurfacdeView != null)
+            mSurfacdeView.requestRender();
     }
 
     private void initRenderStuff() {
@@ -144,7 +148,8 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
             mInputSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
                 @Override
                 public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-                    mSurfacdeView.requestRender();
+                    if (mSurfacdeView != null)
+                        mSurfacdeView.requestRender();
                 }
             });
             if (mInputSurface != null) {
@@ -232,6 +237,44 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
             return mInputSurface;
         } else {
             return null;
+        }
+    }
+
+    public void release() {
+        synchronized (locker) {
+            hasRelease = true;
+
+            if (mOutputVideoFrame != null) {
+                mOutputVideoFrame.release();
+                mOutputVideoFrame = null;
+            }
+
+            if (mInputSurfaceTexture != null) {
+                mInputSurfaceTexture.release();
+                mInputSurfaceTexture = null;
+            }
+
+            if (mInputSurface != null) {
+                mInputSurface.release();
+                mInputSurface = null;
+            }
+
+            if (mExternalTexId > -1) {
+                GLDrawer2D.deleteTex(mExternalTexId);
+            }
+
+            if (mYTexId > -1) {
+                GLDrawer2D.deleteTex(mYTexId);
+            }
+
+            if (mUTexId > -1) {
+                GLDrawer2D.deleteTex(mUTexId);
+            }
+
+            if (mVTexId > -1) {
+                GLDrawer2D.deleteTex(mVTexId);
+            }
+
         }
     }
 }

@@ -198,7 +198,7 @@ public class MediaContentProducer {
      */
     public final void release() {
     	if (DEBUG) Log.v(TAG, "release:");
-    	stop();
+//    	stop();
     	synchronized (mSync) {
     		mRequest = REQ_QUIT;
     		mSync.notifyAll();
@@ -646,7 +646,8 @@ public class MediaContentProducer {
 
 //		if (DEBUG) {Log.e(TAG, "isHardWareDecode: " + mCanHardDecodeH264);
 
-		mCallback.onPrepared(mCanHardDecodeH264);
+		if (mCallback != null)
+			mCallback.onPrepared(mCanHardDecodeH264);
 	}
 
 	/**
@@ -731,7 +732,8 @@ public class MediaContentProducer {
 				throw new RuntimeException("invalid state:" + mState);
 			mState = STATE_PLAYING;
 //			if (DEBUG) Log.v(TAG, "set mState to STATE_PLAYING");
-			mCallback.onStart();
+			if (mCallback != null)
+				mCallback.onStart();
 		}
         if (mRequestTime > 0) {
 			if (DEBUG) Log.v(TAG, "seektime:" + mRequestTime);
@@ -1072,7 +1074,7 @@ public class MediaContentProducer {
                         doRender = !internalWriteVideo(mVideoOutputBuffers[decoderStatus], 0, mVideoBufferInfo.size, mVideoBufferInfo.presentationTimeUs);
 
                         if (doRender) {
-                            if (!frameCallback.onFrameAvailable(mVideoBufferInfo.presentationTimeUs))
+                            if (frameCallback == null || !frameCallback.onFrameAvailable(mVideoBufferInfo.presentationTimeUs))
                                 mVideoStartTime = adjustPresentationTime(mVideoSync, mVideoStartTime, mVideoBufferInfo.presentationTimeUs);
                         }
                     }
@@ -1301,7 +1303,8 @@ public class MediaContentProducer {
 			mState = STATE_FINISHING;
 		}
 
-		mCallback.onFinishing();
+		if (mCallback != null)
+			mCallback.onFinishing();
 	}
 
 	private final void handleStop() {
@@ -1370,7 +1373,8 @@ public class MediaContentProducer {
 		synchronized (mSync) {
 			mState = STATE_STOP;
 		}
-		mCallback.onFinished();
+		if (mCallback != null)
+			mCallback.onFinished();
 	}
 
 	protected void internalStopVideo() {

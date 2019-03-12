@@ -25,7 +25,8 @@ public class GiftMp4Player implements IMP4Player {
     private MP4GLSurfaceView mGLSurfaceView;
     private MP4GLRender mGLRender;
     private MediaContentProducer mContentProducer;
-    private int mLoops = 1;
+    private int mLoops;
+    private Boolean mNeedRelease = false;
 
     public GiftMp4Player(ViewGroup parent){
         this.mParent = parent;
@@ -46,8 +47,8 @@ public class GiftMp4Player implements IMP4Player {
             @Override
             public void onFinishing() {
                 synchronized (mLock) {
-                    Log.d(TAG, "onFinishing");
                     mLoops--;
+                    Log.d(TAG, "onFinishing mLoops=" + mLoops);
                     if (mLoops < 1) {
                         mInnerStatus = EventCallBack.STATE_FINISHING;
                         notifyExternalStatus();
@@ -89,6 +90,9 @@ public class GiftMp4Player implements IMP4Player {
     }
 
     private void notifyExternalStatus() {
+        if (mContentProducer == null)
+            return;
+
         if (mInnerStatus == EventCallBack.STATE_FINISHING && mOuterStatus == EventCallBack.STATE_FINISHING) {
             //外部已经是finishing状态了，直接直接切换到 finished状态
             mContentProducer.stop();
@@ -98,7 +102,11 @@ public class GiftMp4Player implements IMP4Player {
                 public void run() {
                     synchronized (mLock) {
                         if (mInnerStatus > mOuterStatus) {
-                            mCallBack.onStatusChange(mInnerStatus);
+                            EventCallBack callback = mCallBack;
+                            if (mInnerStatus == EventCallBack.STATE_FINISHED) {
+                                mCallBack = null;
+                            }
+                            callback.onStatusChange(mInnerStatus);
                         }
                     }
                 }
@@ -115,6 +123,16 @@ public class GiftMp4Player implements IMP4Player {
 
     @Override
     public void start(String localMp4ResPath, int loops, EventCallBack callBack) {
+        synchronized (mLock) {
+            if (mInnerStatus != EventCallBack.STATE_FINISHED && mInnerStatus != EventCallBack.STATE_NONE) {
+                Log.i(TAG, "start in wrong state, current state:" + mInnerStatus);
+                return;
+            }
+        }
+
+        if (mContentProducer == null)
+            return;
+
         mCallBack = callBack;
         final File fd = new File(localMp4ResPath);
         mOuterStatus = EventCallBack.STATE_NONE;
@@ -123,39 +141,38 @@ public class GiftMp4Player implements IMP4Player {
             mCallBack.onErrorOccur(EventCallBack.ERROR_RES_NOT_EXIT, localMp4ResPath + " not exit");
         } else {
             synchronized (mLock) {
-                if (mInnerStatus == EventCallBack.STATE_NONE || mInnerStatus == EventCallBack.STATE_FINISHED) {
-                    this.mLocalMp4ResPath = localMp4ResPath;
-                    mLoops = loops;
-                    mContentProducer.prepare(localMp4ResPath);
-                } else {
-                    Log.i(TAG, "start in wrong state, current state:" + mInnerStatus);
-                }
+                this.mLocalMp4ResPath = localMp4ResPath;
+                mLoops = loops;
+                Log.d(TAG, "start mLoops: " + mLoops);
+                mContentProducer.prepare(localMp4ResPath);
             }
         }
     }
 
     @Override
-    public Boolean addLoops(int loops) {
-        Boolean stateValid = false;
+    public void addLoops(int loops) {
+        if (mContentProducer == null)
+            return;
+
         synchronized (mLock) {
             if (mInnerStatus == EventCallBack.STATE_START || mInnerStatus == EventCallBack.STATE_FINISHING) {
-                stateValid = true;
                 mLoops += loops;
+                Log.d(TAG, "addLoops: mLoops=" + mLoops);
                 if (mInnerStatus == EventCallBack.STATE_FINISHING) {//由finishing切换到start
                     mContentProducer.play();
                 }
-            } else {
-                Log.i(TAG, "addLoops in wrong state, current state:" + mInnerStatus);
             }
         }
-        return stateValid;
     }
 
     @Override
     public void stop() {
+        if (mContentProducer == null)
+            return;
+
         synchronized (mLock) {
             if (mInnerStatus == EventCallBack.STATE_START) {
-                mLoops = 0;
+                mLoops = 1;
                 mContentProducer.finishing();
             } else {
                 Log.i(TAG, "stop in wrong statestop in wrong state, current state:" + mInnerStatus);
@@ -165,11 +182,15 @@ public class GiftMp4Player implements IMP4Player {
 
     @Override
     public void confirmStatus(int status) {
+        if (mContentProducer == null)
+            return;
+
         synchronized (mLock) {
             mOuterStatus = status;
             if (mOuterStatus == EventCallBack.STATE_FINISHING) {
                 if (mInnerStatus == EventCallBack.STATE_FINISHING) {//等待外部确认 finishing后，才能执行stop
                     if (mLoops < 1) { //播放次数为0的情况下，才能执行切换到finished，防止漏掉连接礼物
+                        Log.i(TAG, "confirmStatus goto finished mLoops:" + mLoops);
                         mContentProducer.stop();
                     }
                 }
@@ -194,6 +215,16 @@ public class GiftMp4Player implements IMP4Player {
 
     @Override
     public void release() {
-
+        synchronized (mLock) {
+//            mNeedRelease = true;
+//            mContentProducer.release();
+            destroyContentProducer();
+            if (mGLRender != null) {
+                mGLRender.release();
+                mGLRender = null;
+            }
+            mCallBack = null;
+            mGLSurfaceView = null;
+        }
     }
 }

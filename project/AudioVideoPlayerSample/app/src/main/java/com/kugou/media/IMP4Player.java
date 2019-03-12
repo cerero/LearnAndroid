@@ -12,9 +12,8 @@ public interface IMP4Player {
     public void start(String localMp4ResPath, int loops, EventCallBack callBack);
 
     /**追加loop次数(用于礼物连接的次数最加)
-     * @return true - 表示成功设置循环次数    false - 由于当前效果已经播放完毕导致设置失败了，请重新调用startGift()
      * **/
-    public Boolean addLoops(int loops);
+    public void addLoops(int loops);
 
     /**强制停止当前在播的效果，会收到 STATE_FINISHING 状态回调
      * **/
