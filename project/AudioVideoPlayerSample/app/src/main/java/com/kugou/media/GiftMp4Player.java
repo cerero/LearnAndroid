@@ -102,11 +102,7 @@ public class GiftMp4Player implements IMP4Player {
                 public void run() {
                     synchronized (mLock) {
                         if (mInnerStatus > mOuterStatus) {
-                            EventCallBack callback = mCallBack;
-                            if (mInnerStatus == EventCallBack.STATE_FINISHED) {
-                                mCallBack = null;
-                            }
-                            callback.onStatusChange(mInnerStatus);
+                            mCallBack.onStatusChange(mInnerStatus);
                         }
                     }
                 }
@@ -137,7 +133,7 @@ public class GiftMp4Player implements IMP4Player {
         final File fd = new File(localMp4ResPath);
         mOuterStatus = EventCallBack.STATE_NONE;
         mInnerStatus = EventCallBack.STATE_NONE;
-        if (!fd.exists()) {
+        if (!fd.exists() || !fd.canRead()) {
             mCallBack.onErrorOccur(EventCallBack.ERROR_RES_NOT_EXIT, localMp4ResPath + " not exit");
         } else {
             synchronized (mLock) {
@@ -155,13 +151,13 @@ public class GiftMp4Player implements IMP4Player {
             return;
 
         synchronized (mLock) {
-            if (mInnerStatus == EventCallBack.STATE_START || mInnerStatus == EventCallBack.STATE_FINISHING) {
+//            if (mInnerStatus == EventCallBack.STATE_START || mInnerStatus == EventCallBack.STATE_FINISHING) {
                 mLoops += loops;
                 Log.d(TAG, "addLoops: mLoops=" + mLoops);
-                if (mInnerStatus == EventCallBack.STATE_FINISHING) {//由finishing切换到start
+//                if (mInnerStatus == EventCallBack.STATE_FINISHING) {//由finishing切换到start
                     mContentProducer.play();
-                }
-            }
+//                }
+//            }
         }
     }
 
@@ -171,12 +167,14 @@ public class GiftMp4Player implements IMP4Player {
             return;
 
         synchronized (mLock) {
-            if (mInnerStatus == EventCallBack.STATE_START) {
-                mLoops = 1;
-                mContentProducer.finishing();
-            } else {
-                Log.i(TAG, "stop in wrong statestop in wrong state, current state:" + mInnerStatus);
-            }
+            mLoops = 1;
+            mContentProducer.finishing();
+//            if (mInnerStatus == EventCallBack.STATE_START) {
+//                mLoops = 1;
+//                mContentProducer.finishing();
+//            } else {
+//                Log.i(TAG, "stop in wrong statestop in wrong state, current state:" + mInnerStatus);
+//            }
         }
     }
 
@@ -188,12 +186,14 @@ public class GiftMp4Player implements IMP4Player {
         synchronized (mLock) {
             mOuterStatus = status;
             if (mOuterStatus == EventCallBack.STATE_FINISHING) {
-                if (mInnerStatus == EventCallBack.STATE_FINISHING) {//等待外部确认 finishing后，才能执行stop
+//                if (mInnerStatus == EventCallBack.STATE_FINISHING) {//等待外部确认 finishing后，才能执行stop
                     if (mLoops < 1) { //播放次数为0的情况下，才能执行切换到finished，防止漏掉连接礼物
                         Log.i(TAG, "confirmStatus goto finished mLoops:" + mLoops);
                         mContentProducer.stop();
                     }
-                }
+//                }
+            } else if (mOuterStatus == EventCallBack.STATE_FINISHED) {
+                mCallBack = null;
             }
         }
     }

@@ -11,8 +11,6 @@ public class H264SoftDecoder {
     public static final int COLOR_FORMAT_BGR32 = 2;
 
     public H264SoftDecoder(int colorFormat) {
-//        String external_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "myyuv";
-//        nativeInit(colorFormat, external_dir);
         nativeInit(colorFormat);
     }
 
@@ -24,7 +22,6 @@ public class H264SoftDecoder {
     private int cdata;
 
     private native void nativeInit(int colorFormat);
-//    private native void nativeInit(int colorFormat, String externalDir);
     private native void nativeDestroy();
 
     public native void consumeNalUnitsFromDirectBuffer(ByteBuffer nalUnits, int numBytes, long packetPTS);
