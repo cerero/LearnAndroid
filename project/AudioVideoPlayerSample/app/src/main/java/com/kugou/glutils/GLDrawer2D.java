@@ -10,6 +10,8 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import com.kugou.util.MatrixUtils;
+
 /**
  * Helper class to drawExternalTex to whole view using specific texture and texture matrix
  */
@@ -89,13 +91,14 @@ public class GLDrawer2D {
     int mUTextureLoc;
     int mVTextureLoc;
 
-	private final float[] mMvpMatrix = new float[16];
+	private float[] mMvpMatrix;// = new float[16];
 
     private float[] mYUVTransformMatrix;
 
 	private static final int FLOAT_SZ = Float.SIZE / 8;
 	private static final int VERTEX_NUM = 4;
 	private static final int VERTEX_SZ = VERTEX_NUM * 2;
+
 	/**
 	 * Constructor
 	 * this should be called in GL context
@@ -133,7 +136,7 @@ public class GLDrawer2D {
             GLES20.glUniformMatrix3fv(muYUVTransform, 1, false, mYUVTransformMatrix, 0);
         }
 
-		Matrix.setIdentityM(mMvpMatrix, 0);
+        mMvpMatrix = MatrixUtils.getOriginalMatrix();
         GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
         GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, mMvpMatrix, 0);
 		GLES20.glVertexAttribPointer(maPositionLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
@@ -144,6 +147,10 @@ public class GLDrawer2D {
         GLES20.glUseProgram(hProgram);
 	}
 
+	public void onViewPortChange(int imgWidth, int imgHeight, int width, int height) {
+        MatrixUtils.getMatrix(mMvpMatrix, MatrixUtils.TYPE_CENTERCROP, imgWidth / 2, imgHeight, width, height);
+        GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
+    }
 	/**
 	 * terminatinng, this should be called in GL context
 	 */

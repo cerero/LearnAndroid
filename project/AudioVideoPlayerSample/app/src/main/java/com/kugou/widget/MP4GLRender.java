@@ -41,9 +41,16 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     //u / v 各自的分辨率
     private int mUorVResolution;
 
+    private int mViewWidth;
+    private int mViewHeight;
+    private int mImgWidth;
+    private int mImgHeight;
+
     private ByteBuffer mYBuffer;
     private ByteBuffer mUBuffer;
     private ByteBuffer mVBuffer;
+
+    private float mViewRatio;
 
     private Object locker = new Object();
     private GLSurfaceView mSurfacdeView;
@@ -54,6 +61,9 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     private Boolean isEOS = false;
     private Boolean isVisible = true;
     private Boolean hasRelease = false;
+
+    private Boolean isSurfaceChanged = false;
+    private Boolean isTextureChanged = false;
 
     public MP4GLRender(GLSurfaceView surfaceView) {
         this.mSurfacdeView = surfaceView;
@@ -70,10 +80,14 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-//        Log.i(TAG, "onSurfaceChanged width:" + width + ",height:" + height);
         GLES20.glViewport(0, 0, width, height);
-        float ratio = (float) width / height;
-//		    Matrix.frustumM(mProjectionMatrix, 0, -ratio,ratio, -1, 1, 3, test_7);
+        if (mViewWidth != width || mViewHeight != height) {
+            mViewWidth = width;
+            mViewHeight = height;
+            synchronized (locker) {
+                isSurfaceChanged = true;
+            }
+        }
     }
 
     @Override
@@ -100,6 +114,12 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
         if (isEOS) {
             return;
+        }
+
+        if ((isSurfaceChanged || isTextureChanged) && mOutputVideoFrame != null) {
+            mOutputVideoFrame.onViewPortChange(mImgWidth, mImgHeight, mViewWidth, mViewHeight);
+            isSurfaceChanged &= true;
+            isTextureChanged &= true;
         }
 
         if (mSupportHWDecode) { //硬解渲染
@@ -207,6 +227,20 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     }
 
     @Override
+    public void onTextureInfo(int imgWidth, int imgHeight) {
+        if (mImgWidth != imgWidth || mImgHeight != imgHeight) {
+            mImgWidth = imgWidth;
+            mImgHeight = imgHeight;
+            synchronized (locker) {
+                isTextureChanged = true;
+                mYBuffer = null;
+                mUBuffer = null;
+                mVBuffer = null;
+            }
+        }
+    }
+
+    @Override
     public void end() {
         isEOS = true;
         //执行一次清屏
@@ -275,6 +309,9 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
                 GLDrawer2D.deleteTex(mVTexId);
             }
 
+            mYBuffer = null;
+            mUBuffer = null;
+            mVBuffer = null;
         }
     }
 }

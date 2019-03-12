@@ -620,8 +620,8 @@ public class MediaContentProducer {
 			throw new RuntimeException("No video and audio track found in " + source_file);
 		}
 
-		mCanHardDecodeH264 = HardwareSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
-//		mCanHardDecodeH264 = false;
+//		mCanHardDecodeH264 = HardwareSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
+		mCanHardDecodeH264 = false;
 		mVideoConsumer.choseRenderMode(mCanHardDecodeH264 ? 1 : 2);
 
 		if (mCanHardDecodeH264) {
@@ -655,6 +655,7 @@ public class MediaContentProducer {
 		        final MediaFormat format = mVideoMediaExtractor.getTrackFormat(trackIndex);
 	        	mVideoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
 	        	mVideoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
+	        	mVideoConsumer.onTextureInfo(mVideoWidth, mVideoHeight);
 //	        	mDuration = format.getLong(MediaFormat.KEY_DURATION);
 //				mBitrate = format.getInteger(MediaFormat.KEY_BIT_RATE);
 //				mFrameRate = format.getFloat(MediaFormat.KEY_FRAME_RATE);

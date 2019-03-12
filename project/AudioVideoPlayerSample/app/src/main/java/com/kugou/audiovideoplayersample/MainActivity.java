@@ -38,15 +38,7 @@ public class MainActivity extends Activity {
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.test_main);
-
-//		setContentView(R.layout.activity_main);
-//		if (savedInstanceState == null) {
-//			getSupportFragmentManager().beginTransaction()
-//					.add(R.id.container, new PlayerFragment()).commit();
-//		}
-
 //		UIPerformance.getInstance(this).start();
 	}
 
