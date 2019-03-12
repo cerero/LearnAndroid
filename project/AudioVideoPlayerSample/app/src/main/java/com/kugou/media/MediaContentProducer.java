@@ -112,8 +112,8 @@ public class MediaContentProducer {
     	synchronized (mSync) {
     		if (mState == STATE_PLAYING)
     			return;
-//    		mRequestTime = 1;
     		mRequest = REQ_START;
+//			if (DEBUG) Log.v(TAG, "set request to REQ_START");
     		mSync.notifyAll();
     	}
 	}
@@ -154,15 +154,18 @@ public class MediaContentProducer {
     public final void stop() {
     	if (DEBUG) Log.v(TAG, "stop:");
     	synchronized (mSync) {
-    		if (mState != STATE_STOP) {
-	    		mRequest = REQ_STOP;
-	    		mSync.notifyAll();
-	        	try {
-	    			mSync.wait(50);
-	    		} catch (final InterruptedException e) {
-	    			// ignore
-	    		}
-    		}
+    		if (mState == STATE_STOP)
+    			return;
+
+			mRequest = REQ_STOP;
+//			if (DEBUG) Log.v(TAG, "set request to REQ_STOP");
+			mSync.notifyAll();
+//			try {
+//				mSync.wait(50);
+//			} catch (final InterruptedException e) {
+//				// ignore
+//			}
+
     	}
     }
 
@@ -235,7 +238,7 @@ public class MediaContentProducer {
 	private String mSourcePath;
 	private long mDuration;
 	private int mRequest;
-	private long mRequestTime;
+	private long mRequestTime = -1;
 	private long mFirstVideoPTS = -1;
 	private long mFirstAudioPTS = -1;
     // for video playback
@@ -347,6 +350,7 @@ public class MediaContentProducer {
 		@Override
 		public void run() {
 			if (DEBUG) Log.v(TAG, "VideoTask:start");
+			mVideoConsumer.start();
 			for (; mIsRunning && !mVideoInputDone && !mVideoOutputDone ;) {
 				try {
 			        if (!mVideoInputDone) {
@@ -363,6 +367,7 @@ public class MediaContentProducer {
 			if (DEBUG) Log.v(TAG, "VideoTask:finished");
 			synchronized (mVideoTask) {
 				mVideoInputDone = mVideoOutputDone = true;
+				mVideoConsumer.end();
 				mVideoTask.notifyAll();
 			}
 
@@ -479,10 +484,11 @@ public class MediaContentProducer {
 		return local_isRunning;
 	}
 
-	private final boolean runFinishingStateByPlayerTask(final int req) {
+	private final boolean runFinishingStateByPlayerTask(final int req)  throws InterruptedException {
 		boolean local_isRunning = true;
 		switch (req) {
 			case REQ_START:
+				mRequestTime = 1;
 				handleStart();
 				break;
 			case REQ_STOP:
@@ -497,6 +503,11 @@ public class MediaContentProducer {
 			case REQ_FINISHING:
 			case REQ_PAUSE:
 				throw new IllegalStateException("invalid state:" + mState);
+			default:
+				synchronized (mSync) {
+					mSync.wait();
+				}
+				break;
 		}
 
 		synchronized (mSync) {
@@ -633,7 +644,7 @@ public class MediaContentProducer {
 			mState = STATE_PREPARED;
 		}
 
-		if (DEBUG) Log.i(TAG, "isHardWareDecode: " + mCanHardDecodeH264);
+//		if (DEBUG) {Log.e(TAG, "isHardWareDecode: " + mCanHardDecodeH264);
 
 		mCallback.onPrepared(mCanHardDecodeH264);
 	}
@@ -719,12 +730,14 @@ public class MediaContentProducer {
 			if (mState != STATE_PREPARED && mState != STATE_FINISHING)
 				throw new RuntimeException("invalid state:" + mState);
 			mState = STATE_PLAYING;
+//			if (DEBUG) Log.v(TAG, "set mState to STATE_PLAYING");
+			mCallback.onStart();
 		}
-//        if (mRequestTime > 0) {
-//			if (DEBUG) Log.v(TAG, "seektime:" + mRequestTime);
-//        	handleSeek(mRequestTime);
-//        }
-		handleReplaySeek();
+        if (mRequestTime > 0) {
+			if (DEBUG) Log.v(TAG, "seektime:" + mRequestTime);
+        	handleSeek(mRequestTime);
+        }
+//		handleReplaySeek();
         previousVideoPresentationTimeUs = previousAudioPresentationTimeUs = -1;
 
 		mVideoStartTime = mAudioStartTime = -1;
@@ -772,6 +785,8 @@ public class MediaContentProducer {
 	        audioThread = new Thread(mAudioTask, "AudioTask");
 		}
 
+//		if (DEBUG) Log.d(TAG, "videoThread and audioThread start");
+
 		if (videoThread != null) videoThread.start();//开启视频解码线程
 		if (audioThread != null) audioThread.start();//开启音频解码线程
 	}
@@ -791,13 +806,12 @@ public class MediaContentProducer {
 
 			if (mVideoSoftDecodeInputBuffer == null) {
 				mVideoSoftDecodeInputBuffer = ByteBuffer.allocateDirect((int)(mVideoWidth * mVideoHeight * 1.5));
+				mVideoSoftDecodeInputBuffer.order(spsByteBuffer.order());
 			}
 
-			mVideoSoftDecodeInputBuffer.order(spsByteBuffer.order());
-
+			mVideoSoftDecodeInputBuffer.position(0);
 			mVideoSoftDecodeInputBuffer.put(spsByteBuffer);
 			mVideoSoftDecodeInputBuffer.put(ppsByteBuffer);
-
 			mVideoSoftDecodeInputBuffer.flip();
 			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_YUV420);
 			softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, mVideoSoftDecodeInputBuffer.limit(), 0);
@@ -874,7 +888,22 @@ public class MediaContentProducer {
 
 		if (mVideoTrackIndex >= 0) {
 			mVideoMediaExtractor.seekTo(newTime, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
-	        mVideoMediaExtractor.advance();
+	        Boolean hasSample = mVideoMediaExtractor.advance();
+//	        if (mVideoSoftDecodeInputBuffer != null) {
+//				while (hasSample) {
+//					final int sample_size = mVideoMediaExtractor.readSampleData(mVideoSoftDecodeInputBuffer, 0);
+//					final long presentationTimeUs = mVideoMediaExtractor.getSampleTime();
+//					mVideoSoftDecodeInputBuffer.position(0);
+//					if (sample_size > 0) {
+//						int naluetype = mVideoSoftDecodeInputBuffer.get(4) & 0x1f;
+//						if (naluetype == 1 || naluetype == 5 || naluetype == 6) {
+//							if (DEBUG) Log.d(TAG, "find the first keyframe naluetype: " + naluetype + ",pts:" + presentationTimeUs);
+//							break;
+//						}
+//					}
+//					hasSample = mVideoMediaExtractor.advance();
+//				}
+//			}
 		}
 		if (mAudioTrackIndex >= 0) {
 			mAudioMediaExtractor.seekTo(newTime, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
@@ -920,7 +949,7 @@ public class MediaContentProducer {
         boolean frame_ready = false;
         if (mIsRunning) {
             final int sample_size = extractor.readSampleData(mVideoSoftDecodeInputBuffer, 0);
-			mVideoSoftDecodeInputBuffer.flip();
+			mVideoSoftDecodeInputBuffer.position(0);
 			if (sample_size > 0) {
 //				if(DEBUG) Log.d(TAG, "extrator readSampleData nalu type: " + (mVideoSoftDecodeInputBuffer.get(4) & 0x1f) + ",sample_size: " + sample_size + ", pts: " + presentationTimeUs);
 				softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, sample_size, presentationTimeUs);
@@ -929,7 +958,7 @@ public class MediaContentProducer {
 //					if(DEBUG) Log.d(TAG, String.format("soft_decode width=%1$d height=%2$d", softDecoder.getWidth(), softDecoder.getHeight()));
 //				}
 
-				if (frame_ready && mFirstVideoPTS < 0) {
+				if (mFirstVideoPTS < 0) {
 					mFirstVideoPTS = presentationTimeUs;
 					if (DEBUG) Log.d(TAG, "mFirstVideoPTS:" + mFirstVideoPTS);
 				}
@@ -958,8 +987,9 @@ public class MediaContentProducer {
             if (inputBufIndex >= 0) {
                 final int size = extractor.readSampleData(inputBuffers[inputBufIndex], 0);
                 if (size > 0) {
-//                    ByteBuffer tmp = inputBuffers[inputBufIndex].duplicate();
-//                    Log.i(TAG, "sample size:" + tmp.capacity() + "," + tmp.get(0) + " " + tmp.get(1) + " " + tmp.get(2) + " " + tmp.get(3) + " " + tmp.get(4) + " " + tmp.get(5) + " " + tmp.get(6) + " " + tmp.get(test_7) + " " + tmp.get(8));
+//                	if (!isAudio) {
+//                		if (DEBUG) Log.d(TAG, "internal_process_input video sample data dequeue size:" + size + ", pts:" + presentationTimeUs);
+//					}
                 	codec.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
                 	if (!isAudio) {
 						if (mFirstVideoPTS < 0) {
@@ -1335,7 +1365,8 @@ public class MediaContentProducer {
         mVideoBufferInfo = mAudioBufferInfo = null;
         mVideoInputBuffers = mVideoOutputBuffers = null;
         mAudioInputBuffers = mAudioOutputBuffers = null;
-
+		mFirstVideoPTS = mFirstAudioPTS = -1;
+		mVideoStartTime = mAudioStartTime = -1;
 		synchronized (mSync) {
 			mState = STATE_STOP;
 		}

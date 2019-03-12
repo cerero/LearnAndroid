@@ -20,15 +20,16 @@ public class GiftMp4Player implements IMP4Player {
     private Object mLock = new Object();
     private EventCallBack mCallBack;
     private ViewGroup mParent;
+    private Activity mActivity;
     private String mLocalMp4ResPath;
     private MP4GLSurfaceView mGLSurfaceView;
     private MP4GLRender mGLRender;
     private MediaContentProducer mContentProducer;
     private int mLoops = 1;
 
-    public GiftMp4Player(ViewGroup parent, EventCallBack callBack){
+    public GiftMp4Player(ViewGroup parent){
         this.mParent = parent;
-        this.mCallBack = callBack;
+        this.mActivity = (Activity) mParent.getContext();
         initGLSurfaceView();
         initContentProducer();
     }
@@ -44,12 +45,12 @@ public class GiftMp4Player implements IMP4Player {
         mContentProducer = new MediaContentProducer(mGLRender, null, new IFrameCallback() {
             @Override
             public void onFinishing() {
-                Log.d(TAG, "onFinishing");
                 synchronized (mLock) {
+                    Log.d(TAG, "onFinishing");
                     mLoops--;
-                    if (mLoops == 0) {
+                    if (mLoops < 1) {
                         mInnerStatus = EventCallBack.STATE_FINISHING;
-                        mContentProducer.stop();
+                        notifyExternalStatus();
                     } else {
                         mContentProducer.play();
                     }
@@ -58,41 +59,51 @@ public class GiftMp4Player implements IMP4Player {
 
             @Override
             public void onPrepared(Boolean canHardWareDecode) {
-                Log.d(TAG, "onPrepared");
-//                Activity activity = (Activity)mParent.getContext();
-//                if ((activity != null) && !activity.isFinishing()) {
-//                    activity.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Toast.makeText(activity, "开始播放", Toast.LENGTH_LONG).show();
-//                        }
-//                    });
-//                }
+                Log.e(TAG, "onPrepared canHardWareDecode:" + canHardWareDecode);
                 mContentProducer.play();
             }
 
             @Override
             public void onFinished() {
-                Log.d(TAG, "onFinished");
                 synchronized (mLock) {
+                    Log.d(TAG, "onFinished");
                     mInnerStatus = EventCallBack.STATE_FINISHED;
+                    notifyExternalStatus();
                 }
-//                Activity activity = (Activity)mParent.getContext();
-//                if ((activity != null) && !activity.isFinishing()) {
-//                    activity.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Toast.makeText(activity, "结束播放", Toast.LENGTH_LONG).show();
-//                        }
-//                    });
-//                }
             }
 
             @Override
             public boolean onFrameAvailable(long presentationTimeUs) {
                 return false;
             }
+
+            @Override
+            public void onStart() {
+                synchronized (mLock) {
+                    Log.d(TAG, "onStart");
+                    mInnerStatus = EventCallBack.STATE_START;
+                    notifyExternalStatus();
+                }
+            }
         });
+    }
+
+    private void notifyExternalStatus() {
+        if (mInnerStatus == EventCallBack.STATE_FINISHING && mOuterStatus == EventCallBack.STATE_FINISHING) {
+            //外部已经是finishing状态了，直接直接切换到 finished状态
+            mContentProducer.stop();
+        } else {
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (mLock) {
+                        if (mInnerStatus > mOuterStatus) {
+                            mCallBack.onStatusChange(mInnerStatus);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     private void destroyContentProducer() {
@@ -103,54 +114,72 @@ public class GiftMp4Player implements IMP4Player {
     }
 
     @Override
-    public void start(String localMp4ResPath, int loops) {
+    public void start(String localMp4ResPath, int loops, EventCallBack callBack) {
+        mCallBack = callBack;
         final File fd = new File(localMp4ResPath);
+        mOuterStatus = EventCallBack.STATE_NONE;
+        mInnerStatus = EventCallBack.STATE_NONE;
         if (!fd.exists()) {
             mCallBack.onErrorOccur(EventCallBack.ERROR_RES_NOT_EXIT, localMp4ResPath + " not exit");
         } else {
-            this.mLocalMp4ResPath = localMp4ResPath;
-            mLoops = loops;
-            mContentProducer.prepare(localMp4ResPath);
+            synchronized (mLock) {
+                if (mInnerStatus == EventCallBack.STATE_NONE || mInnerStatus == EventCallBack.STATE_FINISHED) {
+                    this.mLocalMp4ResPath = localMp4ResPath;
+                    mLoops = loops;
+                    mContentProducer.prepare(localMp4ResPath);
+                } else {
+                    Log.i(TAG, "start in wrong state, current state:" + mInnerStatus);
+                }
+            }
         }
     }
 
     @Override
     public Boolean addLoops(int loops) {
-        return true;
-    }
-
-    @Override
-    public void pause() {
-        if (mContentProducer != null) {
-            mContentProducer.pause();
+        Boolean stateValid = false;
+        synchronized (mLock) {
+            if (mInnerStatus == EventCallBack.STATE_START || mInnerStatus == EventCallBack.STATE_FINISHING) {
+                stateValid = true;
+                mLoops += loops;
+                if (mInnerStatus == EventCallBack.STATE_FINISHING) {//由finishing切换到start
+                    mContentProducer.play();
+                }
+            } else {
+                Log.i(TAG, "addLoops in wrong state, current state:" + mInnerStatus);
+            }
         }
-    }
-
-    @Override
-    public void resume() {
-        if (mContentProducer != null) {
-            mContentProducer.resume();
-        }
+        return stateValid;
     }
 
     @Override
     public void stop() {
-        if (mContentProducer != null) {
-            synchronized (mLock) {
-                mLoops = 1;
+        synchronized (mLock) {
+            if (mInnerStatus == EventCallBack.STATE_START) {
+                mLoops = 0;
+                mContentProducer.finishing();
+            } else {
+                Log.i(TAG, "stop in wrong statestop in wrong state, current state:" + mInnerStatus);
             }
-            mContentProducer.finishing();
         }
     }
 
     @Override
     public void confirmStatus(int status) {
-
+        synchronized (mLock) {
+            mOuterStatus = status;
+            if (mOuterStatus == EventCallBack.STATE_FINISHING) {
+                if (mInnerStatus == EventCallBack.STATE_FINISHING) {//等待外部确认 finishing后，才能执行stop
+                    if (mLoops < 1) { //播放次数为0的情况下，才能执行切换到finished，防止漏掉连接礼物
+                        mContentProducer.stop();
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public void setVisible(Boolean val) {
-
+        mGLRender.setVisible(val);
     }
 
     @Override
@@ -160,6 +189,11 @@ public class GiftMp4Player implements IMP4Player {
 
     @Override
     public void onActivityResume() {
+
+    }
+
+    @Override
+    public void release() {
 
     }
 }

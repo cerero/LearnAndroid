@@ -4,6 +4,7 @@ package com.kugou.media;
  * callback interface
  */
 public interface IFrameCallback {
+	void onStart();
 	/**
 	 * called when preparing finshed
 	 */

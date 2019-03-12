@@ -13,6 +13,9 @@ public interface IVideoConsumer {
     /**软解的yuv数据回调**/
     void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight);
 
+    /**没数据可以渲染了**/
+    void end();
+    void start();
     /**产生一个用于硬解输出的surface**/
     Surface generateHardWareOutputSurface();
 }

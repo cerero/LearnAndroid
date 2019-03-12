@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 import com.kugou.media.GiftMp4Player;
 import com.kugou.media.IMP4Player;
@@ -66,6 +68,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
+    private GiftMp4Player mp4Player;
     @Override
     protected void onResume() {
         super.onResume();
@@ -82,35 +85,64 @@ public class MainActivity extends Activity {
 
         String localRes = path.toString();
         Log.i("MainActivity", "localRes=" + localRes);
-
-        GiftMp4Player mp4Player = new GiftMp4Player(parentViewGroup, new IMP4Player.EventCallBack() {
-            @Override
-            public void onErrorOccur(int errorId, String desc) {
-                Log.e("MainActivity", "onErrorOccur errorId:" + errorId + ", desc:" + desc);
-            }
-
-            @Override
-            public void onStatusChange(int status) {
-                Log.i("MainActivity", "onStatusChange:" + status);
-            }
-        });
+        if (mp4Player == null) {
+            mp4Player = new GiftMp4Player(parentViewGroup);
 //
-        mp4Player.start(localRes, 1);
+            Button btn_start = (Button)findViewById(R.id.button_start);
+            btn_start.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {//点击开始
+                    mp4Player.start(localRes, 1, new IMP4Player.EventCallBack() {
+                        @Override
+                        public void onErrorOccur(int errorId, String desc) {
+                            Log.e("MainActivity", "onErrorOccur errorId:" + errorId + ", desc:" + desc);
+                        }
 
-        Button btn_start = (Button)findViewById(R.id.button_start);
-		btn_start.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {//点击开始
-                mp4Player.start(localRes, 3);
-			}
-		});
+                        @Override
+                        public void onStatusChange(int status) {
+                            Log.i("MainActivity", "onStatusChange:" + status + "  " + Thread.currentThread().getName());
+                            if (status == IMP4Player.EventCallBack.STATE_FINISHING) {
+                                mp4Player.addLoops(1);
+                            }
+                            mp4Player.confirmStatus(status);
+                        }
+                    });
+                }
+            });
 
-		Button btn_stop = (Button)findViewById(R.id.button_stop);
-        btn_stop.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {//点击停止
-				mp4Player.stop();
-			}
-		});
+            Button btn_stop = (Button)findViewById(R.id.button_stop);
+            btn_stop.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {//点击停止
+                    mp4Player.stop();
+                }
+            });
+
+            Button button_loop = (Button)findViewById(R.id.button_loop);
+            button_loop.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {//追加循环次数
+                    mp4Player.addLoops(1);
+                }
+            });
+
+            CheckBox chk_visible = (CheckBox)findViewById(R.id.checkBox_visible);
+            chk_visible.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mp4Player.setVisible(isChecked);
+                }
+            });
+        } else {
+            mp4Player.onActivityResume();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mp4Player != null) {
+            mp4Player.onActivityStop();
+        }
     }
 }

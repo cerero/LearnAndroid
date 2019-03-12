@@ -51,6 +51,8 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     private Boolean hasSurfaceCreate = false;
     private Boolean hasChoseMode = false;
     private Boolean hasInit = false;
+    private Boolean isEOS = false;
+    private Boolean isVisible = true;
 
     public MP4GLRender(GLSurfaceView surfaceView) {
         this.mSurfacdeView = surfaceView;
@@ -87,17 +89,25 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
             return;
         }
 
+        if (mSupportHWDecode) {
+            if (mInputSurfaceTexture != null) {
+                mInputSurfaceTexture.updateTexImage();
+            }
+        }
+
+        if (isEOS) {
+            return;
+        }
+
         if (mSupportHWDecode) { //硬解渲染
             if(mInputSurfaceTexture != null){
-                mInputSurfaceTexture.updateTexImage();
-
-                if (mOutputVideoFrame != null) {
+                if (mOutputVideoFrame != null && isVisible) {
                     mOutputVideoFrame.drawExternalTex(mExternalTexId, null);
                 }
             }
         } else { //软解渲染
             synchronized (locker) {
-                if (mOutputVideoFrame != null && mYBuffer != null && mUBuffer != null && mVBuffer != null) {
+                if (isVisible && mOutputVideoFrame != null && mYBuffer != null && mUBuffer != null && mVBuffer != null) {
                     mOutputVideoFrame.drawYUVTex(mYTexId, mUTexId, mVTexId, mYBuffer,  mUBuffer, mVBuffer, mYWidth, mYHeight, mUVWidth, mUVHeight, null);
                 }
                 //draw完后，通知video解码线程继续执行
@@ -184,11 +194,27 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
             mSurfacdeView.requestRender();
 
-            try {
-                locker.wait();//等待渲染线程把 yuvdata渲染好
-            } catch (InterruptedException e) {
-            }
+//            try {
+//                locker.wait();//等待渲染线程把 yuvdata渲染好
+//            } catch (InterruptedException e) {
+//            }
         }
+    }
+
+    @Override
+    public void end() {
+        isEOS = true;
+        //执行一次清屏
+        mSurfacdeView.requestRender();
+    }
+
+    @Override
+    public void start() {
+        isEOS = false;
+    }
+
+    public void setVisible(Boolean isVisible) {
+        this.isVisible = isVisible;
     }
 
     @Override

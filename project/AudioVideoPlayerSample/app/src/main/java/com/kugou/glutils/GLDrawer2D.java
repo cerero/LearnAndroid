@@ -61,7 +61,7 @@ public class GLDrawer2D {
                 + "yuv.z = texture2D(v_texture, vTextureCoord).r - 0.5;\n"
                 + "rgb = uYUVTransform * yuv; \n"
                 + "a = yuv_ref.x - 0.34414 * yuv_ref.y - 0.71414 * yuv_ref.z;\n"
-                + "gl_FragColor = vec4(rgb, a);  \n"
+                + "gl_FragColor = vec4(rgb, a + 0.05);  \n"
                 + "} \n";
 
 	private static final float[] VERTICES = {
@@ -110,11 +110,6 @@ public class GLDrawer2D {
 		pTexCoord.put(TEXCOORD);
 		pTexCoord.flip();
 
-//		if (supportHWDecode) {
-//            hProgram = loadShader(vss, fss);
-//        } else {
-//            hProgram = loadShader(vss, yuvFSS);
-//        }
 		GLES20.glUseProgram(hProgram);
 
         maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
@@ -145,6 +140,8 @@ public class GLDrawer2D {
 		GLES20.glVertexAttribPointer(maTextureCoordLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
 		GLES20.glEnableVertexAttribArray(maPositionLoc);
 		GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+
+        GLES20.glUseProgram(hProgram);
 	}
 
 	/**
@@ -162,14 +159,14 @@ public class GLDrawer2D {
 	 * @param tex_matrix texture matrix、if this is null, the last one use(we don't check size of this array and needs at least 16 of float)
 	 */
 	public void drawExternalTex(int tex_id, float[] tex_matrix) {
-		GLES20.glUseProgram(hProgram);
+//		GLES20.glUseProgram(hProgram);
 		if (tex_matrix != null)
 			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, tex_id);
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
 		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
-        GLES20.glUseProgram(0);
+//        GLES20.glUseProgram(0);
 	}
 
     public void drawYUVTex(int y_tex_id, int u_tex_id, int v_tex_id, Buffer channelY, Buffer channelU, Buffer channelV, int yuvWidth, int yuvHeight, int uvWidth, int uvHeight, float[] tex_matrix) {
@@ -177,7 +174,7 @@ public class GLDrawer2D {
             return;
         }
 
-        GLES20.glUseProgram(hProgram);
+//        GLES20.glUseProgram(hProgram);
 
         if (tex_matrix != null)
             GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
@@ -204,7 +201,7 @@ public class GLDrawer2D {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
         GLES20.glFinish();
 
-        GLES20.glUseProgram(0);
+//        GLES20.glUseProgram(0);
     }
 
     private void checkGlError(String op) {
@@ -257,45 +254,6 @@ public class GLDrawer2D {
 		final int[] tex = new int[] {hTex};
 		GLES20.glDeleteTextures(1, tex, 0);
 	}
-
-	/**
-	 * 加载、编译、连接shader
-	 * @param vss source of vertex shader
-	 * @param fss source of fragment shader
-	 * @return
-	 */
-//	public static int loadShader(String vss, String fss) {
-//		if (DEBUG) Log.v(TAG, "loadShader:");
-//		int vs = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-//		GLES20.glShaderSource(vs, vss);
-//		GLES20.glCompileShader(vs);
-//		final int[] compiled = new int[1];
-//		GLES20.glGetShaderiv(vs, GLES20.GL_COMPILE_STATUS, compiled, 0);
-//		if (compiled[0] == 0) {
-//			if (DEBUG) Log.e(TAG, "Failed to compile vertex shader:"
-//					+ GLES20.glGetShaderInfoLog(vs));
-//			GLES20.glDeleteShader(vs);
-//			vs = 0;
-//		}
-//
-//		int fs = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-//		GLES20.glShaderSource(fs, fss);
-//		GLES20.glCompileShader(fs);
-//		GLES20.glGetShaderiv(fs, GLES20.GL_COMPILE_STATUS, compiled, 0);
-//		if (compiled[0] == 0) {
-//			if (DEBUG) Log.w(TAG, "Failed to compile fragment shader:"
-//				+ GLES20.glGetShaderInfoLog(fs));
-//			GLES20.glDeleteShader(fs);
-//			fs = 0;
-//		}
-//
-//		final int program = GLES20.glCreateProgram();
-//		GLES20.glAttachShader(program, vs);
-//		GLES20.glAttachShader(program, fs);
-//		GLES20.glLinkProgram(program);
-//
-//		return program;
-//	}
 
 	public static int loadShader(String vss, String fss, int[] result) {
 		if (DEBUG) Log.v(TAG, "loadShader:");

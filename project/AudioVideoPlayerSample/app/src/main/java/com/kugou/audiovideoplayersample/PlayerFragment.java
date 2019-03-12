@@ -136,6 +136,11 @@ public class PlayerFragment extends Fragment {
 	 */
 	private final IFrameCallback mIFrameCallback = new IFrameCallback() {
 		@Override
+		public void onStart() {
+
+		}
+
+		@Override
 		public void onFinishing() {
 
 		}

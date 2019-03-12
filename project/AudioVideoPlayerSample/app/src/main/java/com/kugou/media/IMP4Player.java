@@ -9,20 +9,12 @@ public interface IMP4Player {
      * @param localMp4ResPath 本地资源路径
      * @param loops 播放的循环次数
      * **/
-    public void start(String localMp4ResPath, int loops);
+    public void start(String localMp4ResPath, int loops, EventCallBack callBack);
 
     /**追加loop次数(用于礼物连接的次数最加)
      * @return true - 表示成功设置循环次数    false - 由于当前效果已经播放完毕导致设置失败了，请重新调用startGift()
      * **/
     public Boolean addLoops(int loops);
-
-    /**暂停当前在播的效果，同时会收到 STATE_PAUSED 状态回调
-     * **/
-    public void pause();
-
-    /**恢复播放当前暂停中的效果，会收到 STATE_PLAYING 状态回调
-     * **/
-    public void resume();
 
     /**强制停止当前在播的效果，会收到 STATE_FINISHING 状态回调
      * **/
@@ -41,6 +33,9 @@ public interface IMP4Player {
 
     /**当前activity生命周期的onResume回调，请执行这个方法**/
     public void onActivityResume();
+
+    /**销毁player实例**/
+    public void release();
 
     public interface EventCallBack {
         /**本地mp4资源不存在**/
@@ -61,16 +56,15 @@ public interface IMP4Player {
         public void onErrorOccur(int errorId, String desc);
 
         public static final int STATE_NONE = 0;
-        /**调用startGift()后的状态变更**/
+
+        /**调用startGift()后的状态变更(该状态下还可以继续addloop)**/
         public static final int STATE_START = 1;
-        /**调用pauseGift()后的状态变更**/
-        public static final int STATE_PAUSE = 2;
-        /**resumeGift()后的状态变更**/
-        public static final int STATE_RESUME = 3;
-        /**播放完loop次数后状态变更**/
-        public static final int STATE_FINISHING = 4;
-        /**播放完loop次数后状态变更**/
-        public static final int STATE_FINISHED = 5;
+
+        /**播放完loop次后状态变更(该状态下还可以继续addloop)**/
+        public static final int STATE_FINISHING = 2;
+
+        /**调用方确认finishing状态后，跟着player流转到finished**/
+        public static final int STATE_FINISHED = 3;
 
         public void onStatusChange(int status);
     }

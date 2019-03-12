@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/mylayout">
+
     <ImageView
         android:id="@+id/img_bg"
         android:layout_width="wrap_content"
@@ -39,4 +40,29 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="2dp"
         android:text="stop" />
+
+    <Button
+        android:id="@+id/button_loop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/img_bg"
+        android:layout_marginEnd="13dp"
+        android:layout_marginRight="13dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toStartOf="@+id/button_stop"
+        android:layout_toLeftOf="@+id/button_stop"
+        android:text="loop" />
+
+    <CheckBox
+        android:id="@+id/checkBox_visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_start"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="212dp"
+        android:layout_marginRight="212dp"
+        android:layout_marginBottom="-40dp"
+        android:checked="true"
+        android:text="可见" />
 </RelativeLayout>
