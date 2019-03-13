@@ -17,6 +17,8 @@ public interface IVideoConsumer {
     /**没数据可以渲染了**/
     void end();
     void start();
+    /**销毁**/
+    void release();
     /**产生一个用于硬解输出的surface**/
     Surface generateHardWareOutputSurface();
 }

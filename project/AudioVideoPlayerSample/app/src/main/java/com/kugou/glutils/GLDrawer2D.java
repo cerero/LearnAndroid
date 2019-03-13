@@ -144,12 +144,14 @@ public class GLDrawer2D {
 		GLES20.glEnableVertexAttribArray(maPositionLoc);
 		GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
 
-        GLES20.glUseProgram(hProgram);
+        GLES20.glUseProgram(0);
 	}
 
 	public void onViewPortChange(int imgWidth, int imgHeight, int width, int height) {
+		GLES20.glUseProgram(hProgram);
         MatrixUtils.getMatrix(mMvpMatrix, MatrixUtils.TYPE_CENTERCROP, imgWidth / 2, imgHeight, width, height);
         GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
+		GLES20.glUseProgram(0);
     }
 	/**
 	 * terminatinng, this should be called in GL context
@@ -166,14 +168,14 @@ public class GLDrawer2D {
 	 * @param tex_matrix texture matrix、if this is null, the last one use(we don't check size of this array and needs at least 16 of float)
 	 */
 	public void drawExternalTex(int tex_id, float[] tex_matrix) {
-//		GLES20.glUseProgram(hProgram);
+		GLES20.glUseProgram(hProgram);
 		if (tex_matrix != null)
 			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, tex_id);
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
 		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
-//        GLES20.glUseProgram(0);
+        GLES20.glUseProgram(0);
 	}
 
     public void drawYUVTex(int y_tex_id, int u_tex_id, int v_tex_id, Buffer channelY, Buffer channelU, Buffer channelV, int yuvWidth, int yuvHeight, int uvWidth, int uvHeight, float[] tex_matrix) {
@@ -181,7 +183,7 @@ public class GLDrawer2D {
             return;
         }
 
-//        GLES20.glUseProgram(hProgram);
+        GLES20.glUseProgram(hProgram);
 
         if (tex_matrix != null)
             GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, 0);
@@ -208,7 +210,7 @@ public class GLDrawer2D {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
         GLES20.glFinish();
 
-//        GLES20.glUseProgram(0);
+        GLES20.glUseProgram(0);
     }
 
     private void checkGlError(String op) {
@@ -222,14 +224,14 @@ public class GLDrawer2D {
      * @return texture ID
      * **/
 	public static int initTex(int texUnit) {
-        if (DEBUG) Log.v(TAG, "initTex:");
         final int[] tex = new int[1];
         GLES20.glGenTextures(1, tex, 0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tex[0]);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+		if (DEBUG) Log.v(TAG, "initTex:" + tex[0]);
         return tex[0];
     }
 
@@ -247,9 +249,9 @@ public class GLDrawer2D {
 		GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
 				GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-				GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+				GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
 		GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-				GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+				GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 		return tex[0];
 	}
 
@@ -257,7 +259,7 @@ public class GLDrawer2D {
 	 * delete specific texture
 	 */
 	public static void deleteTex(int hTex) {
-		if (DEBUG) Log.v(TAG, "deleteTex:");
+		if (DEBUG) Log.v(TAG, "deleteTex:" + hTex);
 		final int[] tex = new int[] {hTex};
 		GLES20.glDeleteTextures(1, tex, 0);
 	}

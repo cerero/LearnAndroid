@@ -248,9 +248,9 @@ public class MediaContentProducer {
 	private long mVideoStartTime;
 
 	private long previousVideoPresentationTimeUs = -1;
-	private volatile int mVideoTrackIndex;
-	private volatile boolean mVideoInputDone;
-	private volatile boolean mVideoOutputDone;
+	private volatile int mVideoTrackIndex = -1;
+	private volatile boolean mVideoInputDone = true;
+	private volatile boolean mVideoOutputDone = true;
 	private int mVideoWidth, mVideoHeight;
 	private int mBitrate;
 	private float mFrameRate;
@@ -265,9 +265,9 @@ public class MediaContentProducer {
 	private long mAudioStartTime;
 
 	private long previousAudioPresentationTimeUs = -1;
-	private volatile int mAudioTrackIndex;
-	private volatile boolean mAudioInputDone;
-	private volatile boolean mAudioOutputDone;
+	private volatile int mAudioTrackIndex = - 1;
+	private volatile boolean mAudioInputDone = true;
+	private volatile boolean mAudioOutputDone = true;
 	private int mAudioChannels;
 	private int mAudioSampleRate;
 	private int mAudioInputBufSize;
@@ -278,7 +278,8 @@ public class MediaContentProducer {
 //--------------------------------------------------------------------------------
 	private Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
 		public void uncaughtException(Thread th, Throwable ex) {
-			Log.e(TAG, "Uncaught exception: " + ex);
+			Log.e(TAG, String.format("Thread(%s) uncaught exception:%s", th.getName(), ex.toString()));
+			ex.printStackTrace();
 		}
 	};
 
@@ -335,6 +336,7 @@ public class MediaContentProducer {
 			} finally {
 				if (DEBUG) Log.v(TAG, "player task finished, local_isRunning=" + local_isRunning);
 				handleStop();
+				mVideoConsumer.release();
 			}
 		}
 	};
@@ -627,6 +629,7 @@ public class MediaContentProducer {
 		}
 
 		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
+//		mCanHardDecodeH264 = false;
 		mVideoConsumer.choseRenderMode(mCanHardDecodeH264 ? 1 : 2);
 
 		if (mCanHardDecodeH264) {
@@ -651,6 +654,9 @@ public class MediaContentProducer {
 	 */
 	protected int selectVideoTrackByPlayerTask(final String sourceFile) {
 		int trackIndex = -1;
+		if (mVideoMediaExtractor != null) {
+			mVideoMediaExtractor.release();
+		}
 		mVideoMediaExtractor = new MediaExtractor();
 		try {
 			mVideoMediaExtractor.setDataSource(sourceFile);
@@ -681,6 +687,18 @@ public class MediaContentProducer {
 	 */
 	protected int selectAudioTrackByPlayerTask(final String sourceFile) {
 		int trackIndex = -1;
+
+		if (mAudioTrack != null) {
+			if (mAudioTrack.getState() != AudioTrack.STATE_UNINITIALIZED) {
+				mAudioTrack.stop();
+			}
+			mAudioTrack.release();
+		}
+
+		if (mAudioMediaExtractor != null) {
+			mAudioMediaExtractor.release();
+		}
+
 		mAudioMediaExtractor = new MediaExtractor();
 		try {
 			mAudioMediaExtractor.setDataSource(sourceFile);

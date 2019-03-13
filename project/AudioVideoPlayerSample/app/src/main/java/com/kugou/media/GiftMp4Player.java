@@ -26,7 +26,6 @@ public class GiftMp4Player implements IMP4Player {
     private MP4GLRender mGLRender;
     private MediaContentProducer mContentProducer;
     private int mLoops;
-    private Boolean mNeedRelease = false;
 
     public GiftMp4Player(ViewGroup parent){
         this.mParent = parent;
@@ -40,6 +39,7 @@ public class GiftMp4Player implements IMP4Player {
         mGLRender = new MP4GLRender(mGLSurfaceView);
         mGLSurfaceView.setRenderer(mGLRender);
         mParent.addView(mGLSurfaceView);
+
     }
 
     private void initContentProducer() {
@@ -151,13 +151,13 @@ public class GiftMp4Player implements IMP4Player {
             return;
 
         synchronized (mLock) {
-//            if (mInnerStatus == EventCallBack.STATE_START || mInnerStatus == EventCallBack.STATE_FINISHING) {
+            if (mInnerStatus == EventCallBack.STATE_START || mInnerStatus == EventCallBack.STATE_FINISHING) {
                 mLoops += loops;
-                Log.d(TAG, "addLoops: mLoops=" + mLoops);
-//                if (mInnerStatus == EventCallBack.STATE_FINISHING) {//由finishing切换到start
+//                Log.d(TAG, "addLoops: mLoops=" + mLoops);
+                if (mInnerStatus == EventCallBack.STATE_FINISHING) {//由finishing切换到start
                     mContentProducer.play();
-//                }
-//            }
+                }
+            }
         }
     }
 
@@ -167,12 +167,13 @@ public class GiftMp4Player implements IMP4Player {
             return;
 
         synchronized (mLock) {
-            mLoops = 1;
-            mContentProducer.finishing();
-//            if (mInnerStatus == EventCallBack.STATE_START) {
-//                mLoops = 1;
-//                mContentProducer.finishing();
-//            } else {
+//            mLoops = 1;
+//            mContentProducer.finishing();
+            if (mInnerStatus == EventCallBack.STATE_START) {
+                mLoops = 1;
+                mContentProducer.finishing();
+            }
+//            else {
 //                Log.i(TAG, "stop in wrong statestop in wrong state, current state:" + mInnerStatus);
 //            }
         }
@@ -205,7 +206,7 @@ public class GiftMp4Player implements IMP4Player {
 
     @Override
     public void onActivityStop() {
-
+        stop();
     }
 
     @Override
@@ -214,17 +215,20 @@ public class GiftMp4Player implements IMP4Player {
     }
 
     @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        release();
+    }
+
+    @Override
     public void release() {
         synchronized (mLock) {
-//            mNeedRelease = true;
-//            mContentProducer.release();
+            mParent.removeView(mGLSurfaceView);
             destroyContentProducer();
-            if (mGLRender != null) {
-                mGLRender.release();
-                mGLRender = null;
-            }
+            mGLRender = null;
             mCallBack = null;
             mGLSurfaceView = null;
+            mCallBack = null;
         }
     }
 }

@@ -16,9 +16,11 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     private String TAG = "MP4GLRender";
-    private boolean mSupportHWDecode;
+    //1 - 硬解  2 - 软解
+    private int mRenderMode;
 
-    private GLDrawer2D mOutputVideoFrame;
+    private GLDrawer2D mHardDecodeFrame;
+    private GLDrawer2D mSoftDecodeFrame;
 
     //用于接收外部硬解来源的texture id
     private int mExternalTexId = -1;
@@ -60,7 +62,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     private Boolean hasInit = false;
     private Boolean isEOS = false;
     private Boolean isVisible = true;
-    private Boolean hasRelease = false;
+    private Boolean triggerRelease = false;
 
     private Boolean isSurfaceChanged = false;
     private Boolean isTextureChanged = false;
@@ -71,8 +73,13 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-//        Log.i(TAG, "onSurfaceCreated hasChoseMode:" + hasChoseMode);
-        hasSurfaceCreate = true;
+        if (hasSurfaceCreate) { //重新创建的opengl环境，需恢复资源
+            Log.d(TAG, "onSurfaceReCreated");
+        } else { //首次创建的opengl环境
+            Log.d(TAG, "onSurfaceCreated");
+            hasSurfaceCreate = true;
+        }
+
         if (hasChoseMode) {
             initRenderStuff();
         }
@@ -80,6 +87,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        Log.d(TAG, "onSurfaceChanged width:" + width + ",height:" + height);
         GLES20.glViewport(0, 0, width, height);
         if (mViewWidth != width || mViewHeight != height) {
             mViewWidth = width;
@@ -92,8 +100,11 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        if (hasRelease)
-            return;
+//        if (triggerRelease) {
+//            doRelease();
+//            triggerRelease = false;
+//            return;
+//        }
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -106,8 +117,8 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
             return;
         }
 
-        if (mSupportHWDecode) {
-            if (mInputSurfaceTexture != null) {
+        if (mRenderMode == 1) {
+            if (mInputSurfaceTexture != null) {//每次draw调用，都消费一下硬解surface的图像数据
                 mInputSurfaceTexture.updateTexImage();
             }
         }
@@ -116,22 +127,23 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
             return;
         }
 
-        if ((isSurfaceChanged || isTextureChanged) && mOutputVideoFrame != null) {
-            mOutputVideoFrame.onViewPortChange(mImgWidth, mImgHeight, mViewWidth, mViewHeight);
+        if (isSurfaceChanged || isTextureChanged) {
+            if (mHardDecodeFrame != null) mHardDecodeFrame.onViewPortChange(mImgWidth, mImgHeight, mViewWidth, mViewHeight);
+            if (mSoftDecodeFrame != null) mSoftDecodeFrame.onViewPortChange(mImgWidth, mImgHeight, mViewWidth, mViewHeight);
             isSurfaceChanged &= true;
             isTextureChanged &= true;
         }
 
-        if (mSupportHWDecode) { //硬解渲染
+        if (mRenderMode == 1) { //硬解渲染
             if(mInputSurfaceTexture != null){
-                if (mOutputVideoFrame != null && isVisible) {
-                    mOutputVideoFrame.drawExternalTex(mExternalTexId, null);
+                if (isVisible && mHardDecodeFrame != null) {
+                    mHardDecodeFrame.drawExternalTex(mExternalTexId, null);
                 }
             }
         } else { //软解渲染
             synchronized (locker) {
-                if (isVisible && mOutputVideoFrame != null && mYBuffer != null && mUBuffer != null && mVBuffer != null) {
-                    mOutputVideoFrame.drawYUVTex(mYTexId, mUTexId, mVTexId, mYBuffer,  mUBuffer, mVBuffer, mYWidth, mYHeight, mUVWidth, mUVHeight, null);
+                if (isVisible && mSoftDecodeFrame != null && mYBuffer != null && mUBuffer != null && mVBuffer != null) {
+                    mSoftDecodeFrame.drawYUVTex(mYTexId, mUTexId, mVTexId, mYBuffer, mUBuffer, mVBuffer, mYWidth, mYHeight, mUVWidth, mUVHeight, null);
                 }
                 //draw完后，通知video解码线程继续执行
                 locker.notifyAll();
@@ -141,48 +153,59 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void choseRenderMode(int mode) {
-//        Log.i(TAG, "choseRenderMode mode:" + mode + ",hasSurfaceCreate:" + hasSurfaceCreate);
-        mSupportHWDecode = mode == 1 ? true : false;
+        Log.d(TAG, "choseRenderMode mode:" + mode);
+        mRenderMode = mode;
         hasChoseMode = true;
         if (mSurfacdeView != null)
             mSurfacdeView.requestRender();
     }
 
     private void initRenderStuff() {
+        Log.d(TAG, "initRenderStuff");
+        //创建硬解用的
         int[] compileRet = {-1, -1};
-        int shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, mSupportHWDecode ? GLDrawer2D.fss : GLDrawer2D.yuvFSS, compileRet);
+        int shaderProgram = 0;
+
+        shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, GLDrawer2D.fss, compileRet);
         if (compileRet[0] != 0) {
-            Log.e(TAG, "vertext shader编译失败");
+            Log.e(TAG, "硬解 vertext shader编译失败");
         } else if (compileRet[1] != 0) {
-            Log.e(TAG, "fragment shader编译失败");
+            Log.e(TAG, "硬解 fragment shader编译失败");
         }
+        mHardDecodeFrame = new GLDrawer2D(true, shaderProgram);
 
-        mOutputVideoFrame = new GLDrawer2D(mSupportHWDecode, shaderProgram);
+        //创建软解用的
+        shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, GLDrawer2D.yuvFSS, compileRet);
+        if (compileRet[0] != 0) {
+            Log.e(TAG, "软解 vertext shader编译失败");
+        } else if (compileRet[1] != 0) {
+            Log.e(TAG, "软解 fragment shader编译失败");
+        }
+        mSoftDecodeFrame = new GLDrawer2D(false, shaderProgram);
 
-        if (mSupportHWDecode) { //初始化硬解的外部纹理
-            mExternalTexId = GLDrawer2D.initExternalOESTex();
-            if (mInputSurfaceTexture != null) {
-                mInputSurfaceTexture.release();
+        mYTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE0);
+        mUTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE1);
+        mVTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE2);
+        mExternalTexId = GLDrawer2D.initExternalOESTex();
+
+        if (mInputSurfaceTexture != null) {
+            mInputSurfaceTexture.release();
+        }
+        mInputSurfaceTexture = new SurfaceTexture(mExternalTexId);
+        mInputSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
+            @Override
+            public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+                if (mSurfacdeView != null)
+                    mSurfacdeView.requestRender();
             }
-            mInputSurfaceTexture = new SurfaceTexture(mExternalTexId);
-            mInputSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
-                @Override
-                public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-                    if (mSurfacdeView != null)
-                        mSurfacdeView.requestRender();
-                }
-            });
-            if (mInputSurface != null) {
-                mInputSurface.release();
-            }
-            synchronized (locker) {
-                mInputSurface = new Surface(mInputSurfaceTexture);
-                locker.notifyAll();
-            }
-        } else {
-            mYTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE0);
-            mUTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE1);
-            mVTexId = GLDrawer2D.initTex(GLES20.GL_TEXTURE2);
+        });
+        if (mInputSurface != null) {
+            mInputSurface.release();
+        }
+        synchronized (locker) {
+            //实例创建后,notify到调用方
+            mInputSurface = new Surface(mInputSurfaceTexture);
+            locker.notifyAll();
         }
 
         hasInit = true;
@@ -228,6 +251,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onTextureInfo(int imgWidth, int imgHeight) {
+        Log.d(TAG, "onTextureInfo imgWidth:" + imgWidth + ",imgHeight:" + imgHeight);
         if (mImgWidth != imgWidth || mImgHeight != imgHeight) {
             mImgWidth = imgWidth;
             mImgHeight = imgHeight;
@@ -242,6 +266,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void end() {
+        Log.d(TAG, "end()");
         isEOS = true;
         //执行一次清屏
         mSurfacdeView.requestRender();
@@ -249,6 +274,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void start() {
+        Log.d(TAG, "start()");
         isEOS = false;
     }
 
@@ -258,7 +284,8 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public Surface generateHardWareOutputSurface() {
-        if (mSupportHWDecode) {
+        Log.d(TAG, "generateHardWareOutputSurface()");
+        if (mRenderMode == 1) {
             synchronized (locker) {
                 while (mInputSurface == null) {
                     try {
@@ -274,44 +301,57 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
         }
     }
 
+    @Override
     public void release() {
         synchronized (locker) {
-            hasRelease = true;
-
-            if (mOutputVideoFrame != null) {
-                mOutputVideoFrame.release();
-                mOutputVideoFrame = null;
-            }
-
-            if (mInputSurfaceTexture != null) {
-                mInputSurfaceTexture.release();
-                mInputSurfaceTexture = null;
-            }
-
-            if (mInputSurface != null) {
-                mInputSurface.release();
-                mInputSurface = null;
-            }
-
-            if (mExternalTexId > -1) {
-                GLDrawer2D.deleteTex(mExternalTexId);
-            }
-
-            if (mYTexId > -1) {
-                GLDrawer2D.deleteTex(mYTexId);
-            }
-
-            if (mUTexId > -1) {
-                GLDrawer2D.deleteTex(mUTexId);
-            }
-
-            if (mVTexId > -1) {
-                GLDrawer2D.deleteTex(mVTexId);
-            }
-
-            mYBuffer = null;
-            mUBuffer = null;
-            mVBuffer = null;
+            Log.i(TAG, "release opgnelES res");
+            triggerRelease = true;
+            doRelease();
+//            mSurfacdeView.requestRender();
         }
+    }
+
+    private void doRelease() {
+//        Log.i(TAG, "doRelease opgnelES res");
+        if (mHardDecodeFrame != null) {
+            mHardDecodeFrame.release();
+            mHardDecodeFrame = null;
+        }
+
+        if (mSoftDecodeFrame != null) {
+            mSoftDecodeFrame.release();
+            mSoftDecodeFrame = null;
+        }
+
+        if (mInputSurfaceTexture != null) {
+            mInputSurfaceTexture.release();
+            mInputSurfaceTexture = null;
+        }
+
+        if (mInputSurface != null) {
+            mInputSurface.release();
+            mInputSurface = null;
+        }
+
+        if (mExternalTexId > -1) {
+            GLDrawer2D.deleteTex(mExternalTexId);
+        }
+
+        if (mYTexId > -1) {
+            GLDrawer2D.deleteTex(mYTexId);
+        }
+
+        if (mUTexId > -1) {
+            GLDrawer2D.deleteTex(mUTexId);
+        }
+
+        if (mVTexId > -1) {
+            GLDrawer2D.deleteTex(mVTexId);
+        }
+
+        mYBuffer = null;
+        mUBuffer = null;
+        mVBuffer = null;
+        mSurfacdeView = null;
     }
 }
