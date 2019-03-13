@@ -29,7 +29,6 @@ public class MainActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.test_main);
-//		UIPerformance.getInstance(this).start();
 	}
 
 	private final void prepareSampleMovie(File path, int rawId) throws IOException {
@@ -56,9 +55,8 @@ public class MainActivity extends Activity {
 
         ViewGroup parentViewGroup = findViewById(R.id.mylayout);
 
-
         String localRes1 = createResFromeRaw("gift_480.mp4", R.raw.gift_480);
-        String localRes2 = createResFromeRaw("gift_640.mp4", R.raw.gift_640);
+        String localRes2 = createResFromeRaw("gift_1080.mp4", R.raw.gift_1080);
 
         if (mp4Player != null)
             mp4Player.onActivityResume();
@@ -72,7 +70,7 @@ public class MainActivity extends Activity {
 
                 String localRes;
                 if (ind % 2 == 0) {
-                    localRes = localRes1;
+                    localRes = localRes2;
                 } else {
                     localRes = localRes2;
                 }

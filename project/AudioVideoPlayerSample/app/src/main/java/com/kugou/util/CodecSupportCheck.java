@@ -49,6 +49,8 @@ public class CodecSupportCheck {
 //                                Log.d("===CodecSupportCheck isSupport===", "support height " + intHeightRange);
                             }
                         }
+                    } else {
+                        ret = true;
                     }
                 }
             }catch (Exception e){

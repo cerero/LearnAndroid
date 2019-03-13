@@ -45,6 +45,7 @@ public:
         dst_frame = av_frame_alloc();
 
         avcodec_open2(codec_ctx, codec, NULL);
+        LOGD(TAG, "DecoderContext construct 0x%x", this);
     }
 
     AVPixelFormat color_format;
@@ -77,6 +78,8 @@ public:
 
         if (external_dir)
             delete external_dir;
+
+        LOGD(TAG, "DecoderContext release 0x%x", this);
     }
 
     static void set_ctx(JNIEnv *env, jobject thiz, DecoderContext *ctx) {
@@ -218,7 +221,7 @@ jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_unit
         ctx->frame_ready = 1;
         ctx->total_decode_frame ++;
     }
-//    LOGE(TAG, "consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d, total decode:%d ref:%d", got_picture, ret, ctx->total_decode_frame, ctx->codec_ctx->refcounted_frames);
+//    LOGD(TAG, "consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d, total decode:%d", got_picture, ret, ctx->total_decode_frame);
     return ret;
 }
 
@@ -257,7 +260,7 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
     jbyte *out_buf = (jbyte *)env->GetDirectBufferAddress(out_buffer);
 
     if (out_buf == NULL) {
-//        D("Error getting direct buffer address");
+        LOGE(TAG, "Error getting direct buffer address", 1);
         return -1;
     }
 
@@ -309,7 +312,7 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
         memcpy(out_buf, ctx->src_frame->data[2], ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[2]);
         out_buf += ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[2];
 
-
+//        LOGD(TAG, "write yuv to out_buf 0x%x", out_buf);
 //        char path[2048] = {0};
 //        sprintf(path, "%s/%d.yuv420p", ctx->external_dir, ctx->total_decode_frame);
 //        LOGD(TAG, "write to %s", path);
@@ -342,7 +345,7 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
         sws_scale(ctx->convert_ctx, (const uint8_t **)ctx->src_frame->data, ctx->src_frame->linesize, 0, ctx->codec_ctx->height, ctx->dst_frame->data, ctx->dst_frame->linesize);
     }
 
-//    av_frame_unref(ctx->src_frame);
+    av_frame_unref(ctx->src_frame);
 
     ctx->frame_ready = 0;
 

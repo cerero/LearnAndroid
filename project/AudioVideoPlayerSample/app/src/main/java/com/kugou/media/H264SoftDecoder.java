@@ -24,15 +24,15 @@ public class H264SoftDecoder {
         nativeInit(colorFormat);
     }
 
-    protected void finalize() throws Throwable {
-        nativeDestroy();
-        super.finalize();
-    }
+//    protected void finalize() throws Throwable {
+//        nativeDestroy();
+//        super.finalize();
+//    }
 
     private int cdata;
 
     private native void nativeInit(int colorFormat);
-    private native void nativeDestroy();
+    public native void nativeDestroy();
 
     public native void consumeNalUnitsFromDirectBuffer(ByteBuffer nalUnits, int numBytes, long packetPTS);
     public native boolean isFrameReady();

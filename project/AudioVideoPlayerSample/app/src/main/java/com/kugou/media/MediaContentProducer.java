@@ -25,17 +25,21 @@ public class MediaContentProducer {
     private static final boolean DEBUG = true;
     private static final String TAG = "MediaContentProducer";
 	private static final String TAG_PLAYER_TASK = "playertask";
+	private static final String TAG_VIDEO_TASK = "playertask";
+	private static final String TAG_AUDIO_TASK = "playertask";
 
 	private IFrameCallback mCallback;
 	private boolean mCanHardDecodeH264;
 
 	private IVideoConsumer mVideoConsumer;
 	private IAudioConsumer mAudioConsumer;
+	private IErrorReceiver mErrorReceiver;
 
-	public MediaContentProducer(IVideoConsumer videoConsumer, IAudioConsumer audioConsumer, IFrameCallback frameCallback) {
+	public MediaContentProducer(IVideoConsumer videoConsumer, IAudioConsumer audioConsumer, IFrameCallback frameCallback, IErrorReceiver errorReceiver) {
 		this.mVideoConsumer = videoConsumer;
 		this.mAudioConsumer = audioConsumer;
 		this.mCallback = frameCallback;
+		this.mErrorReceiver = errorReceiver;
 
 		Thread playerTask = new Thread(mMoviePlayerTask, TAG_PLAYER_TASK);
 		playerTask.setUncaughtExceptionHandler(h);
@@ -280,6 +284,13 @@ public class MediaContentProducer {
 		public void uncaughtException(Thread th, Throwable ex) {
 			Log.e(TAG, String.format("Thread(%s) uncaught exception:%s", th.getName(), ex.toString()));
 			ex.printStackTrace();
+			if (th.getName() == TAG_VIDEO_TASK) {
+				mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_DECODE_ERROR, ex.toString());
+			} else if (th.getName() == TAG_AUDIO_TASK) {
+
+			}  else if (th.getName() == TAG_PLAYER_TASK) {
+				mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_DECODE_ERROR, ex.toString());
+			}
 		}
 	};
 
@@ -330,6 +341,7 @@ public class MediaContentProducer {
 						break;
 					} catch (final Exception e) {
 						Log.e(TAG, "MoviePlayerTask:", e);
+						mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_CODEC_ERROR, e.toString());
 						break;
 					}
 				} // end while (local_isRunning)
@@ -337,6 +349,10 @@ public class MediaContentProducer {
 				if (DEBUG) Log.v(TAG, "player task finished, local_isRunning=" + local_isRunning);
 				handleStop();
 				mVideoConsumer.release();
+				mCallback = null;
+				mVideoConsumer = null;
+				mAudioConsumer = null;
+				mErrorReceiver = null;
 			}
 		}
 	};
@@ -628,8 +644,8 @@ public class MediaContentProducer {
 			throw new RuntimeException("No video and audio track found in " + source_file);
 		}
 
-		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
-//		mCanHardDecodeH264 = false;
+//		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
+		mCanHardDecodeH264 = false;
 		mVideoConsumer.choseRenderMode(mCanHardDecodeH264 ? 1 : 2);
 
 		if (mCanHardDecodeH264) {
@@ -778,6 +794,7 @@ public class MediaContentProducer {
 						if (DEBUG) Log.w(TAG, "create video hw decoder fail, change to soft decoder");
 						//硬解码器创建失败,降级走软解
 						mCanHardDecodeH264 = false;
+						mVideoConsumer.choseRenderMode(2);
 						mH264SoftDecoder = internalStartVideoWithSoftDecode(mVideoMediaExtractor, mVideoTrackIndex);
 					}
 				} else {
@@ -792,7 +809,7 @@ public class MediaContentProducer {
             }
 
 			mVideoInputDone = mVideoOutputDone = false;
-			videoThread = new Thread(mVideoTask, "VideoTask");
+			videoThread = new Thread(mVideoTask, TAG_VIDEO_TASK);
 		}
 		//-------------  end
 
@@ -812,7 +829,7 @@ public class MediaContentProducer {
 				if (DEBUG) Log.d(TAG, "resuse audio decoder");
 			}
 			mAudioInputDone = mAudioOutputDone = false;
-	        audioThread = new Thread(mAudioTask, "AudioTask");
+	        audioThread = new Thread(mAudioTask, TAG_AUDIO_TASK);
 		}
 
 		if (videoThread != null) {
@@ -838,9 +855,11 @@ public class MediaContentProducer {
 
 //			int spsByteLen = spsByteBuffer.limit();
 //			int ppsByteLen = ppsByteBuffer.limit();
-
-			if (mVideoSoftDecodeInputBuffer == null) {
-				mVideoSoftDecodeInputBuffer = ByteBuffer.allocateDirect((int)(mVideoWidth * mVideoHeight * 1.5));
+			int cacheByteSize = mVideoWidth * mVideoHeight / 2;
+			if (mVideoSoftDecodeInputBuffer == null ||
+					mVideoSoftDecodeInputBuffer.capacity() < cacheByteSize) {
+				if (DEBUG) Log.v(TAG, "allocate cache:" + cacheByteSize + " byte");
+				mVideoSoftDecodeInputBuffer = ByteBuffer.allocateDirect(cacheByteSize);
 				mVideoSoftDecodeInputBuffer.order(spsByteBuffer.order());
 			}
 
@@ -869,7 +888,7 @@ public class MediaContentProducer {
 				codec = MediaCodec.createDecoderByType(mime);
 				codec.configure(format, mOutputSurface, null, 0);
 		        codec.start();
-			} catch (final IOException e) {
+			} catch (final Exception e) {
 				Log.w(TAG, e);
 				codec = null;
 			}
@@ -964,11 +983,7 @@ public class MediaContentProducer {
 			if (sample_size > 0) {
 //				if(DEBUG) Log.d(TAG, "extrator readSampleData nalu type: " + (mVideoSoftDecodeInputBuffer.get(4) & 0x1f) + ",sample_size: " + sample_size + ", pts: " + presentationTimeUs);
 				softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, sample_size, presentationTimeUs);
-				frame_ready = softDecoder.isFrameReady();
-//				if (frame_ready) {
-//					if(DEBUG) Log.d(TAG, String.format("soft_decode width=%1$d height=%2$d", softDecoder.getWidth(), softDecoder.getHeight()));
-//				}
-
+//				frame_ready = softDecoder.isFrameReady();
 				if (mFirstVideoPTS < 0) {
 					mFirstVideoPTS = presentationTimeUs;
 					if (DEBUG) Log.d(TAG, "mFirstVideoPTS:" + mFirstVideoPTS);
@@ -1105,11 +1120,13 @@ public class MediaContentProducer {
 				if (output_size > 0) {
 					//取出软解后的yuv
 					if (mVideoSoftDecodeOutBuffer == null) {
+						Log.d(TAG, "allocate mVideoSoftDecodeOutBuffer size:" + output_size + "byte");
 						mVideoSoftDecodeOutBuffer = ByteBuffer.allocateDirect(output_size);
 					}
 
 					if (mH264SoftDecoder.isFrameReady()) {
 						mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer);
+
 						doRender = !internalWriteVideo(mVideoSoftDecodeOutBuffer, 0, output_size, pts);
 					}
 				}
@@ -1352,26 +1369,36 @@ public class MediaContentProducer {
     		}
 			mAudioOutputDone = mAudioInputDone = true;
     	}
-    	if (mVideoMediaCodec != null) {
-    		mVideoMediaCodec.stop();
-    		mVideoMediaCodec.release();
-    		mVideoMediaCodec = null;
-    	}
-    	if (mAudioMediaCodec != null) {
-    		mAudioMediaCodec.stop();
-    		mAudioMediaCodec.release();
-    		mAudioMediaCodec = null;
-    	}
-		if (mVideoMediaExtractor != null) {
-			mVideoMediaExtractor.release();
-			mVideoMediaExtractor = null;
-		}
-		if (mAudioMediaExtractor != null) {
-			mAudioMediaExtractor.release();
-			mAudioMediaExtractor = null;
+
+    	try {
+			if (mVideoMediaCodec != null) {
+				mVideoMediaCodec.stop();
+				mVideoMediaCodec.release();
+				mVideoMediaCodec = null;
+			}
+			if (mAudioMediaCodec != null) {
+				mAudioMediaCodec.stop();
+				mAudioMediaCodec.release();
+				mAudioMediaCodec = null;
+			}
+			if (mVideoMediaExtractor != null) {
+				mVideoMediaExtractor.release();
+				mVideoMediaExtractor = null;
+			}
+			if (mAudioMediaExtractor != null) {
+				mAudioMediaExtractor.release();
+				mAudioMediaExtractor = null;
+			}
+
+			if (mH264SoftDecoder != null) {
+				mH264SoftDecoder.nativeDestroy();
+				mH264SoftDecoder = null;
+			}
+		} catch (Exception e) {
+			Log.w(TAG, "release resource exception:" + e);
 		}
 
-        mH264SoftDecoder = null;
+
         mVideoSoftDecodeInputBuffer = null;
         mVideoSoftDecodeOutBuffer = null;
 
@@ -1394,10 +1421,16 @@ public class MediaContentProducer {
 	protected void internalStopAudio() {
 		if (DEBUG) Log.v(TAG, "internalStopAudio:");
     	if (mAudioTrack != null) {
-    		if (mAudioTrack.getState() != AudioTrack.STATE_UNINITIALIZED)
-    			mAudioTrack.stop();
-    		mAudioTrack.release();
-    		mAudioTrack = null;
+			try {
+				if (mAudioTrack.getState() != AudioTrack.STATE_UNINITIALIZED) {
+					mAudioTrack.stop();
+				}
+				mAudioTrack.release();
+			} catch (Exception e) {
+				if (DEBUG) Log.v(TAG, "internalStopAudio exception:" + e);
+			} finally {
+				mAudioTrack = null;
+			}
     	}
 		mAudioOutTempBuf = null;
 	}
