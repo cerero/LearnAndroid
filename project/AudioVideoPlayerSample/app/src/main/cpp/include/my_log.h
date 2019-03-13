@@ -105,5 +105,5 @@
 
 #endif  //ANDROID
 
-void init_my_log();
+//void init_my_log();
 

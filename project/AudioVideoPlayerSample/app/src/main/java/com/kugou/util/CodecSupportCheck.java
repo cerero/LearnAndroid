@@ -6,7 +6,7 @@ import android.media.MediaCodecList;
 import android.util.Log;
 import android.util.Range;
 
-public class HardwareSupportCheck {
+public class CodecSupportCheck {
     @SuppressLint("NewApi")
     private static MediaCodecInfo selectCodec(String mimeType, boolean isEncoder) {
         int numCodecs = MediaCodecList.getCodecCount();
@@ -42,19 +42,17 @@ public class HardwareSupportCheck {
                             MediaCodecInfo.VideoCapabilities vCap = cap.getVideoCapabilities();
                             if (vCap != null) {
                                 ret = vCap.isSizeSupported(width, height);
-                                Range<Integer> intWidthRange = vCap.getSupportedWidths();
-                                Range<Integer> intHeightRange = vCap.getSupportedHeights();
-                                Log.d("===HardwareSupportCheck isSupport===", "width: " + width + ", height: " + height + ", isSupport: " + ret);
-                                Log.d("===HardwareSupportCheck isSupport===", "support widths " + intWidthRange);
-                                Log.d("===HardwareSupportCheck isSupport===", "support height " + intHeightRange);
+//                                Range<Integer> intWidthRange = vCap.getSupportedWidths();
+//                                Range<Integer> intHeightRange = vCap.getSupportedHeights();
+//                                Log.d("===CodecSupportCheck isSupport===", "width: " + width + ", height: " + height + ", isSupport: " + ret);
+//                                Log.d("===CodecSupportCheck isSupport===", "support widths " + intWidthRange);
+//                                Log.d("===CodecSupportCheck isSupport===", "support height " + intHeightRange);
                             }
                         }
-                    } else {
-                        ret = true;
                     }
                 }
             }catch (Exception e){
-                Log.d("===HardwareSupportCheck isSupport===", "Exception:"+e );
+//                Log.d("===CodecSupportCheck isSupport===", "Exception:"+e );
                 e.printStackTrace();
             }
             finally {
@@ -66,11 +64,11 @@ public class HardwareSupportCheck {
     }
 
     public static boolean isSupportH264() {
-        return HardwareSupportCheck.isSupport("video/avc",false, -1, -1);
+        return CodecSupportCheck.isSupport("video/avc",false, -1, -1);
     }
 
     public static boolean isSupportH264(int width, int height) {
-        return HardwareSupportCheck.isSupport("video/avc",false, width, height);
+        return CodecSupportCheck.isSupport("video/avc",false, width, height);
     }
 
 

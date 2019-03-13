@@ -3,12 +3,12 @@
 #include <cstdint>
 #include "h264_soft_decoder.h"
 
+//#include "my_log.h"
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 #include "libavutil/imgutils.h"
-#include "my_log.h"
 }
 
 #define COLOR_FORMAT_YUV420 0
@@ -89,7 +89,6 @@ public:
 
 };
 
-//void nativeInit(JNIEnv* env, jobject thiz, jint color_format, jstring external_dir);
 void nativeInit(JNIEnv* env, jobject thiz, jint color_format);
 void nativeDestroy(JNIEnv* env, jobject thiz);
 jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_units, jint num_bytes, jlong pkt_pts);
@@ -100,13 +99,12 @@ jint getOutputByteSize(JNIEnv* env, jobject thiz);
 jlong getLastPTS(JNIEnv* env, jobject thiz);
 jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer);
 
-void h264softdecoder::OnLoad(JNIEnv* env, void* reserved) {
+void h264softdecoder::OnLoad(JNIEnv* env, void* reserved, const char* register_class_path) {
     av_register_all();
 
     JNINativeMethod nm[9];
 
     nm[0].name = "nativeInit";
-//    nm[0].signature = "(ILjava/lang/String;)V";
     nm[0].signature = "(I)V";
     nm[0].fnPtr = (void *)nativeInit;
 
@@ -142,7 +140,7 @@ void h264softdecoder::OnLoad(JNIEnv* env, void* reserved) {
     nm[8].signature = "()J";
     nm[8].fnPtr = (void *)getLastPTS;
 
-    jclass cls = env->FindClass("com/kugou/media/H264SoftDecoder");
+    jclass cls = env->FindClass(register_class_path);
 
     env->RegisterNatives(cls, nm, 9);
 }
@@ -151,9 +149,9 @@ static void save_raw_yuv(uint8_t *yBuf, uint8_t *uBuf, uint8_t *vBuf,
                      int ySize, int uSize, int vSize,
                      char *filename)
 {
-    LOGD(TAG, "ybuf addr:%x, ySize:%d", yBuf, ySize);
-    LOGD(TAG, "uBuf addr:%x, uSize:%d", uBuf, uSize);
-    LOGD(TAG, "vBuf addr:%x, vSize:%d", vBuf, vSize);
+//    MY_LOG_DEBUG("ybuf addr:%x, ySize:%d", yBuf, ySize);
+//    MY_LOG_DEBUG("uBuf addr:%x, uSize:%d", uBuf, uSize);
+//    MY_LOG_DEBUG("vBuf addr:%x, vSize:%d", vBuf, vSize);
 
     FILE *f;
     int i;
@@ -164,12 +162,11 @@ static void save_raw_yuv(uint8_t *yBuf, uint8_t *uBuf, uint8_t *vBuf,
         fwrite(vBuf, 1, vSize, f);
         fclose(f);
     } else {
-        LOGE(TAG, "file %s can not write!!!", filename);
+//        MY_LOG_DEBUG("file %s can not write!!!", filename);
     }
 }
 
 
-//void nativeInit(JNIEnv* env, jobject thiz, jint color_format, jstring external_dir) {
 void nativeInit(JNIEnv* env, jobject thiz, jint color_format) {
     DecoderContext *ctx = new DecoderContext(color_format);
 
@@ -217,7 +214,7 @@ jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_unit
         ctx->total_decode_frame ++;
     }
 
-//    LOGD(TAG, "consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d, total decode:%d", got_picture, ret, ctx->total_decode_frame);
+//    MY_LOG_DEBUG("consumeNalUnitsFromDirectBuffer got_picture:%d, size cosumed:%d, total decode:%d", got_picture, ret, ctx->total_decode_frame);
     return ret;
 }
 
@@ -265,7 +262,7 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
 //    int pic_buf_size = av_image_get_buffer_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height, 0);
     int pic_buf_size = avpicture_get_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
     if (out_buf_len < pic_buf_size) {
-        LOGD(TAG, "Input buffer size:%ld too small, couldn't decode to direct buffer, need size:%d", out_buf_len, pic_buf_size);
+//        MY_LOG_DEBUG("Input buffer size:%ld too small, couldn't decode to direct buffer, need size:%d", out_buf_len, pic_buf_size);
         return -1;
     }
 

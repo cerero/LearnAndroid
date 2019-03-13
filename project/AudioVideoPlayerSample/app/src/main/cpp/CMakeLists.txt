@@ -28,7 +28,7 @@ set_target_properties(x264
         PROPERTIES IMPORTED_LOCATION
         ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libx264.so )
 
-add_library(AVNative-lib SHARED AVNative-lib.cpp h264_soft_decoder.cpp my_log.c)
+add_library(mini_yuv_decoder SHARED mini_yuv_decoder.cpp h264_soft_decoder.cpp)
 
 find_library(log-lib log)
 #find_library(GLESv1_CM-lib GLESv1_CM)
@@ -37,14 +37,10 @@ find_library(log-lib log)
 #find_library(android-lib android)
 
 target_link_libraries(
-        AVNative-lib
+        mini_yuv_decoder
         ffmpeg
         fdk-aac
         mp3lame
         rtmp
         x264
         ${log-lib})
-#        ${GLESv1_CM-lib}
-#        ${GLESv2-lib}
-#        ${EGL-lib}
-#        ${android-lib}

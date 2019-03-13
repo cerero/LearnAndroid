@@ -22,16 +22,6 @@ import java.io.IOException;
 
 public class MainActivity extends Activity {
 
-    static {
-		System.loadLibrary("fdk-aac");
-		System.loadLibrary("mp3lame");
-		System.loadLibrary("x264");
-		System.loadLibrary("rtmp");
-		System.loadLibrary("ffmpeg");
-
-        System.loadLibrary("AVNative-lib");
-    }
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -42,11 +32,9 @@ public class MainActivity extends Activity {
 //		UIPerformance.getInstance(this).start();
 	}
 
-	public native void stringFromJNI();
-
 	private final void prepareSampleMovie(File path) throws IOException {
 		if (!path.exists()) {
-			final BufferedInputStream in = new BufferedInputStream(getResources().openRawResource(R.raw.gift_480));
+			final BufferedInputStream in = new BufferedInputStream(getResources().openRawResource(R.raw.gift_1080));
 			final BufferedOutputStream out = new BufferedOutputStream(openFileOutput(path.getName(), Context.MODE_PRIVATE));
 			byte[] buf = new byte[8192];
 			int size = in.read(buf);
@@ -69,7 +57,7 @@ public class MainActivity extends Activity {
 
         final File dir = getFilesDir();
         dir.mkdirs();
-        final File path = new File(dir, "gift_480.mp4");
+        final File path = new File(dir, "gift_1080.mp4");
 
         try {
             prepareSampleMovie(path);

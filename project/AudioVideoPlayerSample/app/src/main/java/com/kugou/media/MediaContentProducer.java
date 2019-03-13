@@ -13,20 +13,18 @@ import android.media.AudioTrack;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
-import com.kugou.util.HardwareSupportCheck;
+import com.kugou.util.CodecSupportCheck;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class MediaContentProducer {
     private static final boolean DEBUG = true;
     private static final String TAG = "MediaContentProducer";
+	private static final String TAG_PLAYER_TASK = "playertask";
 
 	private IFrameCallback mCallback;
 	private boolean mCanHardDecodeH264;
@@ -39,7 +37,9 @@ public class MediaContentProducer {
 		this.mAudioConsumer = audioConsumer;
 		this.mCallback = frameCallback;
 
-		new Thread(mMoviePlayerTask, TAG).start();
+		Thread playerTask = new Thread(mMoviePlayerTask, TAG_PLAYER_TASK);
+		playerTask.setUncaughtExceptionHandler(h);
+		playerTask.start();
 
 		//下面只所以进行线程同步，是为了让playertask正常初始化，设置好状态
 		synchronized (mSync) {
@@ -276,6 +276,12 @@ public class MediaContentProducer {
 	private AudioTrack mAudioTrack;
 
 //--------------------------------------------------------------------------------
+	private Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
+		public void uncaughtException(Thread th, Throwable ex) {
+			Log.e(TAG, "Uncaught exception: " + ex);
+		}
+	};
+
 	/**
 	 * playback control task
 	 */
@@ -620,8 +626,7 @@ public class MediaContentProducer {
 			throw new RuntimeException("No video and audio track found in " + source_file);
 		}
 
-//		mCanHardDecodeH264 = HardwareSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
-		mCanHardDecodeH264 = false;
+		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
 		mVideoConsumer.choseRenderMode(mCanHardDecodeH264 ? 1 : 2);
 
 		if (mCanHardDecodeH264) {
@@ -792,8 +797,15 @@ public class MediaContentProducer {
 	        audioThread = new Thread(mAudioTask, "AudioTask");
 		}
 
-		if (videoThread != null) videoThread.start();//开启视频解码线程
-		if (audioThread != null) audioThread.start();//开启音频解码线程
+		if (videoThread != null) {
+			videoThread.setUncaughtExceptionHandler(h);
+			videoThread.start();//开启视频解码线程
+		}
+
+		if (audioThread != null) {
+			audioThread.setUncaughtExceptionHandler(h);
+			audioThread.start();//开启音频解码线程
+		}
 	}
 
 	protected H264SoftDecoder internalStartVideoWithSoftDecode(final MediaExtractor media_extractor, final int trackIndex) {

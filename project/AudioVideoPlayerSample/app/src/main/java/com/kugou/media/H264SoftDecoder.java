@@ -6,6 +6,16 @@ import java.io.File;
 import java.nio.ByteBuffer;
 
 public class H264SoftDecoder {
+    static {
+        System.loadLibrary("fdk-aac");
+        System.loadLibrary("mp3lame");
+        System.loadLibrary("x264");
+        System.loadLibrary("rtmp");
+        System.loadLibrary("ffmpeg");
+
+        System.loadLibrary("mini_yuv_decoder");
+    }
+
     public static final int COLOR_FORMAT_YUV420 = 0;
     public static final int COLOR_FORMAT_RGB565LE = 1;
     public static final int COLOR_FORMAT_BGR32 = 2;
