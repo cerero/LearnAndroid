@@ -4,6 +4,8 @@
 #include "h264_soft_decoder.h"
 
 #include "my_log.h"
+#include <cmath>
+
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
@@ -58,6 +60,11 @@ public:
     int64_t pkt_pts;
     int32_t total_decode_frame;
 
+    uint64_t current_write_size;
+    int new_y_width;
+    int new_u_width;
+    int new_v_width;
+
     char *external_dir;
     ~DecoderContext() {
         if (src_frame) {
@@ -104,8 +111,10 @@ jint getWidth(JNIEnv* env, jobject thiz);
 jint getHeight(JNIEnv* env, jobject thiz);
 jint getOutputByteSize(JNIEnv* env, jobject thiz);
 jlong getLastPTS(JNIEnv* env, jobject thiz);
-jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer);
-unsigned char* _AllocColorComponents( unsigned char* src, int linesize, int width, int height );
+jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_ybuffer, jobject out_ubuffer, jobject out_vbuffer);
+//void getWriteInfoAfterDecode(JNIEnv* env, jobject thiz, jlongArray outInfo);
+
+int _CopyColorComponents( unsigned char* dst, unsigned char* src, int linesize, int width, int height);
 
 void h264softdecoder::OnLoad(JNIEnv* env, void* reserved, const char* register_class_path) {
     av_register_all();
@@ -141,12 +150,16 @@ void h264softdecoder::OnLoad(JNIEnv* env, void* reserved, const char* register_c
     nm[6].fnPtr = (void *)getOutputByteSize;
 
     nm[7].name = "decodeFrameToDirectBuffer";
-    nm[7].signature = "(Ljava/nio/ByteBuffer;)J";
+    nm[7].signature = "(Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;)J";
     nm[7].fnPtr = (void *)decodeFrameToDirectBuffer;
 
     nm[8].name = "getLastPTS";
     nm[8].signature = "()J";
     nm[8].fnPtr = (void *)getLastPTS;
+
+//    nm[9].name = "getWriteSizeAfterDecode";
+//    nm[9].signature = "([J)V";
+//    nm[9].fnPtr = (void *)getWriteInfoAfterDecode;
 
     jclass cls = env->FindClass(register_class_path);
 
@@ -251,55 +264,54 @@ jint getOutputByteSize(JNIEnv* env, jobject thiz) {
     return avpicture_get_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
 }
 
-jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
+//void getWriteInfoAfterDecode(JNIEnv* env, jobject thiz, jlongArray outInfo) {
+//    DecoderContext *ctx = (DecoderContext *)DecoderContext::get_ctx(env, thiz);
+//    jlong* out_info = (jlong*) env->GetLongArrayElements(outInfo, NULL);
+//
+//    out_info[0] = ctx->current_write_size;
+//    out_info[1] = ctx->new_y_width;
+//    out_info[2] = ctx->new_u_width;
+//    out_info[3] = ctx->new_v_width;
+//
+//    env->ReleaseLongArrayElements(outInfo, out_info, 0);
+//}
+
+jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_ybuffer, jobject out_ubuffer, jobject out_vbuffer) {
     DecoderContext *ctx = (DecoderContext *)DecoderContext::get_ctx(env, thiz);
 
     if (!ctx->frame_ready)
         return -1;
 
-    jbyte *out_buf = (jbyte *)env->GetDirectBufferAddress(out_buffer);
+    jbyte *out_ybuf = (jbyte *)env->GetDirectBufferAddress(out_ybuffer);
+    jbyte *out_ubuf = (jbyte *)env->GetDirectBufferAddress(out_ubuffer);
+    jbyte *out_vbuf = (jbyte *)env->GetDirectBufferAddress(out_vbuffer);
 
-    if (out_buf == NULL) {
-        LOGE(TAG, "Error getting direct buffer address", 1);
+    if (out_ybuf == NULL || out_ubuf == NULL || out_vbuf == NULL) {
+//        LOGE(TAG, "Error getting direct buffer address", 1);
         return -1;
     }
 
-    long out_buf_len = env->GetDirectBufferCapacity(out_buffer);
-
+    long out_ybuf_len = env->GetDirectBufferCapacity(out_ybuffer);
+    long out_ubuf_len = env->GetDirectBufferCapacity(out_ubuffer);
+    long out_vbuf_len = env->GetDirectBufferCapacity(out_vbuffer);
+    long total_out_len = out_ybuf_len + out_ubuf_len + out_vbuf_len;
 //    int pic_buf_size = av_image_get_buffer_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height, 0);
     int pic_buf_size = avpicture_get_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
-    if (out_buf_len < pic_buf_size) {
-//        MY_LOG_DEBUG("Input buffer size:%ld too small, couldn't decode to direct buffer, need size:%d", out_buf_len, pic_buf_size);
+    if (total_out_len < pic_buf_size) {
+        LOGE(TAG, "Input buffer size:%ld too small, couldn't decode to direct buffer, need size:%d", total_out_len, pic_buf_size);
         return -1;
     }
 
-    if (ctx->color_format == AV_PIX_FMT_YUV420P) {
-        /**
-         * ffmpeg解码得到的AVFrame里面有data数组和linesize数组，
-         * data[0]是Y平面数据，其大小是linesize[0]，
-         * data[1]是U,大小linesize[1]，
-         * data[2]是V平面数据大小linesize[2]，
-         * **/
-
-//        int lumaByteSize = ctx->src_frame->width * ctx->src_frame->height;
-//        int cbcrByteSize = (ctx->src_frame->width >> 1) * (ctx->src_frame->height >> 1);
-
-//        unsigned char*  luma = _AllocColorComponents( ctx->src_frame->data[ 0 ], ctx->src_frame->linesize[ 0 ], ctx->src_frame->width, ctx->src_frame->height );
-//        unsigned char*  chroma_b = _AllocColorComponents( ctx->src_frame->data[ 1 ], ctx->src_frame->linesize[ 1 ], ctx->src_frame->width/2, ctx->src_frame->height / 2 );
-//        unsigned char*  chroma_r = _AllocColorComponents( ctx->src_frame->data[ 2 ], ctx->src_frame->linesize[ 2 ], ctx->src_frame->width/2, ctx->src_frame->height / 2 );
-//        memcpy(out_buf, luma, lumaByteSize);
-//        out_buf += lumaByteSize;
-//
-//        memcpy(out_buf, chroma_b, cbcrByteSize);
-//        out_buf += cbcrByteSize;
-//
-//        memcpy(out_buf, chroma_r, cbcrByteSize);
-//        out_buf += cbcrByteSize;
-//
-//        delete [] luma;
-//        delete [] chroma_b;
-//        delete [] chroma_r;
-
+    /**
+     * ffmpeg解码得到的AVFrame里面有data数组和linesize数组，
+     * data[0]是Y平面数据，其大小是linesize[0]，
+     * data[1]是U,大小linesize[1]，
+     * data[2]是V平面数据大小linesize[2]，
+     * **/
+    _CopyColorComponents((unsigned char*)out_ybuf, ctx->src_frame->data[0], ctx->src_frame->linesize[0], ctx->src_frame->width, ctx->src_frame->height);
+    _CopyColorComponents((unsigned char*)out_ubuf, ctx->src_frame->data[1], ctx->src_frame->linesize[1], ctx->src_frame->width / 2, ctx->src_frame->height / 2);
+    _CopyColorComponents((unsigned char*)out_vbuf, ctx->src_frame->data[2], ctx->src_frame->linesize[2], ctx->src_frame->width / 2, ctx->src_frame->height / 2);
+        /*
         //写入Y数据
         memcpy(out_buf, ctx->src_frame->data[0], ctx->codec_ctx->height * ctx->src_frame->linesize[0]);
         out_buf += ctx->codec_ctx->height * ctx->src_frame->linesize[0];
@@ -311,7 +323,7 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
         //写入V数据
         memcpy(out_buf, ctx->src_frame->data[2], ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[2]);
         out_buf += ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[2];
-
+        */
 //        LOGD(TAG, "write yuv to out_buf 0x%x", out_buf);
 //        char path[2048] = {0};
 //        sprintf(path, "%s/%d.yuv420p", ctx->external_dir, ctx->total_decode_frame);
@@ -324,60 +336,30 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_buffer) {
 //                     path);
 
 //        LOGD(TAG, "写入yuv完毕 out_buf_end=%x, out_buf=%x", out_buf_end, out_buf);
-    } else {
-        if (ctx->convert_ctx == NULL) {
-            ctx->convert_ctx = sws_getContext(ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->codec_ctx->pix_fmt,
-                                              ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->color_format, SWS_FAST_BILINEAR, NULL, NULL, NULL);//SWS_BILINEAR SWS_FAST_BILINEAR
-        }
-        avpicture_fill((AVPicture*)ctx->dst_frame, (uint8_t*)out_buf, ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
-//        LOGD(TAG, "width:%d, height:%d, src pix_fmt:%d ,dst pix_fmt:%d, pic_buf_size:%d, out_buf_len:%d", ctx->codec_ctx->width, ctx->codec_ctx->height, ctx->codec_ctx->pix_fmt, ctx->color_format, pic_buf_size, out_buf_len);
-//        LOGD(TAG, "ctx->src_frame->linesize[0]: %d", ctx->src_frame->linesize[0]);
-//        LOGD(TAG, "ctx->src_frame->linesize[1]: %d", ctx->src_frame->linesize[1]);
-//        LOGD(TAG, "ctx->src_frame->linesize[2]: %d", ctx->src_frame->linesize[2]);
-//        LOGD(TAG, "ctx->src_frame->data[0] addr:%x", ctx->src_frame->data[0]);
-//        LOGD(TAG, "ctx->src_frame->data[1] addr:%x", ctx->src_frame->data[1]);
-//        LOGD(TAG, "ctx->src_frame->data[2] addr:%x", ctx->src_frame->data[2]);
-//
-//        LOGD(TAG, "ctx->dst_frame->linesize[0]: %d", ctx->dst_frame->linesize[0]);
-//        LOGD(TAG, "ctx->dst_frame->data[0] addr:%x", ctx->dst_frame->data[0]);
-//        LOGD(TAG, "                out_buf addr:%x ", out_buf);
-
-        sws_scale(ctx->convert_ctx, (const uint8_t **)ctx->src_frame->data, ctx->src_frame->linesize, 0, ctx->codec_ctx->height, ctx->dst_frame->data, ctx->dst_frame->linesize);
-    }
 
     av_frame_unref(ctx->src_frame);
-
     ctx->frame_ready = 0;
 
-    if (ctx->src_frame->pkt_pts == AV_NOPTS_VALUE) {
+//    if (ctx->src_frame->pkt_pts == AV_NOPTS_VALUE) {
 //        D("No PTS was passed from avcodec_decode!");
-    }
+//    }
 
     return ctx->src_frame->pkt_pts;
 }
 
-unsigned char* _AllocColorComponents( unsigned char* src, int linesize, int width, int height )
+int _CopyColorComponents( unsigned char* dst, unsigned char* src, int linesize, int width, int height)
 {
-    unsigned char* desttmp = NULL;
-    unsigned char* dest = NULL;
-
     if( width > linesize )
     {
         width = linesize;
     }
-    desttmp = new unsigned char[ width * height ];
-    if( desttmp != NULL )
+    int i = 0;
+    for( i = 0; i < height; i++ )
     {
-        int i = 0;
-        dest = desttmp;
-        for( i = 0; i < height; i++ )
-        {
-            memcpy( dest, src, width );
+        memcpy( dst, src, width );
 
-            dest += width;
-            src += linesize;
-        }
+        dst += width;
+        src += linesize;
     }
-
-    return desttmp;
+    return 0;
 }

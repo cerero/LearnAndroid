@@ -243,7 +243,9 @@ public class MediaContentProducer {
 
 	private H264SoftDecoder mH264SoftDecoder;
 	private ByteBuffer mVideoSoftDecodeInputBuffer;
-    private ByteBuffer mVideoSoftDecodeOutBuffer;
+	private ByteBuffer mYDecodeOutBuffer;
+	private ByteBuffer mUDecodeOutBuffer;
+	private ByteBuffer mVDecodeOutBuffer;
 
 	private MediaCodec mVideoMediaCodec;
 	private MediaCodec.BufferInfo mVideoBufferInfo;
@@ -1095,7 +1097,7 @@ public class MediaContentProducer {
                 } else { // decoderStatus >= 0
                     doRender = false;
                     if (mVideoBufferInfo.size > 0) {
-                        doRender = !internalWriteVideo(mVideoOutputBuffers[decoderStatus], 0, mVideoBufferInfo.size, mVideoBufferInfo.presentationTimeUs);
+                        doRender = !internalWriteVideo(mVideoOutputBuffers[decoderStatus], null, null, 0, mVideoBufferInfo.size, mVideoBufferInfo.presentationTimeUs);
 
                         if (doRender) {
                             if (frameCallback == null || !frameCallback.onFrameAvailable(mVideoBufferInfo.presentationTimeUs))
@@ -1119,15 +1121,28 @@ public class MediaContentProducer {
 				doRender = false;
 				if (output_size > 0) {
 					//取出软解后的yuv
-					if (mVideoSoftDecodeOutBuffer == null) {
-						Log.d(TAG, "allocate mVideoSoftDecodeOutBuffer size:" + output_size + "byte");
-						mVideoSoftDecodeOutBuffer = ByteBuffer.allocateDirect(output_size);
+					if (mYDecodeOutBuffer == null) {
+						Log.d(TAG, "allocate SoftDecodeOutBuffer size:" + output_size + "byte");
+//						mYDecodeOutBuffer = ByteBuffer.allocateDirect(output_size/2);
+//						mUDecodeOutBuffer = ByteBuffer.allocateDirect(output_size/4);
+//						mVDecodeOutBuffer = ByteBuffer.allocateDirect(output_size/4);
+						int ySize = mVideoWidth * mVideoHeight;
+						int uvSize = ySize / 4;
+						mYDecodeOutBuffer = ByteBuffer.allocateDirect(ySize);
+						mUDecodeOutBuffer = ByteBuffer.allocateDirect(uvSize);
+						mVDecodeOutBuffer = ByteBuffer.allocateDirect(uvSize);
 					}
 
 					if (mH264SoftDecoder.isFrameReady()) {
-						mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer);
+						mH264SoftDecoder.decodeFrameToDirectBuffer(mYDecodeOutBuffer, mUDecodeOutBuffer, mVDecodeOutBuffer);
 
-						doRender = !internalWriteVideo(mVideoSoftDecodeOutBuffer, 0, output_size, pts);
+						mYDecodeOutBuffer.position(0);
+						mUDecodeOutBuffer.position(0);
+						mVDecodeOutBuffer.position(0);
+//						long decode_info[] = {0, 0, 0, 0};
+//						mH264SoftDecoder.getWriteInfoAfterDecode(decode_info);
+//						if (DEBUG) Log.d(TAG, "decode_info:" + decode_info.toString());
+						doRender = !internalWriteVideo(mYDecodeOutBuffer, mUDecodeOutBuffer, mVDecodeOutBuffer, 0, output_size, pts);
 					}
 				}
 
@@ -1153,10 +1168,10 @@ public class MediaContentProducer {
 	 * @param presentationTimeUs
 	 * @return if return false, automatically adjust frame rate
 	 */
-	protected boolean internalWriteVideo(final ByteBuffer buffer, final int offset, final int size, final long presentationTimeUs) {
+	protected boolean internalWriteVideo(final ByteBuffer ybuffer, final ByteBuffer ubuffer, final ByteBuffer vbuffer, final int offset, final int size, final long presentationTimeUs) {
 //		if (DEBUG) Log.v(TAG, "internalWriteVideo");
 		if (!mCanHardDecodeH264) {
-			mVideoConsumer.onYUVData(buffer, mVideoWidth, mVideoHeight);
+			mVideoConsumer.onYUVData(ybuffer, ubuffer, vbuffer, mVideoWidth, mVideoHeight);
 		}
 		return false;
 	}
@@ -1400,7 +1415,7 @@ public class MediaContentProducer {
 
 
         mVideoSoftDecodeInputBuffer = null;
-        mVideoSoftDecodeOutBuffer = null;
+		mYDecodeOutBuffer = mUDecodeOutBuffer = mVDecodeOutBuffer = null;
 
         mVideoBufferInfo = mAudioBufferInfo = null;
         mVideoInputBuffers = mVideoOutputBuffers = null;

@@ -50,7 +50,7 @@ public class CodecSupportCheck {
                             }
                         }
                     } else {
-                        ret = true;
+                        ret = false;
                     }
                 }
             }catch (Exception e){

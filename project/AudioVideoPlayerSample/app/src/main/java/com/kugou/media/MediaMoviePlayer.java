@@ -1003,7 +1003,7 @@ public class MediaMoviePlayer {
 					}
 
 					if (mH264SoftDecoder.isFrameReady()) {
-						mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer);
+//						mH264SoftDecoder.decodeFrameToDirectBuffer(mVideoSoftDecodeOutBuffer);
 						if (mYUVReceiver != null) {
 							mYUVReceiver.onYUVData(mVideoSoftDecodeOutBuffer, mVideoWidth, mVideoHeight, output_size);
 						}

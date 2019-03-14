@@ -106,12 +106,13 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+//        Log.d(TAG, "onDrawFrame");
         clearScreen();
 
-        if (triggerRelease) {
-            doRelease();
-            return;
-        }
+//        if (triggerRelease) {
+//            doRelease();
+//            return;
+//        }
 
         if (!hasInit && hasChoseMode && hasSurfaceCreate) {
             initRenderStuff();
@@ -230,7 +231,8 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     }
 
     @Override
-    public void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight) {
+//    public void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight) {
+    public void onYUVData(ByteBuffer yData, ByteBuffer uData, ByteBuffer vData, int frameWidth, int frameHeight) {
 //        Log.d(TAG, "onYUVData width=" + frameWidth + ", height=" + frameHeight);
         //软解时用于接收解码后的yuv数据，该方法在解码线程中执行
         synchronized (locker) {
@@ -243,23 +245,10 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
                 mResolution = mYWidth * mYHeight;
                 mUorVResolution = mResolution >> 2;
-
-                Log.d(TAG, "allocak yuv cache data: " + (mResolution + mUorVResolution + mUorVResolution) + " byte");
-
-                mYBuffer = ByteBuffer.allocateDirect(mResolution);
-                mYBuffer.order(yuvData.order());
-
-                mUBuffer = ByteBuffer.allocateDirect(mUorVResolution);
-                mUBuffer.order(yuvData.order());
-
-                mVBuffer = ByteBuffer.allocateDirect(mUorVResolution);
-                mVBuffer.order(yuvData.order());
             }
-
-            mYBuffer.put(yuvData.array(), 0, mResolution).flip();
-            mUBuffer.put(yuvData.array(), mResolution, mUorVResolution).flip();
-            mVBuffer.put(yuvData.array(), mResolution + mUorVResolution, mUorVResolution).flip();
-
+            mYBuffer = yData;
+            mUBuffer = uData;
+            mVBuffer = vData;
             mSurfacdeView.requestRender();
 
 //            try {
@@ -328,7 +317,8 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     public void release() {
         synchronized (locker) {
             triggerRelease = true;
-            mSurfacdeView.requestRender();
+            doRelease();
+//            mSurfacdeView.requestRender();
         }
     }
 

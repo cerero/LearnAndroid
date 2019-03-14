@@ -1,6 +1,8 @@
 package com.kugou.media;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.ViewGroup;
 
@@ -18,7 +20,7 @@ public class GiftMp4Player implements IMP4Player {
     private Object mLock = new Object();
     private EventCallBack mCallBack;
     private ViewGroup mParent;
-    private Activity mActivity;
+    private Handler handler = new Handler(Looper.getMainLooper());
     private String mLocalMp4ResPath;
     private MP4GLSurfaceView mGLSurfaceView;
     private MP4GLRender mGLRender;
@@ -27,7 +29,6 @@ public class GiftMp4Player implements IMP4Player {
 
     public GiftMp4Player(ViewGroup parent){
         this.mParent = parent;
-        this.mActivity = (Activity) mParent.getContext();
         initGLSurfaceView();
         initContentProducer();
     }
@@ -37,15 +38,12 @@ public class GiftMp4Player implements IMP4Player {
         mGLRender = new MP4GLRender(mGLSurfaceView, new IErrorReceiver() {
             @Override
             public void onError(int code, String desc) {
-                if (mActivity != null && !mActivity.isFinishing()) {
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mCallBack.onErrorOccur(code, desc);
-                        }
-                    });
-                }
-
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCallBack.onErrorOccur(code, desc);
+                    }
+                });
             }
         });
         mGLSurfaceView.setRenderer(mGLRender);
@@ -101,14 +99,12 @@ public class GiftMp4Player implements IMP4Player {
         }, new IErrorReceiver() {
             @Override
             public void onError(int code, String desc) {
-                if (mActivity != null && !mActivity.isFinishing()) {
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mCallBack.onErrorOccur(code, desc);
-                        }
-                    });
-                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCallBack.onErrorOccur(code, desc);
+                    }
+                });
             }
         });
     }
@@ -121,18 +117,16 @@ public class GiftMp4Player implements IMP4Player {
             //外部已经是finishing状态了，直接直接切换到 finished状态
             mContentProducer.stop();
         } else {
-            if (mActivity != null && !mActivity.isFinishing()) {
-                mActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        synchronized (mLock) {
-                            if (mInnerStatus > mOuterStatus) {
-                                mCallBack.onStatusChange(mInnerStatus);
-                            }
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (mLock) {
+                        if (mInnerStatus > mOuterStatus) {
+                            mCallBack.onStatusChange(mInnerStatus);
                         }
                     }
-                });
-            }
+                }
+            });
         }
     }
 
@@ -249,10 +243,12 @@ public class GiftMp4Player implements IMP4Player {
     @Override
     public void release() {
         synchronized (mLock) {
+            mParent.removeView(mGLSurfaceView);
             destroyContentProducer();
             mCallBack = null;
             mGLSurfaceView = null;
             mCallBack = null;
+            mParent = null;
         }
     }
 }

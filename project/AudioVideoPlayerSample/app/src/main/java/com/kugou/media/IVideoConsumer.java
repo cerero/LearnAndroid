@@ -11,7 +11,7 @@ public interface IVideoConsumer {
     void choseRenderMode(int mode);
 
     /**软解的yuv数据回调**/
-    void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight);
+    void onYUVData(ByteBuffer yData, ByteBuffer uData, ByteBuffer vData, int frameWidth, int frameHeight);
 
     void onTextureInfo(int imgWidth, int imgHeight);
     /**没数据可以渲染了**/
