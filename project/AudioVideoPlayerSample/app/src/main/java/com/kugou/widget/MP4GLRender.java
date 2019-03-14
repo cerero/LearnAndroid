@@ -180,13 +180,15 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
         //创建硬解用的
         int[] compileRet = {-1, -1};
         int shaderProgram = 0;
-
+        Boolean hasError = false;
         shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, GLDrawer2D.fss, compileRet);
         if (compileRet[0] != 0) {
             Log.e(TAG, "硬解 vertext shader编译失败");
+            hasError = true;
             mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_SHADER_FAIL, "硬解 vertext shader编译失败");
         } else if (compileRet[1] != 0) {
             Log.e(TAG, "硬解 fragment shader编译失败");
+            hasError = true;
             mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_SHADER_FAIL, "硬解 fragment shader编译失败");
         }
         mHardDecodeFrame = new GLDrawer2D(true, shaderProgram);
@@ -195,10 +197,18 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
         shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, GLDrawer2D.yuvFSS, compileRet);
         if (compileRet[0] != 0) {
             Log.e(TAG, "软解 vertext shader编译失败");
+            hasError = true;
             mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_SHADER_FAIL, "软解 vertext shader编译失败");
         } else if (compileRet[1] != 0) {
             Log.e(TAG, "软解 fragment shader编译失败");
+            hasError = true;
             mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_SHADER_FAIL, "软解 fragment shader编译失败");
+        }
+
+        if (hasError) {//shader错误，不继续执行
+            hasInit = false;
+            hasChoseMode = false;
+            return;
         }
         mSoftDecodeFrame = new GLDrawer2D(false, shaderProgram);
 

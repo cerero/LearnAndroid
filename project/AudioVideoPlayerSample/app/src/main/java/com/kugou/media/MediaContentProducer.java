@@ -286,13 +286,13 @@ public class MediaContentProducer {
 		public void uncaughtException(Thread th, Throwable ex) {
 			Log.e(TAG, String.format("Thread(%s) uncaught exception:%s", th.getName(), ex.toString()));
 			ex.printStackTrace();
-			if (th.getName() == TAG_VIDEO_TASK) {
-				mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_DECODE_ERROR, ex.toString());
-			} else if (th.getName() == TAG_AUDIO_TASK) {
-
-			}  else if (th.getName() == TAG_PLAYER_TASK) {
-				mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_DECODE_ERROR, ex.toString());
-			}
+//			if (th.getName() == TAG_VIDEO_TASK) {
+//				mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_DECODE_ERROR, ex.toString());
+//			} else if (th.getName() == TAG_AUDIO_TASK) {
+//
+//			}  else if (th.getName() == TAG_PLAYER_TASK) {
+//				mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_DECODE_ERROR, ex.toString());
+//			}
 		}
 	};
 
@@ -340,11 +340,12 @@ public class MediaContentProducer {
 							}
 						}
 					} catch (final InterruptedException e) {
-						break;
+						//继续执行
+						if (DEBUG) Log.e(TAG, "MoviePlayerTask:", e);
 					} catch (final Exception e) {
-						Log.e(TAG, "MoviePlayerTask:", e);
+						if (DEBUG) Log.e(TAG, "MoviePlayerTask:", e);
 						mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_CODEC_ERROR, e.toString());
-						break;
+						handleStop();
 					}
 				} // end while (local_isRunning)
 			} finally {
@@ -378,7 +379,11 @@ public class MediaContentProducer {
 			        }
 				} catch (final Exception e) {
 					Log.e(TAG, "VideoTask:", e);
-					break;
+					synchronized (mVideoTask) {//发生错误，停止解码
+						mVideoInputDone = mVideoOutputDone = true;
+						mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_DECODE_ERROR, e.toString());
+						mVideoTask.notifyAll();
+					}
 				}
 			} // end of for
 			if (DEBUG) Log.v(TAG, "VideoTask:finished");
@@ -646,8 +651,7 @@ public class MediaContentProducer {
 			throw new RuntimeException("No video and audio track found in " + source_file);
 		}
 
-//		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
-		mCanHardDecodeH264 = false;
+		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
 		mVideoConsumer.choseRenderMode(mCanHardDecodeH264 ? 1 : 2);
 
 		if (mCanHardDecodeH264) {
@@ -756,6 +760,7 @@ public class MediaContentProducer {
 		return trackIndex;
 	}
 
+//	private int ind = 0;
 	/**prepare 或 finishing状态下调用
 	 * 创建解码器/启动视频与音频线程
 	 * **/
@@ -786,8 +791,12 @@ public class MediaContentProducer {
 		if (mVideoTrackIndex >= 0) {
 		    if (mCanHardDecodeH264) {
 		    	if (mVideoMediaCodec == null) {
-					final MediaCodec codec = internalStartVideo(mVideoMediaExtractor, mVideoTrackIndex);
+					MediaCodec codec = internalStartVideo(mVideoMediaExtractor, mVideoTrackIndex);
 					if (codec != null) {
+//						if (ind % 2 == 0) {
+//							codec = null;
+//						}
+//						ind++;
 						mVideoMediaCodec = codec;
 						mVideoBufferInfo = new MediaCodec.BufferInfo();
 						mVideoInputBuffers = codec.getInputBuffers();

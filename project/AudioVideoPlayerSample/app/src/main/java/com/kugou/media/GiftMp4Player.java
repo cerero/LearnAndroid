@@ -38,12 +38,7 @@ public class GiftMp4Player implements IMP4Player {
         mGLRender = new MP4GLRender(mGLSurfaceView, new IErrorReceiver() {
             @Override
             public void onError(int code, String desc) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mCallBack.onErrorOccur(code, desc);
-                    }
-                });
+                onErrorOccur(code, desc);
             }
         });
         mGLSurfaceView.setRenderer(mGLRender);
@@ -99,18 +94,26 @@ public class GiftMp4Player implements IMP4Player {
         }, new IErrorReceiver() {
             @Override
             public void onError(int code, String desc) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mCallBack.onErrorOccur(code, desc);
-                    }
-                });
+                onErrorOccur(code, desc);
             }
         });
     }
 
+    private void onErrorOccur(int errorId, String desc) {
+        if (mCallBack != null) {
+            IMP4Player.EventCallBack tmpCallBack = mCallBack;
+            mCallBack = null;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    tmpCallBack.onErrorOccur(errorId, desc);
+                }
+            });
+        }
+    }
+
     private void notifyExternalStatus() {
-        if (mContentProducer == null)
+        if (mContentProducer == null || mCallBack == null)
             return;
 
         if (mInnerStatus == EventCallBack.STATE_FINISHING && mOuterStatus == EventCallBack.STATE_FINISHING) {
