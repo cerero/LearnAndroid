@@ -8,6 +8,8 @@ import android.opengl.EGLSurface;
 import android.util.Log;
 import android.view.Surface;
 
+import com.kugou.util.LogWrapper;
+
 public class EGLBase {
 	private static final boolean DEBUG = false;	// TODO set false on release
 	private static final String TAG = "EGLBase";
@@ -23,7 +25,7 @@ public class EGLBase {
 		private EGLSurface mEglSurface = EGL14.EGL_NO_SURFACE;
 
 		EglSurface(EGLBase egl, Surface surface) {
-			if (DEBUG) Log.i(TAG, "EglSurface:");
+			 LogWrapper.LOGI(TAG, "EglSurface:");
 			mEgl = egl;
 			mEglSurface = mEgl.createWindowSurface(surface);
 		}
@@ -37,19 +39,19 @@ public class EGLBase {
 		}
 
 		public void release() {
-			if (DEBUG) Log.i(TAG, "EglSurface:release:");
+			 LogWrapper.LOGI(TAG, "EglSurface:release:");
 			mEgl.destroyWindowSurface(mEglSurface);
 	        mEglSurface = EGL14.EGL_NO_SURFACE;
 		}
 	}
 
 	public EGLBase(EGLContext shared_context, boolean with_depth_buffer) {
-		if (DEBUG) Log.i(TAG, "EGLBase:");
+		LogWrapper.LOGI(TAG, "EGLBase:");
 		init(shared_context, with_depth_buffer);
 	}
 
     public void release() {
-		if (DEBUG) Log.v(TAG, "release:");
+		LogWrapper.LOGV(TAG, "release:");
         if (mEglDisplay != EGL14.EGL_NO_DISPLAY) {
 	    	destroyContext();
 	        EGL14.eglTerminate(mEglDisplay);
@@ -60,13 +62,13 @@ public class EGLBase {
     }
 
 	public EglSurface createFromSurface(Surface surface) {
-		if (DEBUG) Log.i(TAG, "createFromSurface:");
+		LogWrapper.LOGI(TAG, "createFromSurface:");
 		final EglSurface eglSurface = new EglSurface(this, surface);
 		return eglSurface;
 	}
 
 	private void init(EGLContext shared_context, boolean with_depth_buffer) {
-		if (DEBUG) Log.v(TAG, "init:");
+		LogWrapper.LOGV(TAG, "init:");
         if (mEglDisplay != EGL14.EGL_NO_DISPLAY) {
             throw new RuntimeException("EGL already set up");
         }
@@ -94,7 +96,7 @@ public class EGLBase {
         // confirm whether the EGL rendering context is successfully created
         final int[] values = new int[1];
         EGL14.eglQueryContext(mEglDisplay, mEglContext, EGL14.EGL_CONTEXT_CLIENT_VERSION, values, 0);
-        if (DEBUG) Log.d(TAG, "EGLContext created, client version " + values[0]);
+        LogWrapper.LOGD(TAG, "EGLContext created, client version " + values[0]);
 	}
 
 	/**
@@ -102,37 +104,37 @@ public class EGLBase {
 	 * @return
 	 */
 	private boolean makeCurrent(EGLSurface surface) {
-		if (DEBUG) Log.v(TAG, "makeCurrent:");
+		LogWrapper.LOGV(TAG, "makeCurrent:");
         if (mEglDisplay == null) {
-            if (DEBUG) Log.d(TAG, "makeCurrent:eglDisplay not initialized");
+            LogWrapper.LOGD(TAG, "makeCurrent:eglDisplay not initialized");
         }
         if (surface == null || surface == EGL14.EGL_NO_SURFACE) {
             int error = EGL14.eglGetError();
             if (error == EGL14.EGL_BAD_NATIVE_WINDOW) {
-                Log.e(TAG, "makeCurrent:returned EGL_BAD_NATIVE_WINDOW.");
+                LogWrapper.LOGE(TAG, "makeCurrent:returned EGL_BAD_NATIVE_WINDOW.");
             }
             return false;
         }
         // attach EGL renderring context to specific EGL window surface
         if (!EGL14.eglMakeCurrent(mEglDisplay, surface, surface, mEglContext)) {
-            Log.w("TAG", "eglMakeCurrent" + EGL14.eglGetError());
+            LogWrapper.LOGW("TAG", "eglMakeCurrent" + EGL14.eglGetError());
             return false;
         }
         return true;
 	}
 
 	private int swap(EGLSurface surface) {
-		if (DEBUG) Log.v(TAG, "swap:");
+		LogWrapper.LOGV(TAG, "swap:");
         if (!EGL14.eglSwapBuffers(mEglDisplay, surface)) {
         	final int err = EGL14.eglGetError();
-        	if (DEBUG) Log.w(TAG, "swap:err=" + err);
+        	 LogWrapper.LOGW(TAG, "swap:err=" + err);
             return err;
         }
         return EGL14.EGL_SUCCESS;
     }
 
     private EGLContext createContext(EGLContext shared_context) {
-		if (DEBUG) Log.v(TAG, "createContext:");
+		LogWrapper.LOGV(TAG, "createContext:");
 
         final int[] attrib_list = {
         	EGL14.EGL_CONTEXT_CLIENT_VERSION, 2,
@@ -144,17 +146,17 @@ public class EGLBase {
     }
 
     private void destroyContext() {
-		if (DEBUG) Log.v(TAG, "destroyContext:");
+		 LogWrapper.LOGV(TAG, "destroyContext:");
 
         if (!EGL14.eglDestroyContext(mEglDisplay, mEglContext)) {
-            Log.e("DefaultContextFactory", "display:" + mEglDisplay + " context: " + mEglContext);
-            Log.e(TAG, "eglDestroyContex:" + EGL14.eglGetError());
+            LogWrapper.LOGE("DefaultContextFactory", "display:" + mEglDisplay + " context: " + mEglContext);
+            LogWrapper.LOGE(TAG, "eglDestroyContex:" + EGL14.eglGetError());
         }
         mEglContext = EGL14.EGL_NO_CONTEXT;
     }
 
     private EGLSurface createWindowSurface(Object nativeWindow) {
-		if (DEBUG) Log.v(TAG, "createWindowSurface:");
+		 LogWrapper.LOGV(TAG, "createWindowSurface:");
 
         final int[] surfaceAttribs = {
                 EGL14.EGL_NONE
@@ -163,13 +165,13 @@ public class EGLBase {
 		try {
 			result = EGL14.eglCreateWindowSurface(mEglDisplay, mEglConfig, nativeWindow, surfaceAttribs, 0);
 		} catch (IllegalArgumentException e) {
-			Log.e(TAG, "eglCreateWindowSurface", e);
+			LogWrapper.LOGE(TAG, "eglCreateWindowSurface", e);
 		}
 		return result;
 	}
 
 	private void destroyWindowSurface(EGLSurface surface) {
-		if (DEBUG) Log.v(TAG, "destroySurface:");
+		 LogWrapper.LOGV(TAG, "destroySurface:");
 
         if (surface != EGL14.EGL_NO_SURFACE) {
         	EGL14.eglMakeCurrent(mEglDisplay,
@@ -203,7 +205,7 @@ public class EGLBase {
         final int[] numConfigs = new int[1];
         if (!EGL14.eglChooseConfig(mEglDisplay, attribList, 0, configs, 0, configs.length, numConfigs, 0)) {
         	// XXX it will be better to fallback to RGB565
-            Log.w(TAG, "unable to find RGBA8888 / " + " EGLConfig");
+            LogWrapper.LOGW(TAG, "unable to find RGBA8888 / " + " EGLConfig");
             return null;
         }
         return configs[0];

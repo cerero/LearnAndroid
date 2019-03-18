@@ -3,7 +3,6 @@ package com.kugou.audiovideoplayersample;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -14,6 +13,7 @@ import android.widget.CompoundButton;
 
 import com.kugou.media.GiftMp4Player;
 import com.kugou.media.IMP4Player;
+import com.kugou.util.LogWrapper;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -55,8 +55,8 @@ public class MainActivity extends Activity {
 
         ViewGroup parentViewGroup = findViewById(R.id.mylayout);
 
-        String localRes1 = createResFromeRaw("gift_640.mp4", R.raw.gift_640);
-        String localRes2 = createResFromeRaw("gift_480.mp4", R.raw.gift_480);
+        String localRes1 = createResFromeRaw("gift_1080.mp4", R.raw.gift_1080);
+        String localRes2 = createResFromeRaw("gift_720.mp4", R.raw.gift_720);
 
         if (mp4Player != null)
             mp4Player.onActivityResume();
@@ -70,20 +70,20 @@ public class MainActivity extends Activity {
 
                 String localRes;
                 if (ind % 2 == 0) {
-                    localRes = localRes1;
+                    localRes = localRes2;
                 } else {
-                    localRes = localRes1;
+                    localRes = localRes2;
                 }
                 ind ++;
                 mp4Player.start(localRes, 1, new IMP4Player.EventCallBack() {
                     @Override
                     public void onErrorOccur(int errorId, String desc) {
-                        Log.e("MainActivity", "onErrorOccur errorId:" + errorId + ", desc:" + desc);
+                        LogWrapper.LOGE("MainActivity", "onErrorOccur errorId:" + errorId + ", desc:" + desc);
                     }
 
                     @Override
                     public void onStatusChange(int status) {
-                        Log.i("MainActivity", "onStatusChange:" + status + "  " + Thread.currentThread().getName());
+                        LogWrapper.LOGI("MainActivity", "onStatusChange:" + status + "  " + Thread.currentThread().getName());
 
                         if (mp4Player != null) {
 //                            if (status == IMP4Player.EventCallBack.STATE_FINISHING) {
@@ -110,7 +110,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {//追加循环次数
                 if (mp4Player != null)
-                    mp4Player.addLoops(1);
+                    mp4Player.addLoops(999);
             }
         });
 

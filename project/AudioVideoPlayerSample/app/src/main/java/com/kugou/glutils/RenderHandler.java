@@ -7,6 +7,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
+import com.kugou.util.LogWrapper;
+
 /**
  * Helper class to drawExternalTex texture to whole view on private thread
  */
@@ -32,7 +34,7 @@ public final class RenderHandler extends Handler {
 	}
 
 	public final void setEglContext(EGLContext shared_context, int tex_id, Surface surface) {
-		if (DEBUG) Log.i(TAG, "RenderHandler:setEglContext:");
+		 LogWrapper.LOGI(TAG, "RenderHandler:setEglContext:");
 		mTexId = tex_id;
 		sendMessage(obtainMessage(MSG_RENDER_SET_GLCONTEXT, new ContextParams(shared_context, surface)));
 	}
@@ -54,7 +56,7 @@ public final class RenderHandler extends Handler {
 	}
 
 	public final void release() {
-		if (DEBUG) Log.i(TAG, "release:");
+		 LogWrapper.LOGI(TAG, "release:");
 		sendEmptyMessage(MSG_RENDER_QUIT);
 	}
 
@@ -79,7 +81,7 @@ public final class RenderHandler extends Handler {
 //********************************************************************************
 //********************************************************************************
 	private RenderHandler(RenderThread thread) {
-		if (DEBUG) Log.i(TAG, "RenderHandler:");
+		 LogWrapper.LOGI(TAG, "RenderHandler:");
 		mThread = thread;
 	}
 
@@ -122,7 +124,7 @@ public final class RenderHandler extends Handler {
 
     	@Override
     	public final void run() {
-            Log.d(TAG, getName() + " started");
+            LogWrapper.LOGD(TAG, getName() + " started");
             Looper.prepare();
             synchronized (mReadyFence) {
                 mHandler = new RenderHandler(this);
@@ -130,7 +132,7 @@ public final class RenderHandler extends Handler {
             }
             Looper.loop();
 
-            Log.d(TAG, getName() + " finishing");
+            LogWrapper.LOGD(TAG, getName() + " finishing");
             release();
             synchronized (mReadyFence) {
                 mHandler = null;
@@ -153,7 +155,7 @@ public final class RenderHandler extends Handler {
     	}
 
     	private final void setEglContext(EGLContext shard_context, Surface surface) {
-    		if (DEBUG) Log.i(TAG, "RenderThread:setEglContext:");
+    		 LogWrapper.LOGI(TAG, "RenderThread:setEglContext:");
     		release();
     		mEgl = new EGLBase(shard_context, false);
     		mInputSurface = mEgl.createFromSurface(surface);
@@ -165,7 +167,7 @@ public final class RenderHandler extends Handler {
     	}
  
     	private void draw(int tex_id, final float[] tex_matrix) {
-    		if (DEBUG) Log.i(TAG, "RenderThread:drawExternalTex");
+    		 LogWrapper.LOGI(TAG, "RenderThread:drawExternalTex");
     		if (tex_id >= 0) {
 	    		mInputSurface.makeCurrent();
 	    		mDrawer.drawExternalTex(tex_id, tex_matrix);

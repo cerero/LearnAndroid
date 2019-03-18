@@ -3,7 +3,6 @@ package com.kugou.util;
 import android.annotation.SuppressLint;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
-import android.util.Log;
 import android.util.Range;
 
 public class CodecSupportCheck {
@@ -44,9 +43,9 @@ public class CodecSupportCheck {
                                 ret = vCap.isSizeSupported(width, height);
 //                                Range<Integer> intWidthRange = vCap.getSupportedWidths();
 //                                Range<Integer> intHeightRange = vCap.getSupportedHeights();
-//                                Log.d("===CodecSupportCheck isSupport===", "width: " + width + ", height: " + height + ", isSupport: " + ret);
-//                                Log.d("===CodecSupportCheck isSupport===", "support widths " + intWidthRange);
-//                                Log.d("===CodecSupportCheck isSupport===", "support height " + intHeightRange);
+//                                LogWrapper.LOGD("===CodecSupportCheck isSupport===", "width: " + width + ", height: " + height + ", isSupport: " + ret);
+//                                LogWrapper.LOGD("===CodecSupportCheck isSupport===", "support widths " + intWidthRange);
+//                                LogWrapper.LOGD("===CodecSupportCheck isSupport===", "support height " + intHeightRange);
                             }
                         }
                     } else {
@@ -54,7 +53,7 @@ public class CodecSupportCheck {
                     }
                 }
             }catch (Exception e){
-//                Log.d("===CodecSupportCheck isSupport===", "Exception:"+e );
+//                LogWrapper.LOGD("===CodecSupportCheck isSupport===", "Exception:"+e );
                 e.printStackTrace();
             }
             finally {

@@ -8,8 +8,8 @@ import java.nio.FloatBuffer;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.util.Log;
 
+import com.kugou.util.LogWrapper;
 import com.kugou.util.MatrixUtils;
 
 /**
@@ -250,11 +250,11 @@ public class GLDrawer2D {
         final int[] tex = new int[1];
         GLES20.glGenTextures(1, tex, 0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tex[0]);
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-		if (DEBUG) Log.v(TAG, "initTex:" + tex[0]);
+		 LogWrapper.LOGV(TAG, "initTex:" + tex[0]);
         return tex[0];
     }
 
@@ -263,7 +263,7 @@ public class GLDrawer2D {
 	 * @return texture ID
 	 */
 	public static int initExternalOESTex() {
-		if (DEBUG) Log.v(TAG, "initExternalOESTex:");
+		 LogWrapper.LOGV(TAG, "initExternalOESTex:");
 		final int[] tex = new int[1];
 		GLES20.glGenTextures(1, tex, 0);
 		GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, tex[0]);
@@ -282,20 +282,20 @@ public class GLDrawer2D {
 	 * delete specific texture
 	 */
 	public static void deleteTex(int hTex) {
-		if (DEBUG) Log.v(TAG, "deleteTex:" + hTex);
+		 LogWrapper.LOGV(TAG, "deleteTex:" + hTex);
 		final int[] tex = new int[] {hTex};
 		GLES20.glDeleteTextures(1, tex, 0);
 	}
 
 	public static int loadShader(String vss, String fss, int[] result) {
-		if (DEBUG) Log.v(TAG, "loadShader:");
+		 LogWrapper.LOGV(TAG, "loadShader:");
 		int vs = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
 		GLES20.glShaderSource(vs, vss);
 		GLES20.glCompileShader(vs);
 		final int[] compiled = new int[1];
 		GLES20.glGetShaderiv(vs, GLES20.GL_COMPILE_STATUS, compiled, 0);
 		if (compiled[0] == 0) {
-			if (DEBUG) Log.e(TAG, "Failed to compile vertex shader:"
+			 LogWrapper.LOGE(TAG, "Failed to compile vertex shader:"
 					+ GLES20.glGetShaderInfoLog(vs));
 			GLES20.glDeleteShader(vs);
 			vs = 0;
@@ -309,7 +309,7 @@ public class GLDrawer2D {
 		GLES20.glCompileShader(fs);
 		GLES20.glGetShaderiv(fs, GLES20.GL_COMPILE_STATUS, compiled, 0);
 		if (compiled[0] == 0) {
-			if (DEBUG) Log.e(TAG, "Failed to compile fragment shader:"
+			 LogWrapper.LOGE(TAG, "Failed to compile fragment shader:"
 					+ GLES20.glGetShaderInfoLog(fs));
 			GLES20.glDeleteShader(fs);
 			fs = 0;

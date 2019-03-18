@@ -1,11 +1,8 @@
 #include <jni.h>
-#include <string>
-#include <cstdint>
+#include <stdint.h>
 #include "h264_soft_decoder.h"
 
 #include "my_log.h"
-#include <cmath>
-
 extern "C" {
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
@@ -47,7 +44,7 @@ public:
         dst_frame = av_frame_alloc();
 
         avcodec_open2(codec_ctx, codec, NULL);
-        LOGD(TAG, "DecoderContext construct 0x%x", this);
+//        LOGD(TAG, "DecoderContext construct 0x%x", this);
     }
 
     AVPixelFormat color_format;
@@ -86,7 +83,7 @@ public:
         if (external_dir)
             delete external_dir;
 
-        LOGD(TAG, "DecoderContext release 0x%x", this);
+//        LOGD(TAG, "DecoderContext release 0x%x", this);
     }
 
     static void set_ctx(JNIEnv *env, jobject thiz, DecoderContext *ctx) {
@@ -103,7 +100,8 @@ public:
 
 };
 
-void nativeInit(JNIEnv* env, jobject thiz, jint color_format);
+//void nativeInit(JNIEnv* env, jobject thiz, jint color_format);
+void nativeInit(JNIEnv* env, jobject thiz, jint color_format, jstring external_path);
 void nativeDestroy(JNIEnv* env, jobject thiz);
 jint consumeNalUnitsFromDirectBuffer(JNIEnv* env, jobject thiz, jobject nal_units, jint num_bytes, jlong pkt_pts);
 jboolean isFrameReady(JNIEnv* env, jobject thiz);
@@ -122,7 +120,7 @@ void h264softdecoder::OnLoad(JNIEnv* env, void* reserved, const char* register_c
     JNINativeMethod nm[9];
 
     nm[0].name = "nativeInit";
-    nm[0].signature = "(I)V";
+    nm[0].signature = "(ILjava/lang/String;)V";
     nm[0].fnPtr = (void *)nativeInit;
 
     nm[1].name = "nativeDestroy";
@@ -188,13 +186,12 @@ static void save_raw_yuv(uint8_t *yBuf, uint8_t *uBuf, uint8_t *vBuf,
 }
 
 
-void nativeInit(JNIEnv* env, jobject thiz, jint color_format) {
+void nativeInit(JNIEnv* env, jobject thiz, jint color_format, jstring external_dir) {
     DecoderContext *ctx = new DecoderContext(color_format);
 
 //    const char* c_external_dir = env->GetStringUTFChars(external_dir, NULL);
 //    ctx->external_dir = (char *)malloc(sizeof(char) * (strlen(c_external_dir) + 1));
 //    strcpy(ctx->external_dir, c_external_dir);
-//    LOGD(TAG, "setting external_dir:%s", ctx->external_dir);
 //    env->ReleaseStringUTFChars(external_dir, c_external_dir);
 
     DecoderContext::set_ctx(env, thiz, ctx);
@@ -298,7 +295,7 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_ybuffer, 
 //    int pic_buf_size = av_image_get_buffer_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height, 0);
     int pic_buf_size = avpicture_get_size(ctx->color_format, ctx->codec_ctx->width, ctx->codec_ctx->height);
     if (total_out_len < pic_buf_size) {
-        LOGE(TAG, "Input buffer size:%ld too small, couldn't decode to direct buffer, need size:%d", total_out_len, pic_buf_size);
+//        LOGE(TAG, "Input buffer size:%ld too small, couldn't decode to direct buffer, need size:%d", total_out_len, pic_buf_size);
         return -1;
     }
 
@@ -328,11 +325,11 @@ jlong decodeFrameToDirectBuffer(JNIEnv* env, jobject thiz, jobject out_ybuffer, 
 //        char path[2048] = {0};
 //        sprintf(path, "%s/%d.yuv420p", ctx->external_dir, ctx->total_decode_frame);
 //        LOGD(TAG, "write to %s", path);
-
-//        save_raw_yuv((uint8_t *)out_buf - ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[2] - ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[1] - ctx->codec_ctx->height * ctx->src_frame->linesize[0],
-//                     (uint8_t *)out_buf - ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[2] - ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[1],
-//                     (uint8_t *)out_buf - ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[2],
-//                     ctx->codec_ctx->height * ctx->src_frame->linesize[0], ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[1], ctx->codec_ctx->height / 2 * ctx->src_frame->linesize[2],
+//
+//        save_raw_yuv((uint8_t *)out_ybuf,
+//                     (uint8_t *)out_ubuf,
+//                     (uint8_t *)out_vbuf,
+//                     out_ybuf_len, out_ubuf_len, out_vbuf_len,
 //                     path);
 
 //        LOGD(TAG, "写入yuv完毕 out_buf_end=%x, out_buf=%x", out_buf_end, out_buf);

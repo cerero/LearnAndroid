@@ -3,7 +3,6 @@ package com.kugou.widget;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.Surface;
 import android.view.ViewGroup;
 
@@ -11,6 +10,7 @@ import com.kugou.glutils.GLDrawer2D;
 import com.kugou.media.IErrorReceiver;
 import com.kugou.media.IMP4Player;
 import com.kugou.media.IVideoConsumer;
+import com.kugou.util.LogWrapper;
 
 import java.nio.ByteBuffer;
 
@@ -80,11 +80,14 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         if (hasSurfaceCreate) { //重新创建的opengl环境，需恢复资源
-            Log.d(TAG, "onSurfaceReCreated");
+            LogWrapper.LOGD(TAG, "onSurfaceReCreated");
         } else { //首次创建的opengl环境
-            Log.d(TAG, "onSurfaceCreated");
+            LogWrapper.LOGD(TAG, "onSurfaceCreated");
             hasSurfaceCreate = true;
         }
+
+        GLES20.glDisable(GLES20.GL_DITHER);
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
 
         if (hasChoseMode) {
             initRenderStuff();
@@ -93,7 +96,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        Log.d(TAG, "onSurfaceChanged width:" + width + ",height:" + height);
+        LogWrapper.LOGD(TAG, "onSurfaceChanged width:" + width + ",height:" + height);
         GLES20.glViewport(0, 0, width, height);
         if (mViewWidth != width || mViewHeight != height) {
             mViewWidth = width;
@@ -106,7 +109,6 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-//        Log.d(TAG, "onDrawFrame");
         clearScreen();
 
 //        if (triggerRelease) {
@@ -167,7 +169,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void choseRenderMode(int mode) {
-        Log.d(TAG, "choseRenderMode mode:" + mode);
+        LogWrapper.LOGD(TAG, "choseRenderMode mode:" + mode);
         mRenderMode = mode;
         hasChoseMode = true;
         isTextureChanged = true;
@@ -176,18 +178,18 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     }
 
     private void initRenderStuff() {
-        Log.d(TAG, "initRenderStuff");
+        LogWrapper.LOGD(TAG, "initRenderStuff");
         //创建硬解用的
         int[] compileRet = {-1, -1};
         int shaderProgram = 0;
         Boolean hasError = false;
         shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, GLDrawer2D.fss, compileRet);
         if (compileRet[0] != 0) {
-            Log.e(TAG, "硬解 vertext shader编译失败");
+            LogWrapper.LOGE(TAG, "硬解 vertext shader编译失败");
             hasError = true;
             mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_SHADER_FAIL, "硬解 vertext shader编译失败");
         } else if (compileRet[1] != 0) {
-            Log.e(TAG, "硬解 fragment shader编译失败");
+            LogWrapper.LOGE(TAG, "硬解 fragment shader编译失败");
             hasError = true;
             mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_SHADER_FAIL, "硬解 fragment shader编译失败");
         }
@@ -196,11 +198,11 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
         //创建软解用的
         shaderProgram = GLDrawer2D.loadShader(GLDrawer2D.vss, GLDrawer2D.yuvFSS, compileRet);
         if (compileRet[0] != 0) {
-            Log.e(TAG, "软解 vertext shader编译失败");
+            LogWrapper.LOGE(TAG, "软解 vertext shader编译失败");
             hasError = true;
             mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_SHADER_FAIL, "软解 vertext shader编译失败");
         } else if (compileRet[1] != 0) {
-            Log.e(TAG, "软解 fragment shader编译失败");
+            LogWrapper.LOGE(TAG, "软解 fragment shader编译失败");
             hasError = true;
             mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_SHADER_FAIL, "软解 fragment shader编译失败");
         }
@@ -243,7 +245,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     @Override
 //    public void onYUVData(ByteBuffer yuvData, int frameWidth, int frameHeight) {
     public void onYUVData(ByteBuffer yData, ByteBuffer uData, ByteBuffer vData, int frameWidth, int frameHeight) {
-//        Log.d(TAG, "onYUVData width=" + frameWidth + ", height=" + frameHeight);
+//        LogWrapper.LOGD(TAG, "onYUVData width=" + frameWidth + ", height=" + frameHeight);
         //软解时用于接收解码后的yuv数据，该方法在解码线程中执行
         synchronized (locker) {
             if (mYBuffer == null) {
@@ -270,7 +272,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void onTextureInfo(int imgWidth, int imgHeight) {
-        Log.d(TAG, "onTextureInfo imgWidth:" + imgWidth + ",imgHeight:" + imgHeight);
+        LogWrapper.LOGD(TAG, "onTextureInfo imgWidth:" + imgWidth + ",imgHeight:" + imgHeight);
         if (mImgWidth != imgWidth || mImgHeight != imgHeight) {
             mImgWidth = imgWidth;
             mImgHeight = imgHeight;
@@ -285,7 +287,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public void end() {
-        Log.d(TAG, "end()");
+        LogWrapper.LOGD(TAG, "end()");
         isEOS = true;
         mSurfacdeView.requestRender();
     }
@@ -296,7 +298,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     }
     @Override
     public void start() {
-        Log.d(TAG, "start()");
+        LogWrapper.LOGD(TAG, "start()");
         isEOS = false;
     }
 
@@ -306,7 +308,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
 
     @Override
     public Surface generateHardWareOutputSurface() {
-        Log.d(TAG, "generateHardWareOutputSurface()");
+        LogWrapper.LOGD(TAG, "generateHardWareOutputSurface()");
         if (mRenderMode == 1) {
             synchronized (locker) {
                 while (mInputSurface == null) {
@@ -333,7 +335,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     }
 
     private void doRelease() {
-        Log.i(TAG, "doRelease opgnelES res");
+        LogWrapper.LOGI(TAG, "doRelease opgnelES res");
         if (mHardDecodeFrame != null) {
             mHardDecodeFrame.release();
             mHardDecodeFrame = null;
