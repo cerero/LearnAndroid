@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
 
         ViewGroup parentViewGroup = findViewById(R.id.mylayout);
 
-        String localRes1 = createResFromeRaw("gift_1080.mp4", R.raw.gift_1080);
+        String localRes1 = createResFromeRaw("gift_750.mp4", R.raw.gift_750);
         String localRes2 = createResFromeRaw("gift_720.mp4", R.raw.gift_720);
 
         if (mp4Player != null)

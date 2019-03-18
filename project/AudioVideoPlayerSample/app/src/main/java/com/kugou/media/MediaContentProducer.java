@@ -1244,6 +1244,7 @@ public class MediaContentProducer {
 						mAudioTask.notifyAll();
 					}
 				}
+				return;
 			}
 		}
 	}
