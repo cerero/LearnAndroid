@@ -755,7 +755,8 @@ public class MediaMoviePlayer {
 			LogWrapper.LOGI(TAG, "nalu type " + mVideoSoftDecodeInputBuffer.get(spsByteLen + 4));
 			LogWrapper.LOGI(TAG, "pps size " + ppsByteLen);
 
-			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_YUV420);
+			softDecoder = new H264SoftDecoder();
+			softDecoder.initColorFormat(H264SoftDecoder.COLOR_FORMAT_YUV420);
 //			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_BGR32);
 			softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, spsByteLen + ppsByteLen, 0);
 

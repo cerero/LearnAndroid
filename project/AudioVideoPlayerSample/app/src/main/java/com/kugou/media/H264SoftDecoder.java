@@ -2,28 +2,54 @@ package com.kugou.media;
 
 import android.os.Environment;
 
+import com.kugou.util.LogWrapper;
+
 import java.io.File;
 import java.nio.ByteBuffer;
 
 public class H264SoftDecoder {
-    static {
-        System.loadLibrary("fdk-aac");
-        System.loadLibrary("mp3lame");
-        System.loadLibrary("x264");
-        System.loadLibrary("rtmp");
-        System.loadLibrary("ffmpeg");
-
-        System.loadLibrary("mini_yuv_decoder");
-    }
+//    static {
+//        System.loadLibrary("fdk-aac");
+//        System.loadLibrary("mp3lame");
+//        System.loadLibrary("x264");
+//        System.loadLibrary("rtmp");
+//        System.loadLibrary("ffmpeg");
+//
+//        System.loadLibrary("mini_yuv_decoder");
+//    }
 
     public static final int COLOR_FORMAT_YUV420 = 0;
     public static final int COLOR_FORMAT_RGB565LE = 1;
     public static final int COLOR_FORMAT_BGR32 = 2;
 
-    public H264SoftDecoder(int colorFormat) {
+    private static boolean hasInitLibrary = false;
+    private static boolean hasInitSuccess = false;
+
+    public H264SoftDecoder() {
+    }
+
+    public boolean initColorFormat(int colorFormat) {
         String external_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "myyuv";
-        nativeInit(colorFormat, external_dir);
-//        nativeInit(colorFormat);
+        if (!hasInitLibrary) {
+            hasInitLibrary = true;
+            hasInitSuccess = true;
+            try {
+                System.loadLibrary("fdk-aac");
+                System.loadLibrary("mp3lame");
+                System.loadLibrary("x264");
+                System.loadLibrary("rtmp");
+                System.loadLibrary("ffmpeg");
+
+                System.loadLibrary("mini_yuv_decoder2");
+            } catch (Exception e) {
+                LogWrapper.LOGE("H264SoftDecoder", e.toString());
+            }
+        }
+
+        if (hasInitSuccess) {
+            nativeInit(colorFormat, external_dir);
+        }
+        return hasInitSuccess;
     }
 
 //    protected void finalize() throws Throwable {

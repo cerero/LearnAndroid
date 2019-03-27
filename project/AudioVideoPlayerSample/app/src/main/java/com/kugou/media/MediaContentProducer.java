@@ -652,6 +652,7 @@ public class MediaContentProducer {
 		}
 
 		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
+		mCanHardDecodeH264 = false;
 		mVideoConsumer.choseRenderMode(mCanHardDecodeH264 ? 1 : 2);
 
 		if (mCanHardDecodeH264) {
@@ -875,9 +876,19 @@ public class MediaContentProducer {
 			mVideoSoftDecodeInputBuffer.put(spsByteBuffer);
 			mVideoSoftDecodeInputBuffer.put(ppsByteBuffer);
 			mVideoSoftDecodeInputBuffer.flip();
-			softDecoder = new H264SoftDecoder(H264SoftDecoder.COLOR_FORMAT_YUV420);
-			softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, mVideoSoftDecodeInputBuffer.limit(), 0);
-			LogWrapper.LOGV(TAG, "internalStartVideoWithSoftDecode:codec started");
+
+			softDecoder = new H264SoftDecoder();
+
+			Boolean initRet = false;//softDecoder.initColorFormat(H264SoftDecoder.COLOR_FORMAT_YUV420);
+			if (initRet) {
+				softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, mVideoSoftDecodeInputBuffer.limit(), 0);
+				LogWrapper.LOGV(TAG, "internalStartVideoWithSoftDecode:codec started");
+			} else {
+				softDecoder = null;
+				LogWrapper.LOGV(TAG, "internalStartVideoWithSoftDecode:codec fail");
+				throw new RuntimeException("internalStartVideoWithSoftDecode:codec fail");
+			}
+
 		}
 		return softDecoder;
 	}
