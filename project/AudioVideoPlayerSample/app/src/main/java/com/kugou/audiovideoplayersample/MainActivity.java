@@ -55,8 +55,9 @@ public class MainActivity extends Activity {
 
         ViewGroup parentViewGroup = findViewById(R.id.mylayout);
 
-        String localRes1 = createResFromeRaw("gift_750.mp4", R.raw.gift_750);
-        String localRes2 = createResFromeRaw("gift_720.mp4", R.raw.gift_720);
+        String localRes1 = createResFromeRaw("data1_720.mp4", R.raw.data1_720);
+        String localRes2 = createResFromeRaw("data2_720.mp4", R.raw.data2_720);
+        String localRes3 = createResFromeRaw("data3_720.mp4", R.raw.data3_720);
 
         if (mp4Player != null)
             mp4Player.onActivityResume();
@@ -69,10 +70,12 @@ public class MainActivity extends Activity {
                     mp4Player = new GiftMp4Player(parentViewGroup);
 
                 String localRes;
-                if (ind % 2 == 0) {
+                if (ind % 3 == 0) {
+                    localRes = localRes1;
+                } else if (ind % 3 == 1) {
                     localRes = localRes2;
                 } else {
-                    localRes = localRes2;
+                    localRes = localRes3;
                 }
                 ind ++;
                 mp4Player.start(localRes, 1, new IMP4Player.EventCallBack() {

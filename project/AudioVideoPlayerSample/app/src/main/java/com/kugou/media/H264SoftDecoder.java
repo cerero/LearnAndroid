@@ -32,7 +32,6 @@ public class H264SoftDecoder {
         String external_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "myyuv";
         if (!hasInitLibrary) {
             hasInitLibrary = true;
-            hasInitSuccess = true;
             try {
                 System.loadLibrary("fdk-aac");
                 System.loadLibrary("mp3lame");
@@ -40,8 +39,10 @@ public class H264SoftDecoder {
                 System.loadLibrary("rtmp");
                 System.loadLibrary("ffmpeg");
 
-                System.loadLibrary("mini_yuv_decoder2");
-            } catch (Exception e) {
+                System.loadLibrary("mini_yuv_decoder");
+                hasInitSuccess = true;
+            } catch (Throwable e) {
+                hasInitSuccess = false;
                 LogWrapper.LOGE("H264SoftDecoder", e.toString());
             }
         }

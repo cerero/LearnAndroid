@@ -342,7 +342,7 @@ public class MediaContentProducer {
 					} catch (final InterruptedException e) {
 						//继续执行
 						LogWrapper.LOGE(TAG, "MoviePlayerTask:", e);
-					} catch (final Exception e) {
+					} catch (final Throwable e) {
 						LogWrapper.LOGE(TAG, "MoviePlayerTask:", e);
 						mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_CODEC_ERROR, e.toString());
 						handleStop();
@@ -879,7 +879,7 @@ public class MediaContentProducer {
 
 			softDecoder = new H264SoftDecoder();
 
-			Boolean initRet = false;//softDecoder.initColorFormat(H264SoftDecoder.COLOR_FORMAT_YUV420);
+			Boolean initRet = softDecoder.initColorFormat(H264SoftDecoder.COLOR_FORMAT_YUV420);
 			if (initRet) {
 				softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, mVideoSoftDecodeInputBuffer.limit(), 0);
 				LogWrapper.LOGV(TAG, "internalStartVideoWithSoftDecode:codec started");
