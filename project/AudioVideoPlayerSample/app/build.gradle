@@ -51,4 +51,8 @@ dependencies {
 		exclude module: 'appcompat-v7'
 	}
 	implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+
+	//单元测试
+    testImplementation 'junit:junit:4.12'
+
 }
