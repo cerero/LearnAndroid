@@ -342,7 +342,7 @@ public class MediaContentProducer {
 					} catch (final InterruptedException e) {
 						//继续执行
 						LogWrapper.LOGE(TAG, "MoviePlayerTask:", e);
-					} catch (final Exception e) {
+					} catch (final Throwable e) {
 						LogWrapper.LOGE(TAG, "MoviePlayerTask:", e);
 						mErrorReceiver.onError(IMP4Player.EventCallBack.ERROR_VIDEO_CODEC_ERROR, e.toString());
 						handleStop();
