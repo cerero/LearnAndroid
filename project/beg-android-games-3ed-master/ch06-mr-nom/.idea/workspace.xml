@@ -2,21 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b2838686-dc45-47fc-8e3f-6057676688de" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/AnimationWithImageViewActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/AnimationWithSurfaceViewActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/opensource/svgaplayer/SVGASurfaceView.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/opensource/svgaplayer/SVGASurfaceViewDrawable.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/AnimationFromAssetsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/AnimationFromAssetsActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/app/src/main/java/com/example/ponycui_home/svgaplayer/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/GLCanvas.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/GLCanvas.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/GLES20Canvas.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/GLES20Canvas.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/UploadedTexture.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/kugou/graphic/glcanvas/UploadedTexture.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/opensource/svgaplayer/SVGAVideoEntity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../../SVGAPlayer-Android/library/src/main/java/com/opensource/svgaplayer/SVGAVideoEntity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../VideoDecoderAndRender/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../VideoDecoderAndRender/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ch07-gl-basics/.idea/caches/gradle_models.ser" beforeDir="false" afterPath="$PROJECT_DIR$/../ch07-gl-basics/.idea/caches/gradle_models.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ch07-gl-basics/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ch07-gl-basics/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/aidehuojian_480.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/chucixindong_480.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/jinlinvshen_480.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/sirenfeiji_480.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/six_480.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/xinfumotianlun_480.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/yueguangzhicheng_480.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/zhenaiyisheng_480.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/java/com/kugou/audiovideoplayersample/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/java/com/kugou/audiovideoplayersample/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/java/com/kugou/media/H264SoftDecoder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/java/com/kugou/media/H264SoftDecoder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/java/com/kugou/media/MediaContentProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/java/com/kugou/media/MediaContentProducer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/gift_1080.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/gift_480.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/gift_640.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/gift_720.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../AudioVideoPlayerSample/app/src/main/res/raw/gift_750.mp4" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,10 +29,10 @@
     <session id="581151387">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="2" />
-          <entry key="project.open.time.0" value="1" />
+          <entry key="project.closed" value="3" />
+          <entry key="project.open.time.0" value="2" />
           <entry key="project.open.time.1" value="1" />
-          <entry key="project.opened" value="2" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -70,7 +71,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/mrnom/World.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="780">
+            <state relative-caret-position="988">
               <caret line="52" column="5" selection-start-line="52" selection-start-column="5" selection-end-line="52" selection-end-column="5" />
             </state>
           </provider>
@@ -79,7 +80,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidAudio.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
+            <state relative-caret-position="133">
               <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
             </state>
           </provider>
@@ -97,8 +98,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidGraphics.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="30" column="5" lean-forward="true" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
+            <state relative-caret-position="304">
+              <caret line="30" column="5" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -106,7 +107,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidFastRenderView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="532">
+            <state relative-caret-position="684">
               <caret line="40" column="41" selection-start-line="40" selection-start-column="30" selection-end-line="40" selection-end-column="41" />
             </state>
           </provider>
@@ -136,6 +137,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -221,15 +224,12 @@
               <item name="com" type="462c0819:PsiDirectoryNode" />
               <item name="badlogic" type="462c0819:PsiDirectoryNode" />
               <item name="androidgames" type="462c0819:PsiDirectoryNode" />
-              <item name="framework" type="462c0819:PsiDirectoryNode" />
-              <item name="impl" type="462c0819:PsiDirectoryNode" />
+              <item name="mrnom" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -264,7 +264,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="161" y="40" width="1627" height="977" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="Captures" order="0" weight="0.25" />
       <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.2901619" />
@@ -297,31 +296,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidFastRenderView.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="532">
-          <caret line="40" column="41" selection-start-line="40" selection-start-column="30" selection-end-line="40" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/mrnom/World.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="780">
+        <state relative-caret-position="988">
           <caret line="52" column="5" selection-start-line="52" selection-start-column="5" selection-end-line="52" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidAudio.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
+        <state relative-caret-position="133">
           <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidGraphics.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="30" column="5" lean-forward="true" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
+        <state relative-caret-position="304">
+          <caret line="30" column="5" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/badlogic/androidgames/framework/impl/AndroidFastRenderView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="684">
+          <caret line="40" column="41" selection-start-line="40" selection-start-column="30" selection-end-line="40" selection-end-column="41" />
         </state>
       </provider>
     </entry>

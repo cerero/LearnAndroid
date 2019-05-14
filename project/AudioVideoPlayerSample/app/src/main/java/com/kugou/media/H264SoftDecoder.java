@@ -40,7 +40,7 @@ public class H264SoftDecoder {
                 System.loadLibrary("rtmp");
                 System.loadLibrary("ffmpeg");
 
-                System.loadLibrary("mini_yuv_decoder2");
+                System.loadLibrary("mini_yuv_decoder");
             } catch (Exception e) {
                 LogWrapper.LOGE("H264SoftDecoder", e.toString());
             }

@@ -652,7 +652,7 @@ public class MediaContentProducer {
 		}
 
 		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
-		mCanHardDecodeH264 = false;
+//		mCanHardDecodeH264 = false;
 		mVideoConsumer.choseRenderMode(mCanHardDecodeH264 ? 1 : 2);
 
 		if (mCanHardDecodeH264) {
@@ -879,7 +879,7 @@ public class MediaContentProducer {
 
 			softDecoder = new H264SoftDecoder();
 
-			Boolean initRet = false;//softDecoder.initColorFormat(H264SoftDecoder.COLOR_FORMAT_YUV420);
+			Boolean initRet = softDecoder.initColorFormat(H264SoftDecoder.COLOR_FORMAT_YUV420);
 			if (initRet) {
 				softDecoder.consumeNalUnitsFromDirectBuffer(mVideoSoftDecodeInputBuffer, mVideoSoftDecodeInputBuffer.limit(), 0);
 				LogWrapper.LOGV(TAG, "internalStartVideoWithSoftDecode:codec started");
