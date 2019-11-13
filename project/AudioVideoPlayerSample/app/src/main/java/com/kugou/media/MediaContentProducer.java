@@ -351,11 +351,9 @@ public class MediaContentProducer {
 			} finally {
 				LogWrapper.LOGV(TAG, "player task finished, local_isRunning=" + local_isRunning);
 				handleStop();
-				if (mVideoConsumer != null) {
-					mVideoConsumer.release();
-					mVideoConsumer = null;
-				}
+				mVideoConsumer.release();
 				mCallback = null;
+				mVideoConsumer = null;
 				mAudioConsumer = null;
 				mErrorReceiver = null;
 			}
@@ -391,6 +389,7 @@ public class MediaContentProducer {
 			LogWrapper.LOGV(TAG, "VideoTask:finished");
 			synchronized (mVideoTask) {
 				mVideoInputDone = mVideoOutputDone = true;
+				mVideoConsumer.end();
 				mVideoTask.notifyAll();
 			}
 
@@ -653,6 +652,7 @@ public class MediaContentProducer {
 		}
 
 		mCanHardDecodeH264 = CodecSupportCheck.isSupportH264(mVideoWidth, mVideoHeight);
+//		mCanHardDecodeH264 = false;
 		mVideoConsumer.choseRenderMode(mCanHardDecodeH264 ? 1 : 2);
 
 		if (mCanHardDecodeH264) {
@@ -1404,7 +1404,7 @@ public class MediaContentProducer {
     		}
 			mAudioOutputDone = mAudioInputDone = true;
     	}
-		LogWrapper.LOGV(TAG, "handleStop() release all thing");
+
     	try {
 			if (mVideoMediaCodec != null) {
 				mVideoMediaCodec.stop();
@@ -1451,9 +1451,6 @@ public class MediaContentProducer {
 
 	protected void internalStopVideo() {
 		 LogWrapper.LOGV(TAG, "internalStopVideo:");
-		 if (mVideoConsumer != null) {
-			 mVideoConsumer.end();
-		 }
 	}
 
 	protected void internalStopAudio() {

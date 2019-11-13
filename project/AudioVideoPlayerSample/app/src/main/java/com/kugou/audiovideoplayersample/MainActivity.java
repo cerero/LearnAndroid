@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import com.kugou.fanxing.allinone.base.fasecurity.SecurityUtil;
 import com.kugou.media.GiftMp4Player;
 import com.kugou.media.IMP4Player;
 import com.kugou.util.LogWrapper;
@@ -20,7 +19,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends Activity {
 
@@ -31,34 +29,6 @@ public class MainActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.test_main);
-
-        SecurityUtil securityUtil = new SecurityUtil();
-        String plainTxt = "这是一个hellokugou,明文来的";
-        byte[] plainBytes = null;
-        try {
-            plainBytes = plainTxt.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        byte[] secreteBytes = securityUtil.encrypt(plainBytes);
-        if (secreteBytes != null) {
-            byte[] deBytes = securityUtil.decrypt(secreteBytes);
-            if (deBytes != null) {
-                System.out.println("plainBytes=" + plainBytes);
-                System.out.println("deBytes=" + deBytes);
-                try {
-                    String deTxt = new String(deBytes, "UTF-8");
-
-
-                    System.out.println("plainTxt=" + plainTxt);
-                    System.out.println("deTxt=" + deTxt);
-
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 	}
 
 	private final void prepareSampleMovie(File path, int rawId) throws IOException {
@@ -77,23 +47,36 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	private boolean use720p = true;
     private GiftMp4Player mp4Player;
     private int ind = 0;
     @Override
     protected void onResume() {
         super.onResume();
 
-        final ViewGroup parentViewGroup = findViewById(R.id.mylayout);
+        ViewGroup parentViewGroup = findViewById(R.id.mylayout);
 
-//        String localRes1 = createResFromeRaw("data_chucixindong_640.mp4", R.raw.data_chucixindong_640);
-//        String localRes2 = createResFromeRaw("data_jinlinvshen_740.mp4", R.raw.data_jinlinvshen_740);
-//        String localRes3 = createResFromeRaw("data_sirenfeiji_740.mp4", R.raw.data_sirenfeiji_740);
-//        String localRes4 = createResFromeRaw("data_xinfumotianlun_740.mp4", R.raw.data_xinfumotianlun_740);
+        String resOf720p[] = {
+                createResFromeRaw("six_720.mp4", R.raw.six_720),
+                createResFromeRaw("chucixindong_720.mp4", R.raw.chucixindong_720),
+                createResFromeRaw("motianlun_720.mp4", R.raw.motianlun_720),
+                createResFromeRaw("yueguangzhichen_720.mp4", R.raw.yueguangzhichen_720),
+                createResFromeRaw("aidehuojian_720.mp4", R.raw.aidehuojian_720),
+                createResFromeRaw("zhenaiyisheng_720.mp4", R.raw.zhenaiyisheng_720),
+                createResFromeRaw("sirenfeiji_720.mp4", R.raw.sirenfeiji_720),
+                createResFromeRaw("jinlinvhsen_720.mp4", R.raw.jinlinvhsen_720),
+        };
 
-        String localRes1 = createResFromeRaw("data1_720.mp4", R.raw.data1_720);
-        String localRes2 = createResFromeRaw("data2_720.mp4", R.raw.data2_720);
-        String localRes3 = createResFromeRaw("data3_720.mp4", R.raw.data3_720);
-        final String localRes4 = createResFromeRaw("gift_360.mp4", R.raw.gift_360);
+        String resOf480p[] = {
+                createResFromeRaw("six_480.mp4", R.raw.six_480),
+                createResFromeRaw("chucixindong_480.mp4", R.raw.chucixindong_480),
+                createResFromeRaw("motianlun_480.mp4", R.raw.motianlun_480),
+                createResFromeRaw("yueguangzhichen_480.mp4", R.raw.yueguangzhichen_480),
+                createResFromeRaw("aidehuojian_480.mp4", R.raw.aidehuojian_480),
+                createResFromeRaw("zhenaiyisheng_480.mp4", R.raw.zhenaiyisheng_480),
+                createResFromeRaw("sirenfeiji_480.mp4", R.raw.sirenfeiji_480),
+                createResFromeRaw("jinlinvhsen_480.mp4", R.raw.jinlinvhsen_480),
+        };
 
         if (mp4Player != null)
             mp4Player.onActivityResume();
@@ -105,18 +88,12 @@ public class MainActivity extends Activity {
                 if (mp4Player == null)
                     mp4Player = new GiftMp4Player(parentViewGroup);
 
-                String localRes = localRes4;
-//                if (ind % 4 == 0) {
-//                    localRes = localRes1;
-//                } else if (ind % 4 == 1) {
-//                    localRes = localRes2;
-//                } else if (ind % 4 == 2) {
-//                    localRes = localRes3;
-//                } else {
-//                    localRes = localRes4;
-//                }
-//                ind ++;
-                mp4Player.start(localRes, 1, new IMP4Player.EventCallBack() {
+                String[] locaResArr = use720p ? resOf720p : resOf480p;
+                if (ind >= locaResArr.length) {
+                    ind = 0;
+                }
+
+                mp4Player.start(locaResArr[ind], 1, new IMP4Player.EventCallBack() {
                     @Override
                     public void onErrorOccur(int errorId, String desc) {
                         LogWrapper.LOGE("MainActivity", "onErrorOccur errorId:" + errorId + ", desc:" + desc);
@@ -137,12 +114,14 @@ public class MainActivity extends Activity {
             }
         });
 
-        Button btn_stop = (Button)findViewById(R.id.button_stop);
-        btn_stop.setOnClickListener(new View.OnClickListener() {
+        Button btn_next = (Button)findViewById(R.id.button_next);
+        btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {//点击停止
                 if (mp4Player != null)
                     mp4Player.stop();
+
+                ind++;
             }
         });
 
@@ -161,6 +140,14 @@ public class MainActivity extends Activity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (mp4Player != null)
                     mp4Player.setVisible(isChecked);
+            }
+        });
+
+        CheckBox chk_rate = (CheckBox) findViewById(R.id.checkBox_rate);
+        chk_rate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                use720p = isChecked;
             }
         });
 

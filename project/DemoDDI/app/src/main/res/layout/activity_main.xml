@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/btn_init"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:text="初始化" />
+
+    <Button
+        android:id="@+id/btn_get_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="获取ID" />
+
+
+    <ScrollView
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="80dp"
+        android:scrollbarStyle="insideInset">
+
+        <TextView
+            android:textIsSelectable="true"
+            android:textColor="#ffffff"
+            android:id="@+id/txt_did"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="正在获取唯一ID..." />
+    </ScrollView>
+
+</RelativeLayout>

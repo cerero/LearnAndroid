@@ -30,7 +30,7 @@
         android:text="start" />
 
     <Button
-        android:id="@+id/button_stop"
+        android:id="@+id/button_next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -39,7 +39,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="2dp"
-        android:text="stop" />
+        android:text="NEXT" />
 
     <Button
         android:id="@+id/button_loop"
@@ -49,8 +49,8 @@
         android:layout_marginEnd="13dp"
         android:layout_marginRight="13dp"
         android:layout_marginBottom="0dp"
-        android:layout_toStartOf="@+id/button_stop"
-        android:layout_toLeftOf="@+id/button_stop"
+        android:layout_toStartOf="@+id/button_next"
+        android:layout_toLeftOf="@+id/button_next"
         android:text="loop" />
 
     <CheckBox
@@ -65,6 +65,19 @@
         android:layout_marginBottom="13dp"
         android:checked="true"
         android:text="可见" />
+
+    <CheckBox
+        android:id="@+id/checkBox_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_start"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="343dp"
+        android:layout_marginRight="343dp"
+        android:layout_marginBottom="13dp"
+        android:checked="true"
+        android:text="高清" />
 
     <Button
         android:id="@+id/button_release"
