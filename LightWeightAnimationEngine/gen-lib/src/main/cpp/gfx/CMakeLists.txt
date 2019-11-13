@@ -7,7 +7,7 @@ set(distribution_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../distribution)
 aux_source_directory(. SRC_LIST)
 aux_source_directory(./bullet bullet_SRC_LIST)
 aux_source_directory(./detour detour_SRC_LIST)
-aux_source_directory(./GLES2 GLES2_SRC_LIST)
+#aux_source_directory(./GLES2 GLES2_SRC_LIST)
 aux_source_directory(./nvtristrip nvtristrip_SRC_LIST)
 aux_source_directory(./png png_SRC_LIST)
 aux_source_directory(./recast recast_SRC_LIST)
@@ -15,7 +15,7 @@ aux_source_directory(./ttf ttf_SRC_LIST)
 aux_source_directory(./vorbis vorbis_SRC_LIST)
 aux_source_directory(./zlib zlib_SRC_LIST)
 list(APPEND SRC_LIST
-        ${bullet_SRC_LIST} ${detour_SRC_LIST} ${GLES2_SRC_LIST}
+        ${bullet_SRC_LIST} ${detour_SRC_LIST}
         ${nvtristrip_SRC_LIST} ${png_SRC_LIST} ${recast_SRC_LIST}
         ${ttf_SRC_LIST} ${vorbis_SRC_LIST} ${zlib_SRC_LIST})
 
@@ -52,7 +52,7 @@ target_link_libraries(gfx
 file(COPY . DESTINATION ${distribution_DIR}/gfx FILES_MATCHING PATTERN "*.h")
 file(COPY ./bullet DESTINATION ${distribution_DIR}/gfx FILES_MATCHING PATTERN "*.h")
 file(COPY ./detour DESTINATION ${distribution_DIR}/gfx FILES_MATCHING PATTERN "*.h")
-file(COPY ./GLES2 DESTINATION ${distribution_DIR}/gfx FILES_MATCHING PATTERN "*.h")
+#file(COPY ./GLES2 DESTINATION ${distribution_DIR}/gfx FILES_MATCHING PATTERN "*.h")
 file(COPY ./nvtristrip DESTINATION ${distribution_DIR}/gfx FILES_MATCHING PATTERN "*.h")
 file(COPY ./png DESTINATION ${distribution_DIR}/gfx FILES_MATCHING PATTERN "*.h")
 file(COPY ./recast DESTINATION ${distribution_DIR}/gfx FILES_MATCHING PATTERN "*.h")

@@ -69,9 +69,11 @@ as being the original software.
 	#include <jni.h>
 	#include <android/log.h>
 
+    #define GL_GLEXT_PROTOTYPES
+
 	#include <EGL/egl.h>
-	#include "GLES2/gl2.h"
-	#include "GLES2/gl2ext.h"
+	#include <GLES2/gl2.h>
+	#include <GLES2/gl2ext.h>
 
 	#include "png/png.h"
 
@@ -104,9 +106,9 @@ as being the original software.
 	#include "vorbis/vorbisfile.h"
 
 
-	extern PFNGLBINDVERTEXARRAYOESPROC glBindVertexArrayOES;
-	extern PFNGLGENVERTEXARRAYSOESPROC glGenVertexArraysOES;
-	extern PFNGLDELETEVERTEXARRAYSOESPROC glDeleteVertexArraysOES;
+//	extern PFNGLBINDVERTEXARRAYOESPROC glBindVertexArrayOES;
+//	extern PFNGLGENVERTEXARRAYSOESPROC glGenVertexArraysOES;
+//	extern PFNGLDELETEVERTEXARRAYSOESPROC glDeleteVertexArraysOES;
 
 #endif
 

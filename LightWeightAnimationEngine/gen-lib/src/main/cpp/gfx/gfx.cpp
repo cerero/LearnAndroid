@@ -26,12 +26,12 @@ as being the original software.
 GFX gfx;
 
 
-#ifndef __IPHONE_4_0
-
-	PFNGLBINDVERTEXARRAYOESPROC		glBindVertexArrayOES;
-	PFNGLGENVERTEXARRAYSOESPROC		glGenVertexArraysOES;
-	PFNGLDELETEVERTEXARRAYSOESPROC	glDeleteVertexArraysOES;
-#endif
+//#ifndef __IPHONE_4_0
+//
+//	PFNGLBINDVERTEXARRAYOESPROC		glBindVertexArrayOES;
+//	PFNGLGENVERTEXARRAYSOESPROC		glGenVertexArraysOES;
+//	PFNGLDELETEVERTEXARRAYSOESPROC	glDeleteVertexArraysOES;
+//#endif
 
 
 void GFX_start( void )
@@ -71,12 +71,12 @@ void GFX_start( void )
 	
 	glClear( GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 
-	#ifndef __IPHONE_4_0
-
-		glBindVertexArrayOES 	= ( PFNGLBINDVERTEXARRAYOESPROC    ) eglGetProcAddress("glBindVertexArrayOES"  );
-		glGenVertexArraysOES 	= ( PFNGLGENVERTEXARRAYSOESPROC    ) eglGetProcAddress("glGenVertexArraysOES"  );
-		glDeleteVertexArraysOES = ( PFNGLDELETEVERTEXARRAYSOESPROC ) eglGetProcAddress("glDeleteVertexArraysOES");
-	#endif
+//	#ifndef __IPHONE_4_0
+//
+//		glBindVertexArrayOES 	= ( PFNGLBINDVERTEXARRAYOESPROC    ) eglGetProcAddress("glBindVertexArrayOES"  );
+//		glGenVertexArraysOES 	= ( PFNGLGENVERTEXARRAYSOESPROC    ) eglGetProcAddress("glGenVertexArraysOES"  );
+//		glDeleteVertexArraysOES = ( PFNGLDELETEVERTEXARRAYSOESPROC ) eglGetProcAddress("glDeleteVertexArraysOES");
+//	#endif
 	
 	GFX_set_matrix_mode( TEXTURE_MATRIX );
 	GFX_load_identity();
