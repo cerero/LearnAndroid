@@ -1,20 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-	compileSdkVersion versionCompiler
-	buildToolsVersion versionBuildTool
-	compileOptions {
-		sourceCompatibility javaSourceCompatibility
-		targetCompatibility javaTargetCompatibility
-	}
-
+	compileSdkVersion 26
 	defaultConfig {
 		applicationId "com.kugou.audiovideoplayersample"
 		minSdkVersion 16
-		targetSdkVersion versionTarget
-		versionCode versionCodeNum
-		versionName versionNameString
-
+		targetSdkVersion 26
 		externalNativeBuild {
 			cmake {
 				cppFlags "-std=c++11"
@@ -25,7 +16,6 @@ android {
 			abiFilters 'armeabi-v7a'
 		}
 	}
-
 	buildTypes {
 		debug {
 			debuggable true
@@ -34,25 +24,23 @@ android {
 			minifyEnabled false
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
 		}
-    }
-
+	}
 	externalNativeBuild {
 		cmake {
 			path "src/main/cpp/CMakeLists.txt"
 		}
 	}
+	productFlavors {
+	}
 }
 
 dependencies {
-	implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-	implementation ("com.android.support:design:${supportLibVersion}") {
+	implementation fileTree(include: ['*.jar'], dir: 'libs')
+	implementation("com.android.support:design:26+") {
 		exclude module: 'support-v4'
 		exclude module: 'appcompat-v7'
 	}
-	implementation "com.android.support:appcompat-v7:${supportLibVersion}"
-
+	implementation "com.android.support:appcompat-v7:26+"
 	//单元测试
-    testImplementation 'junit:junit:4.12'
-
+	testImplementation 'junit:junit:4.12'
 }

@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
+import com.kugou.fanxing.allinone.base.fasecurity.SecurityUtil;
 import com.kugou.media.GiftMp4Player;
 import com.kugou.media.IMP4Player;
 import com.kugou.util.LogWrapper;
@@ -19,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends Activity {
 
@@ -29,6 +31,34 @@ public class MainActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.test_main);
+
+        SecurityUtil securityUtil = new SecurityUtil();
+        String plainTxt = "这是一个hellokugou,明文来的";
+        byte[] plainBytes = null;
+        try {
+            plainBytes = plainTxt.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        byte[] secreteBytes = securityUtil.encrypt(plainBytes);
+        if (secreteBytes != null) {
+            byte[] deBytes = securityUtil.decrypt(secreteBytes);
+            if (deBytes != null) {
+                System.out.println("plainBytes=" + plainBytes);
+                System.out.println("deBytes=" + deBytes);
+                try {
+                    String deTxt = new String(deBytes, "UTF-8");
+
+
+                    System.out.println("plainTxt=" + plainTxt);
+                    System.out.println("deTxt=" + deTxt);
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 	}
 
 	private final void prepareSampleMovie(File path, int rawId) throws IOException {
@@ -53,7 +83,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        ViewGroup parentViewGroup = findViewById(R.id.mylayout);
+        final ViewGroup parentViewGroup = findViewById(R.id.mylayout);
 
 //        String localRes1 = createResFromeRaw("data_chucixindong_640.mp4", R.raw.data_chucixindong_640);
 //        String localRes2 = createResFromeRaw("data_jinlinvshen_740.mp4", R.raw.data_jinlinvshen_740);
@@ -63,7 +93,7 @@ public class MainActivity extends Activity {
         String localRes1 = createResFromeRaw("data1_720.mp4", R.raw.data1_720);
         String localRes2 = createResFromeRaw("data2_720.mp4", R.raw.data2_720);
         String localRes3 = createResFromeRaw("data3_720.mp4", R.raw.data3_720);
-        String localRes4 = createResFromeRaw("gift_720.mp4", R.raw.gift_720);
+        final String localRes4 = createResFromeRaw("gift_360.mp4", R.raw.gift_360);
 
         if (mp4Player != null)
             mp4Player.onActivityResume();
@@ -75,17 +105,17 @@ public class MainActivity extends Activity {
                 if (mp4Player == null)
                     mp4Player = new GiftMp4Player(parentViewGroup);
 
-                String localRes;
-                if (ind % 4 == 0) {
-                    localRes = localRes1;
-                } else if (ind % 4 == 1) {
-                    localRes = localRes2;
-                } else if (ind % 4 == 2) {
-                    localRes = localRes3;
-                } else {
-                    localRes = localRes4;
-                }
-                ind ++;
+                String localRes = localRes4;
+//                if (ind % 4 == 0) {
+//                    localRes = localRes1;
+//                } else if (ind % 4 == 1) {
+//                    localRes = localRes2;
+//                } else if (ind % 4 == 2) {
+//                    localRes = localRes3;
+//                } else {
+//                    localRes = localRes4;
+//                }
+//                ind ++;
                 mp4Player.start(localRes, 1, new IMP4Player.EventCallBack() {
                     @Override
                     public void onErrorOccur(int errorId, String desc) {
