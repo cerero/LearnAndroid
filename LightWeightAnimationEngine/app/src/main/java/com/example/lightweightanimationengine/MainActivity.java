@@ -6,7 +6,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.os.Bundle;
 
-import com.android.templateApp.templateApp;
+//import com.android.templateApp.ch0203.templateApp;
+import com.android.templateApp.ch0304.templateApp;
 
 public class MainActivity extends Activity implements SensorEventListener {
 

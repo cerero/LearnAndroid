@@ -3,8 +3,11 @@ cmake_minimum_required(VERSION 3.4.1)
 set(CMAKE_VERBOSE_MAKEFILE on)
 set(distribution_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../distribution)
 
-aux_source_directory(. SRC_LIST)
-include_directories(. ${distribution_DIR}/gfx ${distribution_DIR})
+#set(DEMO_SRC_DIR ch0203)
+set(DEMO_SRC_DIR ch0304)
+
+aux_source_directory(${DEMO_SRC_DIR} SRC_LIST)
+include_directories(${DEMO_SRC_DIR} ${distribution_DIR}/gfx ${distribution_DIR})
 
 #add_library(openal-lib SHARED IMPORTED)
 #set_target_properties(openal-lib PROPERTIES IMPORTED_LOCATION
@@ -16,7 +19,7 @@ set_target_properties(gfx-lib PROPERTIES IMPORTED_LOCATION
 
 add_library(templateApp
              SHARED
-             ./templateApp.cpp)
+             ${SRC_LIST})
 
 find_library(log-lib log)
 find_library(GLESv2-lib GLESv2)
