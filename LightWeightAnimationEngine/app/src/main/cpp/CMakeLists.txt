@@ -4,7 +4,8 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 set(distribution_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../distribution)
 
 #set(DEMO_SRC_DIR ch0203)
-set(DEMO_SRC_DIR ch0304)
+#set(DEMO_SRC_DIR ch0304)
+set(DEMO_SRC_DIR ch0405)
 
 aux_source_directory(${DEMO_SRC_DIR} SRC_LIST)
 include_directories(${DEMO_SRC_DIR} ${distribution_DIR}/gfx ${distribution_DIR})

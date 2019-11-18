@@ -67,38 +67,34 @@ void program_draw_callback( void *ptr ) {
 			glUniformMatrix4fv( curr_program->uniform_array[ i ].location,
 								1,
 								GL_FALSE,
-								( float * )GFX_get_modelview_matrix() ); }
-
-		else if( !strcmp( curr_program->uniform_array[ i ].name, "PROJECTIONMATRIX" ) ) {
+								( float * )GFX_get_modelview_matrix() );
+		} else if( !strcmp( curr_program->uniform_array[ i ].name, "PROJECTIONMATRIX" ) ) {
 		
 			glUniformMatrix4fv( curr_program->uniform_array[ i ].location,
 								1,
 								GL_FALSE,
-								( float * )GFX_get_projection_matrix() ); }
-
-		else if( !strcmp( curr_program->uniform_array[ i ].name, "NORMALMATRIX" ) ) {
+								( float * )GFX_get_projection_matrix() );
+		} else if( !strcmp( curr_program->uniform_array[ i ].name, "NORMALMATRIX" ) ) {
 		
 			glUniformMatrix3fv( curr_program->uniform_array[ i ].location,
 								1,
 								GL_FALSE,
-								( float * )GFX_get_normal_matrix() ); }
-
-		else if( !strcmp( curr_program->uniform_array[ i ].name, "LIGHTPOSITION" ) ) {
+								( float * )GFX_get_normal_matrix() );
+		} else if( !strcmp( curr_program->uniform_array[ i ].name, "LIGHTPOSITION" ) ) {
 		
 			// In eye space, far is Z
-			vec3 l = { 0.0f, 0.0f, 0.0f };
+			vec3 l = { 4.0f, 0.0f, 0.0f };
 
 			glUniform3fv( curr_program->uniform_array[ i ].location,
 						  1,
-						  ( float * )&l ); }
-		/*
-		else if( !strcmp( curr_program->uniform_array[ i ].name, "DIFFUSE" ) &&
+						  ( float * )&l );
+		} /*else if( !strcmp( curr_program->uniform_array[ i ].name, "DIFFUSE" ) &&
 				 !curr_program->uniform_array[ i ].constant ) {
 		
 			curr_program->uniform_array[ i ].constant = 1;
 			
-			glUniform1i( curr_program->uniform_array[ i ].location, 0 ); }
-		*/
+			glUniform1i( curr_program->uniform_array[ i ].location, 0 );
+		}*/
 		
 		++i;
 	}
@@ -142,7 +138,7 @@ void templateAppInit( int width, int height ) {
 
 	objmesh = &obj->objmesh[ 0 ];
 
-	size = objmesh->n_objvertexdata * sizeof( vec3 ) * sizeof( vec3 ) * sizeof( vec2 );
+	size = objmesh->n_objvertexdata * (sizeof( vec3 ) + sizeof( vec3 ) + sizeof( vec2 ));
 
 	vertex_array = ( unsigned char * ) malloc( size );
 	vertex_start = vertex_array;
