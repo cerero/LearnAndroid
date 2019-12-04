@@ -1072,7 +1072,7 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 			if( !line[ 0 ] || line[ 0 ] == '#' ) goto next_obj_line;
 			
 			else if( line[ 0 ] == 'f' && line[ 1 ] == ' ' )
-			{
+			{//解析面
 				unsigned char useuvs;
 						
 				int vertex_index[ 3 ] = { 0, 0, 0 },
@@ -1117,7 +1117,7 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 				
 				
 				if( last != 'f' )
-				{
+				{//遇到第一个object的f，构造objmesh
 					++obj->n_objmesh;
 								
 					obj->objmesh = ( OBJMESH * ) realloc( obj->objmesh,
@@ -1204,7 +1204,7 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 				objtrianglelist->objtriangleindex[ triangle_index ].uv_index[ 0 ] = uv_index[ 0 ];
 				objtrianglelist->objtriangleindex[ triangle_index ].uv_index[ 1 ] = uv_index[ 1 ];
 				objtrianglelist->objtriangleindex[ triangle_index ].uv_index[ 2 ] = uv_index[ 2 ];
-			}			
+			}//解析面  end
 			
 			else if( sscanf( line, "v %f %f %f", &v.x, &v.y, &v.z ) == 3 )
 			{

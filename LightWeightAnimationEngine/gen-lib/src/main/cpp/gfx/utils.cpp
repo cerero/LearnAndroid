@@ -19,7 +19,10 @@ unsigned int get_milli_time( void )
     return tv.tv_usec / 1000 + tv.tv_sec * 1000;
 }
 
-
+/**
+ * filepath中的 \ 转换为 /
+ * User\data\test.txt -> User/data/test.txt
+ */
 void adjust_file_path( char *filepath )
 {
 	unsigned int i = 0,
@@ -32,7 +35,10 @@ void adjust_file_path( char *filepath )
 	}
 }
 
-
+/**
+ * 复制filepath中的父目录路径到path
+ * User/data/test.txt -> User/data/
+ */
 void get_file_path( char *filepath, char *path )
 {
 	char *t = NULL;
@@ -51,7 +57,10 @@ void get_file_path( char *filepath, char *path )
 	}
 }
 
-
+/**
+ * 复制filepath中的文件名称到name
+ * User/data/test.txt -> test.txt
+ */
 void get_file_name( char *filepath, char *name )
 {
 	char *t = NULL;
