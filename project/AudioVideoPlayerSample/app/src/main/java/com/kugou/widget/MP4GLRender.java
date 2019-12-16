@@ -11,6 +11,7 @@ import com.kugou.media.IErrorReceiver;
 import com.kugou.media.IMP4Player;
 import com.kugou.media.IVideoConsumer;
 import com.kugou.util.LogWrapper;
+import com.kugou.util.MatrixUtils;
 
 import java.nio.ByteBuffer;
 
@@ -50,7 +51,10 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     private int mViewHeight;
     private int mImgWidth;
     private int mImgHeight;
-
+    private int mCropImgWidth;
+    private int mCropImgHeight;
+    private float mWidthScale = 1.0f;
+    private float mHeightScale = 1.0f;
     private ByteBuffer mYBuffer;
     private ByteBuffer mUBuffer;
     private ByteBuffer mVBuffer;
@@ -138,7 +142,7 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
             if (mRenderMode == 1) {
                 if (mHardDecodeFrame != null) {
                     mHardDecodeFrame.active(mExternalTexId, mYTexId, mUTexId, mVTexId);
-                    mHardDecodeFrame.onViewPortChange(mImgWidth, mImgHeight, mViewWidth, mViewHeight);
+                    mHardDecodeFrame.onViewPortChange(mCropImgWidth, mCropImgHeight, mViewWidth, mViewHeight);
                 }
             } else {
                 if (mSoftDecodeFrame != null){
@@ -153,7 +157,9 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
         if (mRenderMode == 1) { //硬解渲染
             if(mInputSurfaceTexture != null){
                 if (isVisible && mHardDecodeFrame != null) {
-                    mHardDecodeFrame.drawExternalTex(mExternalTexId, null);
+                    float[] textureMat = MatrixUtils.getOriginalMatrix();
+                    MatrixUtils.scale(textureMat, mWidthScale, mHeightScale);
+                    mHardDecodeFrame.drawExternalTex(mExternalTexId, textureMat);
                 }
             }
         } else { //软解渲染
@@ -274,14 +280,30 @@ public class MP4GLRender implements GLSurfaceView.Renderer, IVideoConsumer {
     public void onTextureInfo(int imgWidth, int imgHeight) {
         LogWrapper.LOGD(TAG, "onTextureInfo imgWidth:" + imgWidth + ",imgHeight:" + imgHeight);
         if (mImgWidth != imgWidth || mImgHeight != imgHeight) {
-            mImgWidth = imgWidth;
-            mImgHeight = imgHeight;
+            mCropImgWidth = mImgWidth = imgWidth;
+            mCropImgHeight = mImgHeight = imgHeight;
+            mWidthScale = 1.0f;
+            mHeightScale = 1.0f;
             synchronized (locker) {
                 isTextureChanged = true;
                 mYBuffer = null;
                 mUBuffer = null;
                 mVBuffer = null;
             }
+        }
+    }
+
+    @Override
+    public void onTextureActualSizeChange(int cropImgWidth, int cropImgHeight, int alignWidth, int alignHeight) {
+        if (cropImgWidth > 0 && cropImgHeight > 0 && (cropImgWidth != mImgWidth || cropImgHeight != mImgHeight)) {
+            mImgWidth = alignWidth == 0 ? mImgWidth : alignWidth;
+            mImgHeight = alignHeight == 0 ? mImgHeight : alignHeight;
+            mCropImgWidth = cropImgWidth;
+            mCropImgHeight = cropImgHeight;
+            isTextureChanged = true;
+            mWidthScale = (float) mCropImgWidth / mImgWidth;
+            mHeightScale = (float) mCropImgHeight / mImgHeight;
+            LogWrapper.LOGD(TAG, "onTextureActualSizeChange:  \n\t\tcropImgWidth=" + cropImgWidth + ", cropImgHeight=" + cropImgHeight + ", alignWidth=" + alignWidth + ", alignHeight=" + alignHeight + ",widthScale=" + mWidthScale + ", heightScale=" + mHeightScale);
         }
     }
 

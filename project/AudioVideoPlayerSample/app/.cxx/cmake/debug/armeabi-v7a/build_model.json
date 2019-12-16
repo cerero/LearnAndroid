@@ -1,0 +1,69 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample",
+      "sdkFolder": "/Users/lisujia/Library/Android/sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/build/intermediates",
+      "gradleModulePathName": ":app",
+      "moduleRootFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app",
+      "makeFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/src/main/cpp/CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/.cxx",
+      "cxxFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx",
+      "ndkFolder": "/Users/lisujia/Library/Android/sdk/ndk-bundle",
+      "ndkVersion": "19.2.5345600",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [
+      "-std\u003dc++11"
+    ],
+    "variantName": "debug",
+    "soFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/build/intermediates/cmake/debug/lib",
+    "objFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/build/intermediates/cmake/debug/obj",
+    "jsonFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cmake/debug",
+    "gradleBuildOutputFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug",
+    "isDebuggableEnabled": true,
+    "validAbiList": [
+      "ARMEABI_V7A"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "ARMEABI_V7A",
+  "abiPlatformVersion": 16,
+  "cxxBuildFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cmake/debug/armeabi-v7a",
+  "jsonFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cmake/debug/armeabi-v7a/android_gradle_build.json",
+  "gradleBuildOutputFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug/armeabi-v7a",
+  "objFolder": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/build/intermediates/cmake/debug/obj/armeabi-v7a",
+  "buildCommandFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cmake/debug/armeabi-v7a/build_command.txt",
+  "buildOutputFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cmake/debug/armeabi-v7a/build_output.txt",
+  "modelOutputFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cmake/debug/armeabi-v7a/build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug/armeabi-v7a/CMakeLists.txt",
+    "toolchainWrapperFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug/armeabi-v7a/android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug/armeabi-v7a/build_generation_state.json",
+    "cacheKeyFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug/armeabi-v7a/compiler_cache_key.json",
+    "compilerCacheUseFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug/armeabi-v7a/compiler_cache_use.json",
+    "compilerCacheWriteFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug/armeabi-v7a/compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cxx/debug/armeabi-v7a/compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cmake/debug/armeabi-v7a/json_generation_record.json",
+  "compileCommandsJsonFile": "/Users/lisujia/workspace/LearnAndroid/project/AudioVideoPlayerSample/app/.cxx/cmake/debug/armeabi-v7a/compile_commands.json"
+}

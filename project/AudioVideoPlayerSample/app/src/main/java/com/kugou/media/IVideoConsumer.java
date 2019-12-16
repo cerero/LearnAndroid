@@ -14,6 +14,7 @@ public interface IVideoConsumer {
     void onYUVData(ByteBuffer yData, ByteBuffer uData, ByteBuffer vData, int frameWidth, int frameHeight);
 
     void onTextureInfo(int imgWidth, int imgHeight);
+    void onTextureActualSizeChange(int cropImgWidth, int cropImgHeight, int alignWidth, int alignHeight);
     /**没数据可以渲染了**/
     void end();
     void start();

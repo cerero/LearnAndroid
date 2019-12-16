@@ -24,10 +24,13 @@ public class GLDrawer2D {
 		+ "uniform mat4 uTexMatrix;\n"
 		+ "attribute highp vec4 aPosition;\n"
 		+ "attribute highp vec4 aTextureCoord;\n"
+		+ "attribute highp vec4 aTextureCoordAlpha;\n"
 		+ "varying highp vec2 vTextureCoord;\n"
+		+ "varying highp vec2 vRefTextureCoord;\n"
 		+ "void main() {\n"
 		    + "gl_Position = uMVPMatrix * aPosition;\n"
 		    + "vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n"
+		    + "vRefTextureCoord = (uTexMatrix * aTextureCoordAlpha).xy;\n"
 		+ "}\n";
 
 	public static final String fss
@@ -35,9 +38,9 @@ public class GLDrawer2D {
 		+ "precision highp float;\n"
 		+ "uniform samplerExternalOES sTexture;\n"
 		+ "varying highp vec2 vTextureCoord;\n"
+		+ "varying highp vec2 vRefTextureCoord;\n"
 		+ "void main() {\n"
-            + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t);\n"
-            + "vec4 refColor = texture2D(sTexture, refTextureCoord);\n"
+            + "vec4 refColor = texture2D(sTexture, vRefTextureCoord);\n"
             + "vec4 texel = texture2D(sTexture, vTextureCoord);\n"
             + "gl_FragColor = vec4(texel.rgb, refColor.b);\n"
 		+ "} \n";
@@ -49,15 +52,15 @@ public class GLDrawer2D {
             + "uniform sampler2D y_texture; \n"
             + "uniform sampler2D u_texture; \n"
             + "uniform sampler2D v_texture; \n"
+			+ "varying highp vec2 vRefTextureCoord;\n"
             + "void main (void){  \n"
                 + "mediump vec3 yuv; \n"
                 + "mediump vec3 yuv_ref; \n"
                 + "mediump vec3 rgb; \n"
                 + "float a; \n"
-                + "vec2 refTextureCoord = vec2(vTextureCoord.s + 0.5, vTextureCoord.t); \n"
-                + "yuv_ref.x = texture2D(y_texture, refTextureCoord).r;\n"
-                + "yuv_ref.y = texture2D(u_texture, refTextureCoord).r - 0.5;\n"
-                + "yuv_ref.z = texture2D(v_texture, refTextureCoord).r - 0.5;\n"
+                + "yuv_ref.x = texture2D(y_texture, vRefTextureCoord).r;\n"
+                + "yuv_ref.y = texture2D(u_texture, vRefTextureCoord).r - 0.5;\n"
+                + "yuv_ref.z = texture2D(v_texture, vRefTextureCoord).r - 0.5;\n"
                 + "yuv.x = texture2D(y_texture, vTextureCoord).r;\n"
                 + "yuv.y = texture2D(u_texture, vTextureCoord).r - 0.5;\n"
                 + "yuv.z = texture2D(v_texture, vTextureCoord).r - 0.5;\n"
@@ -78,11 +81,19 @@ public class GLDrawer2D {
             0.5f, 1.0f,
             0.0f, 1.0f };
 
+	private static final float[] TEXCOORD_ALPHA = {
+			1.0f, 0.0f,
+			0.5f, 0.0f,
+			1.0f, 1.0f,
+			0.5f, 1.0f };
+
 	private final FloatBuffer pVertex;
 	private final FloatBuffer pTexCoord;
+	private final FloatBuffer pTexCoordAlpha;
 	private int hProgram;
     int maPositionLoc;
     int maTextureCoordLoc;
+    int maTextureCoordAlphaLoc;
     int muMVPMatrixLoc;
     int muTexMatrixLoc;
     int muYUVTransform;
@@ -115,10 +126,16 @@ public class GLDrawer2D {
 		pTexCoord.put(TEXCOORD);
 		pTexCoord.flip();
 
+		pTexCoordAlpha = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		pTexCoordAlpha.put(TEXCOORD_ALPHA);
+		pTexCoordAlpha.flip();
+
+
 		GLES20.glUseProgram(hProgram);
 
         maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
         maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");
+		maTextureCoordAlphaLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoordAlpha");
         muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
         muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
 
@@ -143,8 +160,10 @@ public class GLDrawer2D {
         GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, mMvpMatrix, 0);
 		GLES20.glVertexAttribPointer(maPositionLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
 		GLES20.glVertexAttribPointer(maTextureCoordLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+		GLES20.glVertexAttribPointer(maTextureCoordAlphaLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoordAlpha);
 		GLES20.glEnableVertexAttribArray(maPositionLoc);
 		GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+		GLES20.glEnableVertexAttribArray(maTextureCoordAlphaLoc);
 
         GLES20.glUseProgram(0);
 	}

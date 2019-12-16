@@ -54,10 +54,10 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        ViewGroup parentViewGroup = findViewById(R.id.mylayout);
+        final ViewGroup parentViewGroup = findViewById(R.id.mylayout);
 
-        String resOf720p[] = {
-                createResFromeRaw("six_720.mp4", R.raw.six_720),
+        final String resOf720p[] = {
+                createResFromeRaw("chucixindong_1080_2.mp4", R.raw.chucixindong_1080_2),
                 createResFromeRaw("chucixindong_720.mp4", R.raw.chucixindong_720),
                 createResFromeRaw("motianlun_720.mp4", R.raw.motianlun_720),
                 createResFromeRaw("yueguangzhichen_720.mp4", R.raw.yueguangzhichen_720),
@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
                 createResFromeRaw("jinlinvhsen_720.mp4", R.raw.jinlinvhsen_720),
         };
 
-        String resOf480p[] = {
+        final String resOf480p[] = {
                 createResFromeRaw("six_480.mp4", R.raw.six_480),
                 createResFromeRaw("chucixindong_480.mp4", R.raw.chucixindong_480),
                 createResFromeRaw("motianlun_480.mp4", R.raw.motianlun_480),

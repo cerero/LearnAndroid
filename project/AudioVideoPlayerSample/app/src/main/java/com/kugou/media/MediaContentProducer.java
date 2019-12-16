@@ -689,6 +689,59 @@ public class MediaContentProducer {
 		        final MediaFormat format = mVideoMediaExtractor.getTrackFormat(trackIndex);
 	        	mVideoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
 	        	mVideoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
+
+				//视频宽高，如果存在裁剪范围的话，宽等于右边减左边坐标，高等于底部减顶部
+				if (format.containsKey("crop-left") && format.containsKey("crop-right")) {
+					mVideoWidth = format.getInteger("crop-right") + 1 - format.getInteger("crop-left");
+				}
+				if (format.containsKey("crop-top") && format.containsKey("crop-bottom")) {
+					mVideoHeight = format.getInteger("crop-bottom") + 1 - format.getInteger("crop-top");
+				}
+				/*
+				//解码后数据对齐的宽高，在有些设备上会返回0
+				int keyStride = format.getInteger(MediaFormat.KEY_STRIDE);
+				int keyStrideHeight = format.getInteger(MediaFormat.KEY_SLICE_HEIGHT);
+				// 当对齐后高度返回0的时候，分两种情况
+				// 如果对齐后宽度有给值，则只需要计算高度从16字节对齐到128字节对齐这几种情况下哪个值跟对齐后宽度相乘再乘3/2等于对齐后大小，
+				// 如果计算不出则默认等于视频宽高。
+				// 当对齐后宽度也返回0，这时候也要对宽度做对齐处理，原理同上
+				int alignWidth = keyStride;
+				int alignHeight = keyStrideHeight;
+				if (alignHeight == 0) {
+					if (alignWidth == 0) {
+						align:
+						for (int w = 16; w <= 128; w = w << 1) {
+							for (int h = 16; h <= w; h = h << 1) {
+								alignWidth = ((mVideoHeight - 1) / w + 1) * w;
+								alignHeight = ((mVideoHeight - 1) / h + 1) * h;
+								int size = alignWidth * alignHeight * 3 / 2;
+								if (size == bufferSize) {
+									break align;
+								}
+							}
+						}
+					} else {
+						for (int h = 16; h <= 128; h = h << 1) {
+							alignHeight = ((mVideoHeight - 1) / h + 1) * h;
+							int size = alignWidth * alignHeight * 3 / 2;
+							if (size == bufferSize) {
+								break;
+							}
+						}
+					}
+					int size = alignWidth * alignHeight * 3 / 2;
+					if (size != bufferSize) {
+						alignWidth = mVideoHeight;
+						alignHeight = mVideoHeight;
+					}
+				}
+
+				int size = mVideoHeight * mVideoHeight * 3 / 2;
+				if (size == bufferSize) {
+					alignWidth = mVideoHeight;
+					alignHeight = mVideoHeight;
+				}
+				*/
 	        	mVideoConsumer.onTextureInfo(mVideoWidth, mVideoHeight);
 //	        	mDuration = format.getLong(MediaFormat.KEY_DURATION);
 //				mBitrate = format.getInteger(MediaFormat.KEY_BIT_RATE);
@@ -1107,7 +1160,23 @@ public class MediaContentProducer {
                     LogWrapper.LOGD(TAG, "INFO_OUTPUT_BUFFERS_CHANGED:");
                 } else if (decoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     final MediaFormat newFormat = mVideoMediaCodec.getOutputFormat();
-                    LogWrapper.LOGD(TAG, "video decoder output format changed: " + newFormat);
+
+					//视频宽高，如果存在裁剪范围的话，宽等于右边减左边坐标，高等于底部减顶部
+					int cropImgWidth = newFormat.getInteger(MediaFormat.KEY_WIDTH);
+					if (newFormat.containsKey("crop-left") && newFormat.containsKey("crop-right")) {
+						cropImgWidth = newFormat.getInteger("crop-right") + 1 - newFormat.getInteger("crop-left");
+					}
+					int cropImgHeight = newFormat.getInteger(MediaFormat.KEY_HEIGHT);
+					if (newFormat.containsKey("crop-top") && newFormat.containsKey("crop-bottom")) {
+						cropImgHeight = newFormat.getInteger("crop-bottom") + 1 - newFormat.getInteger("crop-top");
+					}
+
+					//解码后数据对齐的宽高，在有些设备上会返回0
+					int keyStride = newFormat.getInteger(MediaFormat.KEY_STRIDE);
+					int keyStrideHeight = newFormat.getInteger(MediaFormat.KEY_SLICE_HEIGHT);
+
+					LogWrapper.LOGD(TAG, "video decoder output format changed: " + newFormat);
+					mVideoConsumer.onTextureActualSizeChange(cropImgWidth, cropImgHeight, keyStride, keyStrideHeight);
                 } else if (decoderStatus < 0) {
                     throw new RuntimeException(
                             "unexpected result from video decoder.dequeueOutputBuffer: " + decoderStatus);
