@@ -66,19 +66,19 @@ typedef struct
 
 typedef struct
 {
-	unsigned int	 n_objtriangleindex;
+	unsigned int	 n_objtriangleindex;//f的个数
 	
-	OBJTRIANGLEINDEX *objtriangleindex;
+	OBJTRIANGLEINDEX *objtriangleindex;//f的内容
 
-	unsigned char	 useuvs;
+	unsigned char	 useuvs;    	   //是否有纹理坐标uv
 	
-	unsigned short	 n_indice_array;
+	unsigned short	 n_indice_array;   //所有f的点的index总数
+
+	unsigned short   *indice_array;    //所有f的点的index值, 是objmesh->objvertexdata的下标, 可查询对应的vertext和uv索引值
 	
-	unsigned short   *indice_array;
+	OBJMATERIAL		 *objmaterial;	  //渲染要用到的材质
 	
-	OBJMATERIAL		 *objmaterial;
-	
-	int				 mode;
+	int				 mode;			  //GL_TRIANGLES
 	
 	unsigned int	 vbo;
 
@@ -102,9 +102,9 @@ typedef struct
 		
 	char			group[ MAX_CHAR ]; // g
 
-	unsigned short	n_objvertexdata;
+	unsigned short	n_objvertexdata;	//构成当前对象mesh所需最少的顶点数量
 	
-	OBJVERTEXDATA	*objvertexdata;
+	OBJVERTEXDATA	*objvertexdata;		//构成当前对象mesh所需最少的顶点(存放着vertex和uv索引的结构体)
 	
 	unsigned char	n_objtrianglelist;
 	
@@ -150,11 +150,14 @@ typedef struct
 	char			texture_path[ MAX_PATH ];
 
 	char			program_path[ MAX_PATH ];
-	
+
+	//每个o遇到的第一个f会构造的字段----
 	unsigned int	n_objmesh;
 	
 	OBJMESH			*objmesh;
-	
+	//每个o遇到的第一个f会构造的字段 end----
+
+	//执行OBJ_load_mtl时，会构造的字段----
 	unsigned int	n_objmaterial;
 	
 	OBJMATERIAL		*objmaterial;
@@ -166,7 +169,9 @@ typedef struct
 	unsigned int	n_program;
 	
 	PROGRAM			**program;
-	
+	//执行OBJ_load_mtl时，会构造的字段 end----
+
+	//解析v 时，会构造的字段----
 	unsigned int	n_indexed_vertex;
 	
 	vec3			*indexed_vertex;	// v
@@ -176,11 +181,13 @@ typedef struct
 	vec3			*indexed_fnormal;
 
 	vec3			*indexed_tangent;
+	//解析v 时，会构造的字段 end----
 
+	//解析texture uv 坐标  会构造的字段------
 	unsigned int	n_indexed_uv;
 	
 	vec2			*indexed_uv;		// vt
-
+	//解析texture uv 坐标  会构造的字段 end------
 } OBJ;
 
 

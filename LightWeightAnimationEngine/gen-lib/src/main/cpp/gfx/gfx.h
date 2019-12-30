@@ -1,7 +1,7 @@
 #ifndef GFX_H
 #define GFX_H
 
-#define GFX_COPYRIGHT		"Copyright (C) 2011 Romain Marucchi-Foino. All Rights Reserved."
+#define GFX_COPYRIGHT		"Fanxin.Kugou.com All Rights Reserved."
 #define GFX_RENDERER		"GFX"
 
 #define GFX_VERSION_MAJOR	1

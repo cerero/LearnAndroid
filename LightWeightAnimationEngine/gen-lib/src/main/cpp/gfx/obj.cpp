@@ -890,7 +890,17 @@ void OBJ_free_mesh_vertex_data( OBJ *obj, unsigned int mesh_index )
 	}
 }
 
-
+/**
+ * 初始化材质对象，构造OBJ结构体的以下几个重要字段
+ * n_objmaterial
+ * objmaterial
+ *
+ * n_texture
+ * texture
+ *
+ * n_program
+ * program
+ */
 unsigned char OBJ_load_mtl( OBJ *obj, char *filename, unsigned char relative_path )
 {
 	MEMORY *m = mopen( filename, relative_path );
@@ -910,10 +920,9 @@ unsigned char OBJ_load_mtl( OBJ *obj, char *filename, unsigned char relative_pat
 
 	while( line )
 	{
-		if( !line[ 0 ] || line[ 0 ] == '#' ) goto next_mat_line;
-		
-		else if( sscanf( line, "newmtl %s", str ) == 1 )
-		{
+		if( !line[ 0 ] || line[ 0 ] == '#' ) {//跳过注释
+			goto next_mat_line;
+		} else if( sscanf( line, "newmtl %s", str ) == 1 ) {				//解析材质的名称 newmtl xxxxx
 			++obj->n_objmaterial;
 			
 			obj->objmaterial = ( OBJMATERIAL * ) realloc( obj->objmaterial, 
@@ -925,39 +934,27 @@ unsigned char OBJ_load_mtl( OBJ *obj, char *filename, unsigned char relative_pat
 			memset( objmaterial, 0, sizeof( OBJMATERIAL ) );
 					
 			strcpy( objmaterial->name, str );
-		}
-
-		else if( sscanf( line, "Ka %f %f %f", &v.x, &v.y, &v.z ) == 3 )
-		{ memcpy( &objmaterial->ambient, &v, sizeof( vec3 ) ); }
-
-		else if( sscanf( line, "Kd %f %f %f", &v.x, &v.y, &v.z ) == 3 )
-		{ memcpy( &objmaterial->diffuse, &v, sizeof( vec3 ) ); }
-
-		else if( sscanf( line, "Ks %f %f %f", &v.x, &v.y, &v.z ) == 3 )
-		{ memcpy( &objmaterial->specular, &v, sizeof( vec3 ) ); }
-
-		else if( sscanf( line, "Tf %f %f %f", &v.x, &v.y, &v.z ) == 3 )
-		{ memcpy( &objmaterial->transmission_filter, &v, sizeof( vec3 ) ); }
-
-		else if( sscanf( line, "illum %f", &v.x ) == 1 )
-		{ objmaterial->illumination_model = ( int )v.x; }
-
-		else if( sscanf( line, "d %f", &v.x ) == 1 )
-		{
+			//解析材质的名称 end
+		} else if( sscanf( line, "Ka %f %f %f", &v.x, &v.y, &v.z ) == 3 ) { //解析Ka
+			memcpy( &objmaterial->ambient, &v, sizeof( vec3 ) );
+		} else if( sscanf( line, "Kd %f %f %f", &v.x, &v.y, &v.z ) == 3 ) { //解析Kd
+			memcpy( &objmaterial->diffuse, &v, sizeof( vec3 ) );
+		} else if( sscanf( line, "Ks %f %f %f", &v.x, &v.y, &v.z ) == 3 ) { //解析Ks
+			memcpy( &objmaterial->specular, &v, sizeof( vec3 ) ); }
+		else if( sscanf( line, "Tf %f %f %f", &v.x, &v.y, &v.z ) == 3 ) {	//解析Tf
+			memcpy( &objmaterial->transmission_filter, &v, sizeof( vec3 ) );
+		} else if( sscanf( line, "illum %f", &v.x ) == 1 ) {				//解析illum
+			objmaterial->illumination_model = ( int )v.x;
+		} else if( sscanf( line, "d %f", &v.x ) == 1 ) {					//解析d
 			objmaterial->ambient.w  = v.x;
 			objmaterial->diffuse.w  = v.x;
 			objmaterial->specular.w = v.x;
 			objmaterial->dissolve   = v.x;
-		}
-
-		else if( sscanf( line, "Ns %f", &v.x ) == 1 )
-		{ objmaterial->specular_exponent = v.x; }
-
-		else if( sscanf( line, "Ni %f", &v.x ) == 1 )
-		{ objmaterial->optical_density = v.x; }
-
-		else if( sscanf( line, "map_Ka %s", str ) == 1 )
-		{
+		} else if( sscanf( line, "Ns %f", &v.x ) == 1 ) {					//解析Ns
+			objmaterial->specular_exponent = v.x;
+		} else if( sscanf( line, "Ni %f", &v.x ) == 1 ) {					//解析Ni
+			objmaterial->optical_density = v.x;
+		} else if( sscanf( line, "map_Ka %s", str ) == 1 ) {				//解析map_Ka
 			get_file_name( str, objmaterial->map_ambient );
 			
 			get_file_extension( objmaterial->map_ambient, str, 1 );
@@ -965,10 +962,7 @@ unsigned char OBJ_load_mtl( OBJ *obj, char *filename, unsigned char relative_pat
 			if( !strcmp( str, "GFX" ) ) OBJ_add_program( obj, objmaterial->map_ambient );
 			
 			else OBJ_add_texture( obj, objmaterial->map_ambient );
-		}
-
-		else if( sscanf( line, "map_Kd %s", str ) == 1 )
-		{
+		} else if( sscanf( line, "map_Kd %s", str ) == 1 ) {				//解析map_Kd
 			get_file_name( str, objmaterial->map_diffuse );
 			
 			get_file_extension( objmaterial->map_diffuse, str, 1 );
@@ -977,10 +971,7 @@ unsigned char OBJ_load_mtl( OBJ *obj, char *filename, unsigned char relative_pat
 			
 			else OBJ_add_texture( obj, objmaterial->map_diffuse );
 
-		}
-
-		else if( sscanf( line, "map_Ks %s", str ) == 1 )
-		{
+		} else if( sscanf( line, "map_Ks %s", str ) == 1 ) {				//解析map_Ks
 			get_file_name( str, objmaterial->map_specular );
 			
 			get_file_extension( objmaterial->map_specular, str, 1 );
@@ -988,10 +979,7 @@ unsigned char OBJ_load_mtl( OBJ *obj, char *filename, unsigned char relative_pat
 			if( !strcmp( str, "GFX" ) ) OBJ_add_program( obj, objmaterial->map_specular );
 			
 			else OBJ_add_texture( obj, objmaterial->map_specular );
-		}
-
-		else if( sscanf( line, "map_Tr %s", str ) == 1 )
-		{
+		} else if( sscanf( line, "map_Tr %s", str ) == 1 ) {				//解析map_Tr
 			get_file_name( str, objmaterial->map_translucency );
 			
 			get_file_extension( objmaterial->map_translucency, str, 1 );
@@ -999,12 +987,9 @@ unsigned char OBJ_load_mtl( OBJ *obj, char *filename, unsigned char relative_pat
 			if( !strcmp( str, "GFX" ) ) OBJ_add_program( obj, objmaterial->map_translucency );
 			
 			else OBJ_add_texture( obj, objmaterial->map_translucency );
-		}
-
-		else if( sscanf( line, "map_disp %s", str ) == 1 ||
+		} else if( sscanf( line, "map_disp %s", str ) == 1 ||
 				 sscanf( line, "map_Disp %s", str ) == 1 ||
-				 sscanf( line, "disp %s"    , str ) == 1 )
-		{
+				 sscanf( line, "disp %s"    , str ) == 1 ) {				//解析map_disp/map_Disp/disp
 			get_file_name( str, objmaterial->map_disp );
 			
 			get_file_extension( objmaterial->map_disp, str, 1 );
@@ -1013,12 +998,9 @@ unsigned char OBJ_load_mtl( OBJ *obj, char *filename, unsigned char relative_pat
 			
 			else OBJ_add_texture( obj, objmaterial->map_disp );
 
-		}
-
-		else if( sscanf( line, "map_bump %s", str ) == 1 ||
+		} else if( sscanf( line, "map_bump %s", str ) == 1 ||
 				 sscanf( line, "map_Bump %s", str ) == 1 ||
-				 sscanf( line, "bump %s"	, str ) == 1 )
-		{
+				 sscanf( line, "bump %s"	, str ) == 1 ) {				//解析map_bump/map_Bump/bump
 			get_file_name( str, objmaterial->map_bump );
 			
 			get_file_extension( objmaterial->map_bump, str, 1 );
@@ -1046,10 +1028,9 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 	
 	MEMORY *o = mopen( filename, relative_path );
 	
-	if( !o ) return obj;
-
-	else
-	{
+	if( !o ) {
+		return obj;
+	} else { //循环遍历读取整个obj文件的每一行
 		char name  [ MAX_CHAR ] = {""},	
 			 group [ MAX_CHAR ] = {""},
 			 usemtl[ MAX_CHAR ] = {""},
@@ -1069,40 +1050,42 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 
 		while( line )
 		{	
-			if( !line[ 0 ] || line[ 0 ] == '#' ) goto next_obj_line;
-			
-			else if( line[ 0 ] == 'f' && line[ 1 ] == ' ' )
-			{
+			if( !line[ 0 ] || line[ 0 ] == '#' ) { //跳过注释
+				goto next_obj_line;
+			} else if( line[ 0 ] == 'f' && line[ 1 ] == ' ' ) {//解析面f
 				unsigned char useuvs;
 						
 				int vertex_index[ 3 ] = { 0, 0, 0 },
 					normal_index[ 3 ] = { 0, 0, 0 },
 					uv_index	[ 3 ] = { 0, 0, 0 },
 					triangle_index;
-					
+
+				/**
+				 * f 有以下几种形式
+				 * f v v v
+				 * f v//n v//n v//n
+				 * f v/uv v/uv v/uv
+				 * f v/uv/n v/uv/n v/uv/n
+				 */
 				if( sscanf( line, "f %d %d %d", &vertex_index[ 0 ],
 												&vertex_index[ 1 ],
-												&vertex_index[ 2 ] ) == 3 )
-												{ useuvs = 0; }
-				
-				else if( sscanf( line, "f %d//%d %d//%d %d//%d", &vertex_index[ 0 ],
+												&vertex_index[ 2 ] ) == 3 ) {
+					useuvs = 0;
+				} else if( sscanf( line, "f %d//%d %d//%d %d//%d", &vertex_index[ 0 ],
 																 &normal_index[ 0 ],
 																 &vertex_index[ 1 ],
 																 &normal_index[ 1 ],
 																 &vertex_index[ 2 ],
-																 &normal_index[ 2 ] ) == 6 )
-																 { useuvs = 0; }
-				
-				else if( sscanf( line, "f %d/%d %d/%d %d/%d", &vertex_index[ 0 ],
+																 &normal_index[ 2 ] ) == 6 ) {
+					useuvs = 0;
+				} else if( sscanf( line, "f %d/%d %d/%d %d/%d", &vertex_index[ 0 ],
 															  &uv_index    [ 0 ],
 															  &vertex_index[ 1 ],
 															  &uv_index    [ 1 ],
 															  &vertex_index[ 2 ],
-															  &uv_index    [ 2 ] ) == 6 )
-															  { useuvs = 1; }
-				
-				else
-				{
+															  &uv_index    [ 2 ] ) == 6 ) {
+					useuvs = 1;
+				} else {
 					sscanf( line, "f %d/%d/%d %d/%d/%d %d/%d/%d", &vertex_index[ 0 ],
 																  &uv_index    [ 0 ],
 																  &normal_index[ 0 ],
@@ -1116,8 +1099,7 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 				}
 				
 				
-				if( last != 'f' )
-				{
+				if( last != 'f' ) {//每个o的第一个f
 					++obj->n_objmesh;
 								
 					obj->objmesh = ( OBJMESH * ) realloc( obj->objmesh,
@@ -1128,17 +1110,21 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 	
 					memset( objmesh, 0, sizeof( OBJMESH ) );
 
-					objmesh->scale.x  =
-					objmesh->scale.y  =
-					objmesh->scale.z  =
+					objmesh->scale.x  = 1.0f;
+					objmesh->scale.y  = 1.0f;
+					objmesh->scale.z  = 1.0f;
 					objmesh->distance = 1.0f;
 					objmesh->visible  = 1;
 
-					if( name[ 0 ] ) strcpy( objmesh->name, name );
+					if( name[ 0 ] ) {
+						strcpy( objmesh->name, name );
+					} else if( usemtl[ 0 ] ) {
+						strcpy( objmesh->name, usemtl );
+					}
 					
-					else if( usemtl[ 0 ] ) strcpy( objmesh->name, usemtl );
-					
-					if( group[ 0 ] ) strcpy( objmesh->group, group );
+					if( group[ 0 ] ) {
+						strcpy( objmesh->group, group );
+					}
 					
 					objmesh->use_smooth_normals = use_smooth_normals;
 					
@@ -1163,7 +1149,7 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 					
 					name  [ 0 ] = 0;
 					usemtl[ 0 ] = 0;
-				}
+				}//每个o的第一个f  end----
 				
 				--vertex_index[ 0 ];
 				--vertex_index[ 1 ];
@@ -1204,10 +1190,8 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 				objtrianglelist->objtriangleindex[ triangle_index ].uv_index[ 0 ] = uv_index[ 0 ];
 				objtrianglelist->objtriangleindex[ triangle_index ].uv_index[ 1 ] = uv_index[ 1 ];
 				objtrianglelist->objtriangleindex[ triangle_index ].uv_index[ 2 ] = uv_index[ 2 ];
-			}			
-			
-			else if( sscanf( line, "v %f %f %f", &v.x, &v.y, &v.z ) == 3 )
-			{
+				//解析面f  end
+			} else if( sscanf( line, "v %f %f %f", &v.x, &v.y, &v.z ) == 3 ) {//解析顶点vertex
 				// Vertex
 				++obj->n_indexed_vertex;
 				
@@ -1245,43 +1229,36 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 				memset( &obj->indexed_tangent[ obj->n_indexed_vertex - 1 ],
 						0,
 						sizeof( vec3 ) );
-			}
-
-			// Drop the normals.
-			else if( sscanf( line, "vn %f %f %f", &v.x, &v.y, &v.z ) == 3 ) goto next_obj_line;
-			
-			else if( sscanf( line, "vt %f %f", &v.x, &v.y ) == 2 )
-			{
+				//解析顶点vertex end
+			} else if( sscanf( line, "vn %f %f %f", &v.x, &v.y, &v.z ) == 3 ) {// Drop the normals.
+				goto next_obj_line;
+			} else if( sscanf( line, "vt %f %f", &v.x, &v.y ) == 2 ) {//解析texture uv 坐标
 				++obj->n_indexed_uv;
 				
 				obj->indexed_uv = ( vec2 * ) realloc( obj->indexed_uv,
 													  obj->n_indexed_uv * 
 													  sizeof( vec2 ) );
-				v.y = 1.0f - v.y;
+				v.y = 1.0f - v.y;//转换为openGL的纹理坐标系
 				
 				memcpy( &obj->indexed_uv[ obj->n_indexed_uv - 1 ],
 						&v,
 						sizeof( vec2 ) );
-			}			
-
-			else if( line[ 0 ] == 'v' && line[ 1 ] == 'n' ) goto next_obj_line;
-			
-			else if( sscanf( line, "usemtl %s", str ) == 1 ) strcpy( usemtl, str );
-			
-			else if( sscanf( line, "o %s", str ) == 1 ) strcpy( name, str );
-
-			else if( sscanf( line, "g %s", str ) == 1 ) strcpy( group, str );
-			
-			else if( sscanf( line, "s %s", str ) == 1 )
-			{
-				use_smooth_normals = 1;
-				
-				if( !strcmp( str, "off" ) || !strcmp( str, "0" ) )
-				{ use_smooth_normals = 0; }
-			}
-			
-			else if( sscanf( line, "mtllib %s", str ) == 1 )
-			{
+				//解析texture uv 坐标  end
+			} else if( line[ 0 ] == 'v' && line[ 1 ] == 'n' ) {
+				goto next_obj_line;
+			} else if( sscanf( line, "usemtl %s", str ) == 1 ) {
+				strcpy( usemtl, str );
+			} else if( sscanf( line, "o %s", str ) == 1 ) {
+				strcpy( name, str );
+			} else if( sscanf( line, "g %s", str ) == 1 ) {
+				strcpy( group, str );
+			} else if( sscanf( line, "s %s", str ) == 1 ) {
+				if( !strcmp( str, "off" ) || !strcmp( str, "0" ) ) {
+					use_smooth_normals = 0;
+				} else {
+					use_smooth_normals = 1;
+				}
+			} else if( sscanf( line, "mtllib %s", str ) == 1 ) {//解析材质
 				o->position = ( unsigned char * )line - o->buffer + strlen( line ) + 1;
 				
 				OBJ_load_mtl( obj, str, relative_path );
@@ -1290,14 +1267,13 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 				continue;
 			}
 
-			next_obj_line:
-			
+			next_obj_line://跳到下一行
 				last = line[ 0 ];
 				line = strtok( NULL, "\n" );
 		}
 		
 		mclose( o );
-	}
+	}//整个obj文件所有行读取完毕
 
 	
 	// Build Normals and Tangent
@@ -1305,19 +1281,16 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 		unsigned int i, j, k,index;
 		
 		i = 0;
-		while( i != obj->n_objmesh )
-		{
+		while( i != obj->n_objmesh ) {//遍历obj中的n_objmesh
 			OBJMESH *objmesh = &obj->objmesh[ i ];
 		
 			// Accumulate Normals and Tangent
 			j = 0;
-			while( j != objmesh->n_objtrianglelist )
-			{
+			while( j != objmesh->n_objtrianglelist ) {// 遍历objmesh中的objtrianglelist
 				OBJTRIANGLELIST *objtrianglelist = &objmesh->objtrianglelist[ j ];
 
 				k = 0;
-				while( k != objtrianglelist->n_objtriangleindex )
-				{
+				while( k != objtrianglelist->n_objtriangleindex ) {//遍历f列表
 					vec3 v1,
 						 v2,
 						 normal;
@@ -1365,8 +1338,7 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 							  &normal );
 
 				
-					if( objtrianglelist->useuvs )
-					{
+					if( objtrianglelist->useuvs ) {
 						vec3 tangent;
 						
 						vec2 uv1, uv2;
@@ -1403,13 +1375,13 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 					}
 				
 					++k;
-				}
+				}//遍历f列表 end---
 			
 				++j;
-			}
+			}// 遍历objmesh中的objtrianglelist  完毕---
 		
 			++i;
-		}
+		}//遍历obj中的n_objmesh 完毕---
 		
 
 		// Normalize Normals & Tangent
@@ -1436,7 +1408,7 @@ OBJ *OBJ_load( char *filename, unsigned char relative_path )
 			
 			++i;
 		}	
-	}
+	}//Build Normals and Tangent  end---
 
 	return obj;
 }

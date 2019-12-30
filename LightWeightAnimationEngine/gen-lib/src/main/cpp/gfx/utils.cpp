@@ -19,7 +19,9 @@ unsigned int get_milli_time( void )
     return tv.tv_usec / 1000 + tv.tv_sec * 1000;
 }
 
-
+/**
+ * \\转换为/
+ */
 void adjust_file_path( char *filepath )
 {
 	unsigned int i = 0,
@@ -32,7 +34,9 @@ void adjust_file_path( char *filepath )
 	}
 }
 
-
+/**
+ * 截取filepath中最后一个 / 前的路径(包含最后一个/)
+ */
 void get_file_path( char *filepath, char *path )
 {
 	char *t = NULL;
@@ -51,7 +55,9 @@ void get_file_path( char *filepath, char *path )
 	}
 }
 
-
+/**
+ * 截取filepath中最后一个 / 后的内容(不包含最后一个/)
+ */
 void get_file_name( char *filepath, char *name )
 {
 	char *t = NULL;
